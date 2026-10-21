@@ -123,6 +123,24 @@ export const useTaskStore = create<TaskState>()(
         });
       },
 
+      updateAssistantMessage: (sessionId, messageId, updates) => {
+        set((state) => {
+          const sessions = state.sessions.map((sess) => {
+            if (sess.id !== sessionId) return sess;
+            const messages = sess.messages.map((msg) => {
+              if (msg.id !== messageId) return msg;
+              return {
+                ...msg,
+                text: updates.text !== undefined ? updates.text : msg.text,
+                steps: updates.steps !== undefined ? updates.steps : msg.steps,
+              };
+            });
+            return { ...sess, messages };
+          });
+          return { sessions };
+        });
+      },
+
       toggleStepCompletion: (sessionId: string, messageId: string, stepId: number) => {
         set((state) => {
           const sessions = state.sessions.map((sess) => {

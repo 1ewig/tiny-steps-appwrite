@@ -44,6 +44,11 @@ export interface TaskState {
 
   // Chat & Step Actions
   addMessage: (sessionId: string, message: Omit<ChatMessage, 'id' | 'timestamp'>) => void;
+  updateAssistantMessage: (
+    sessionId: string,
+    messageId: string,
+    updates: { text?: string; steps?: Step[] }
+  ) => void;
   toggleStepCompletion: (sessionId: string, messageId: string, stepId: number) => void;
   shrinkStep: (sessionId: string, messageId: string, stepIndex: number, subSteps?: Step[]) => void;
   skipStep: (sessionId: string, messageId: string, stepIndex: number) => void;

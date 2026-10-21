@@ -40,6 +40,7 @@ export function TinyStepsClient() {
     setFocusTunnel,
     toggleTheme,
     addMessage,
+    updateAssistantMessage,
     toggleStepCompletion,
     shrinkStep,
     skipStep,
@@ -81,25 +82,44 @@ export function TinyStepsClient() {
 
       const intent = interpretUserIntent(text, steps, granularity);
 
-      if (intent.type === 'complete_step' && latestMessageWithSteps) {
-        toggleStepCompletion(currentSession.id, latestMessageWithSteps.id, intent.targetStepId);
+      if (latestMessageWithSteps) {
+        // Edit existing breakdown card in-place (strictly one checklist per session)
+        if (intent.type === 'complete_step') {
+          toggleStepCompletion(currentSession.id, latestMessageWithSteps.id, intent.targetStepId);
+          updateAssistantMessage(currentSession.id, latestMessageWithSteps.id, {
+            text: intent.dialogue,
+          });
+        } else if (intent.type === 'shrink_step') {
+          shrinkStep(currentSession.id, latestMessageWithSteps.id, intent.targetStepIndex, intent.microSteps);
+          updateAssistantMessage(currentSession.id, latestMessageWithSteps.id, {
+            text: intent.dialogue,
+          });
+        } else if (intent.type === 'new_task') {
+          // Preserve any already completed steps and adjust the remaining ones
+          const existingCompleted = (latestMessageWithSteps.steps || []).filter((s) => s.completed);
+          const combinedSteps = [
+            ...existingCompleted,
+            ...intent.steps.map((st, i) => ({ ...st, id: Date.now() + i, completed: false })),
+          ];
+          const updatedDialogue =
+            existingCompleted.length > 0
+              ? `Plan updated! Kept your ${existingCompleted.length} completed step${
+                  existingCompleted.length > 1 ? 's' : ''
+                } and adjusted the rest:`
+              : intent.dialogue;
+
+          updateAssistantMessage(currentSession.id, latestMessageWithSteps.id, {
+            text: updatedDialogue,
+            steps: combinedSteps,
+          });
+        }
+      } else {
+        // Initial breakdown in a fresh session
+        const initialSteps = intent.type === 'new_task' ? intent.steps : [];
         addMessage(currentSession.id, {
           role: 'assistant',
           text: intent.dialogue,
-          steps: latestMessageWithSteps.steps,
-        });
-      } else if (intent.type === 'shrink_step' && latestMessageWithSteps) {
-        shrinkStep(currentSession.id, latestMessageWithSteps.id, intent.targetStepIndex, intent.microSteps);
-        addMessage(currentSession.id, {
-          role: 'assistant',
-          text: intent.dialogue,
-          steps: latestMessageWithSteps.steps,
-        });
-      } else if (intent.type === 'new_task') {
-        addMessage(currentSession.id, {
-          role: 'assistant',
-          text: intent.dialogue,
-          steps: intent.steps,
+          steps: initialSteps,
         });
       }
     }, 600);
