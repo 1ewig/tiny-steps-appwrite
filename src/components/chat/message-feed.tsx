@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from 'react';
 import type { ChatMessage } from '@/types/task';
-import { UserBubble } from './user-bubble';
 import { AssistantBubble } from './assistant-bubble';
 import { TypingIndicator } from './typing-indicator';
 
@@ -29,22 +28,20 @@ export function MessageFeed({
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
+  const assistantMessages = messages.filter((m) => m.role === 'assistant');
+
   return (
     <div className="space-y-6">
-      {messages.map((msg) =>
-        msg.role === 'user' ? (
-          <UserBubble key={msg.id} text={msg.text} />
-        ) : (
-          <AssistantBubble
-            key={msg.id}
-            message={msg}
-            onToggleStep={(stepId) => onToggleStep(msg.id, stepId)}
-            onShrinkStep={(stepIndex) => onShrinkStep(msg.id, stepIndex)}
-            onSkipStep={(stepIndex) => onSkipStep(msg.id, stepIndex)}
-            onOpenFocusTunnel={onOpenFocusTunnel}
-          />
-        )
-      )}
+      {assistantMessages.map((msg) => (
+        <AssistantBubble
+          key={msg.id}
+          message={msg}
+          onToggleStep={(stepId) => onToggleStep(msg.id, stepId)}
+          onShrinkStep={(stepIndex) => onShrinkStep(msg.id, stepIndex)}
+          onSkipStep={(stepIndex) => onSkipStep(msg.id, stepIndex)}
+          onOpenFocusTunnel={onOpenFocusTunnel}
+        />
+      ))}
 
       {isTyping && <TypingIndicator />}
 

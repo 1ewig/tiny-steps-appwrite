@@ -100,10 +100,9 @@ src/
 │   │   └── sidebar.tsx                # Collapsible session drawer (history, sensitivity, theme)
 │   │
 │   ├── chat/
-│   │   ├── hero-welcome.tsx           # Empty state with breathing orb & starter cards
-│   │   ├── message-feed.tsx           # Auto-scrolling chat feed
-│   │   ├── user-bubble.tsx            # User prompt bubble
-│   │   ├── assistant-bubble.tsx       # AI avatar & dialogue
+│   │   ├── hero-welcome.tsx           # Empty state with breathing orb
+│   │   ├── message-feed.tsx           # Auto-scrolling task feed
+│   │   ├── assistant-bubble.tsx       # Assistant dialogue & task card
 │   │   ├── steps-checklist.tsx        # Framer Motion animated checklist (Shrink / Skip / Done)
 │   │   ├── typing-indicator.tsx       # Calm shimmer dots
 │   │   └── chat-input.tsx             # Floating single-row chat input block
