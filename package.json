@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "typecheck:bun": "bun check",
+    "check": "bun check"
   },
   "dependencies": {
     "next": "16.4.2",
