@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { TaskState, ChatSession, GranularityLevel, Step } from '@/types/task';
-import { generateMicroSteps } from '@/hooks/use-offline-assistant';
+import { generateMicroSteps } from '@/lib/assistant-engine';
 
 const initialSessionId = 'session_' + Date.now();
 
