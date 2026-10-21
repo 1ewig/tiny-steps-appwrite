@@ -9,7 +9,7 @@ import { AppHeader } from '@/components/layout/app-header';
 import { Sidebar } from '@/components/layout/sidebar';
 import { HeroWelcome } from '@/components/chat/hero-welcome';
 import { MessageFeed } from '@/components/chat/message-feed';
-import { PromptCapsule } from '@/components/chat/prompt-capsule';
+import { ChatInput } from '@/components/chat/chat-input';
 import { FocusTunnelModal } from '@/components/focus/focus-tunnel-modal';
 
 const emptySubscribe = () => () => {};
@@ -155,14 +155,12 @@ export function TinyStepsClient() {
         isOpen={sidebarOpen}
         sessions={sessions}
         currentSessionId={currentSessionId}
-        granularity={granularity}
         theme={theme}
         onClose={() => setSidebarOpen(false)}
         onNewSession={() => createNewSession(true)}
         onSelectSession={(id) => switchSession(id)}
         onDeleteSession={(id) => deleteSession(id)}
         onClearAll={clearAllSessions}
-        onSelectGranularity={setGranularity}
         onToggleTheme={toggleTheme}
       />
 
@@ -172,9 +170,11 @@ export function TinyStepsClient() {
           sessionTitle={currentSession?.title || 'New session'}
           hasActiveSteps={steps.length > 0}
           granularity={granularity}
+          peekFuture={peekFuture}
           onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           onOpenFocusTunnel={() => setFocusTunnel(true)}
           onSelectGranularity={setGranularity}
+          onTogglePeek={togglePeek}
         />
 
         {/* Scrollable Feed */}
@@ -195,12 +195,10 @@ export function TinyStepsClient() {
           </div>
         </main>
 
-        {/* Floating Prompt Capsule */}
-        <PromptCapsule
-          peekFuture={peekFuture}
+        {/* Floating Chat Input */}
+        <ChatInput
           disabled={isTyping}
           onSubmit={handleSendMessage}
-          onTogglePeek={togglePeek}
         />
       </div>
 

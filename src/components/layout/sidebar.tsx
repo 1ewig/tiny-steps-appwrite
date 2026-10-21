@@ -1,19 +1,17 @@
 'use client';
 
-import type { ChatSession, GranularityLevel } from '@/types/task';
+import type { ChatSession } from '@/types/task';
 
 interface SidebarProps {
   isOpen: boolean;
   sessions: ChatSession[];
   currentSessionId: string | null;
-  granularity: GranularityLevel;
   theme: 'light' | 'dark';
   onClose: () => void;
   onNewSession: () => void;
   onSelectSession: (sessionId: string) => void;
   onDeleteSession: (sessionId: string) => void;
   onClearAll: () => void;
-  onSelectGranularity: (level: GranularityLevel) => void;
   onToggleTheme: () => void;
 }
 
@@ -21,14 +19,12 @@ export function Sidebar({
   isOpen,
   sessions,
   currentSessionId,
-  granularity,
   theme,
   onClose,
   onNewSession,
   onSelectSession,
   onDeleteSession,
   onClearAll,
-  onSelectGranularity,
   onToggleTheme,
 }: SidebarProps) {
   return (
@@ -149,36 +145,8 @@ export function Sidebar({
           )}
         </div>
 
-        {/* Bottom: Sensitivity Selector & Theme Toggle */}
-        <div className="p-3 border-t border-border-subtle space-y-2 bg-canvas/40">
-          {/* Sensitivity Mode */}
-          <div className="px-2 py-1.5 rounded-lg bg-surface-subtle/60 text-2xs space-y-1.5">
-            <div className="flex items-center justify-between text-text-secondary font-medium">
-              <span>Sensitivity</span>
-              <span className="text-accent font-semibold">
-                {granularity === 1 ? 'Stuck' : granularity === 2 ? 'Overwhelmed' : 'Paralysis'}
-              </span>
-            </div>
-            <div className="grid grid-cols-3 gap-1">
-              {([1, 2, 3] as GranularityLevel[]).map((lvl) => {
-                const isSelected = lvl === granularity;
-                const labels = { 1: 'Stuck', 2: 'Medium', 3: 'Paralysis' };
-                return (
-                  <button
-                    key={lvl}
-                    onClick={() => onSelectGranularity(lvl)}
-                    className={`py-1 rounded text-2xs font-medium text-center transition-all ${
-                      isSelected
-                        ? 'bg-accent text-text-inverse font-semibold shadow-subtle'
-                        : 'text-text-secondary hover:text-text-primary hover:bg-surface-subtle'
-                    }`}
-                  >
-                    {labels[lvl]}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+        {/* Bottom: Theme Toggle & Clear History */}
+        <div className="p-3 border-t border-border-subtle bg-canvas/40">
 
           {/* Theme & Clear History Row */}
           <div className="flex items-center justify-between pt-1 px-1">

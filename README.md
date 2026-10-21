@@ -106,7 +106,7 @@ src/
 │   │   ├── assistant-bubble.tsx       # AI avatar & dialogue
 │   │   ├── steps-checklist.tsx        # Framer Motion animated checklist (Shrink / Skip / Done)
 │   │   ├── typing-indicator.tsx       # Calm shimmer dots
-│   │   └── prompt-capsule.tsx         # Floating multiline capsule with keyboard hints
+│   │   └── chat-input.tsx             # Floating single-row chat input block
 │   │
 │   └── focus/
 │       └── focus-tunnel-modal.tsx     # Distraction-free single-task execution modal
