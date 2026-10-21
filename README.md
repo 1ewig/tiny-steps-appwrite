@@ -1,36 +1,184 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌱 Tiny Steps — Low-Friction AI Task Companion
 
-## Getting Started
+> **An empathetic, zero-pressure task decomposition companion designed for ADHD paralysis, burnout, and executive dysfunction.**
 
-First, run the development server:
+[![Next.js 16.4.2](https://img.shields.io/badge/Next.js-16.4.2-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![React 19](https://img.shields.io/badge/React-19.3-61dafb?style=flat-square&logo=react)](https://react.dev/)
+[![TypeScript 7](https://img.shields.io/badge/TypeScript-7.0.2-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Bun 1.4](https://img.shields.io/badge/Bun-1.4.3-FBF0DF?style=flat-square&logo=bun)](https://bun.sh/)
+[![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.0-38bdf8?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
+[![Zustand](https://img.shields.io/badge/State-Zustand_5-brown?style=flat-square)](https://github.com/pmndrs/zustand)
+[![Framer Motion](https://img.shields.io/badge/Motion-Framer_14-black?style=flat-square&logo=framer)](https://www.framer.com/motion/)
+[![Oxlint](https://img.shields.io/badge/Linter-Oxlint_1.89-orange?style=flat-square)](https://oxc.rs/)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## 💡 The Philosophy Behind Tiny Steps
+
+Traditional productivity apps (Todoist, Notion, Jira) are designed for organized minds operating at high energy. When you are experiencing burnout or executive dysfunction:
+* **Long lists cause panic**: Seeing 15 items triggers an amygdala freeze response.
+* **Guilt mechanics backfire**: Overdue badges and broken streaks create shame and avoidance.
+* **Tasks are too vague**: "Clean the room" or "Work on taxes" requires too much working memory just to identify step #1.
+
+### The Core Thesis:
+> **"Lower the activation energy until refusal is harder than starting."**
+
+Action does not follow motivation; **motivation follows microscopic physical momentum**. If an action takes only 10–30 seconds (*"Touch one wrapper"*, *"Put feet flat on the floor"*, *"Type 'Hi' in the email draft"*), the brain does not perceive it as a threat. Once the paralysis breaks, forward momentum takes over naturally.
+
+---
+
+## ✨ Key Features
+
+### 1. 🤖 Modern AI Chatbot Interface
+* **Conversational Dialogue**: Vent your raw thoughts or describe what feels heavy. Tiny Steps validates your cognitive load first before offering a solution.
+* **Embedded Interactive Steps**: Dynamic checklists live directly inside the conversation stream with real-time checkmarks and progress tracking.
+
+### 2. 🎚️ Elastic Sensitivity Modes
+Users experience task resistance differently depending on their daily energy:
+* **🌱 A little stuck**: Clear, manageable 2–5 minute chunks.
+* **🌿 Overwhelmed (Default)**: Small, gentle 1-minute steps with warm reassuring tone.
+* **🪴 Full paralysis**: Absurdly tiny 5–30 second micro-actions (*"Exhale slowly. You only have to do 10 seconds of motion right now"*).
+
+### 3. ✨ On-Demand Step Shrinking ("Still too big?")
+If any step triggers hesitation or fear, click **"✨ Shrink this step"** to split it dynamically into 3 bite-sized pieces:
+1. **Prep**: Glance at or reach for what you need (zero pressure to work).
+2. **Touch**: Do just the first 15–20 seconds.
+3. **Finish**: Complete just that piece cleanly.
+
+### 4. ◎ Focus Tunnel (Monotasking Mode)
+* A full-screen, distraction-free view isolating the present task in large bold typography.
+* Controlled via keyboard shortcuts (`Space` or `Enter` to advance).
+* Gentle celebration screen upon completion (*"Take a breath and unclench your jaw. You turned something heavy into momentum"*).
+
+### 5. 👁️ Progressive Disclosure (Anti-Scan Panic)
+* Future steps are softly blurred by default (`future-step-blur`) to prevent users from scanning ahead and quitting.
+* Toggleable peek button to unblur future steps whenever you feel ready.
+
+### 6. 🎨 Sensory-Friendly Design System
+* Warm oatmeal canvas, gentle sage green accents, and a soothing **Dim Mode** toggle.
+* Zero harsh alert reds, countdown clocks, or aggressive urgency triggers.
+* Fully accessible with `@media (prefers-reduced-motion)` support.
+
+### 7. 🔒 100% Offline & Private
+* Requires **no API keys** and sends **no personal data** to external servers.
+* All sessions and step progress are automatically saved to `localStorage`.
+
+---
+
+## 🛠️ Tech Stack & Architecture
+
+Built with a high-performance modern web stack:
+
+| Technology | Role |
+| :--- | :--- |
+| **Next.js 16.4.2** | App Router with Turbopack, React Server Components (RSC) & Partial Prefetching |
+| **React 19.3.0** | Modern React with Server Components, Actions, and `useSyncExternalStore` |
+| **TypeScript 7.0.2** | Microsoft's native Go-based multi-threaded compiler (10x faster build times) |
+| **Bun 1.4.3** | Lightning-fast JavaScript runtime, package manager, and native typechecker |
+| **Tailwind CSS v4** | 100% tokenized CSS variable architecture (`globals.css`) with zero hardcoded values |
+| **Zustand 5.0** | Centralized, hydration-safe reactive state with local persistence |
+| **Framer Motion 14** | Physics-based spring animations, checkmark animations, and modal transitions |
+| **Oxlint 1.89** | Rust-based linter that scans the entire codebase in ~15ms |
+
+---
+
+## 📂 Project Structure
+
+```text
+src/
+├── app/
+│   ├── layout.tsx                     # Root layout (Plus Jakarta Sans, globals.css tokens)
+│   ├── page.tsx                       # Lightweight React Server Component (RSC entry point)
+│   └── globals.css                    # Complete design tokens (colors, radii, shadows, typography)
+│
+├── components/
+│   ├── tiny-steps-client.tsx          # Client Orchestrator ("use client" coordinator)
+│   │
+│   ├── layout/
+│   │   ├── ambient-progress.tsx       # Top ambient progress bar
+│   │   ├── app-header.tsx             # Header with title, sensitivity dropdown & tunnel launcher
+│   │   └── sidebar.tsx                # Collapsible session drawer (history, sensitivity, theme)
+│   │
+│   ├── chat/
+│   │   ├── hero-welcome.tsx           # Empty state with breathing orb & starter cards
+│   │   ├── message-feed.tsx           # Auto-scrolling chat feed
+│   │   ├── user-bubble.tsx            # User prompt bubble
+│   │   ├── assistant-bubble.tsx       # AI avatar & dialogue
+│   │   ├── steps-checklist.tsx        # Framer Motion animated checklist (Shrink / Skip / Done)
+│   │   ├── typing-indicator.tsx       # Calm shimmer dots
+│   │   └── prompt-capsule.tsx         # Floating multiline capsule with keyboard hints
+│   │
+│   └── focus/
+│       └── focus-tunnel-modal.tsx     # Distraction-free single-task execution modal
+│
+├── hooks/
+│   ├── use-offline-assistant.ts       # NLP decomposition & multi-turn breakdown engine
+│   └── use-keyboard-shortcuts.ts      # Global Ctrl+K, Space, and Enter listeners
+│
+├── store/
+│   └── task-store.ts                  # Persisted Zustand state (multi-session management)
+└── types/
+    └── task.ts                        # Strongly-typed data models
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🚀 Getting Started
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Prerequisites
+* [Bun](https://bun.sh/) (v1.4+ recommended)
 
-## Learn More
+### 1. Installation
+Clone the repository and install dependencies using Bun:
+```bash
+bun install
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 2. Development Server
+Start the Next.js development server powered by Turbopack:
+```bash
+bun run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 3. Native Typechecking
+Run Bun's multi-core typechecker:
+```bash
+bun run check
+```
+*(Runs in ~120ms across all files!)*
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 4. Fast Linting
+Run Oxlint across the codebase:
+```bash
+bun run lint
+```
+*(Runs in ~15ms with 148+ rules!)*
 
-## Deploy on Vercel
+### 5. Production Build
+Create an optimized production build:
+```bash
+bun run build
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## ⌨️ Keyboard Shortcuts
+
+| Shortcut | Action |
+| :--- | :--- |
+| `Ctrl + K` / `Cmd + K` | Start a new gentle task session |
+| `Enter` (in input) | Send message / decompose task |
+| `Shift + Enter` (in input) | Insert a newline |
+| `Space` / `Enter` (in Focus Tunnel) | Mark current micro-step done and advance |
+
+---
+
+## 💚 The Permission Slip
+
+> *"Doing just one tiny step and stopping is still a complete win."*
+
+---
+
+## 📄 License
+MIT License. Created with care for anyone who ever felt overwhelmed by a to-do list.
