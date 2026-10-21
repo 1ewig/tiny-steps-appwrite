@@ -8,7 +8,6 @@ interface AppHeaderProps {
   hasActiveSteps: boolean;
   granularity: GranularityLevel;
   peekFuture: boolean;
-  onToggleSidebar: () => void;
   onOpenFocusTunnel: () => void;
   onSelectGranularity: (level: GranularityLevel) => void;
   onTogglePeek: () => void;
@@ -25,7 +24,6 @@ export function AppHeader({
   hasActiveSteps,
   granularity,
   peekFuture,
-  onToggleSidebar,
   onOpenFocusTunnel,
   onSelectGranularity,
   onTogglePeek,
@@ -48,18 +46,6 @@ export function AppHeader({
   return (
     <header className="h-14 border-b border-border-subtle px-4 sm:px-6 flex items-center justify-between shrink-0 bg-canvas/80 backdrop-blur-md z-header">
       <div className="flex items-center gap-3">
-        {/* Sidebar Toggle */}
-        <button
-          onClick={onToggleSidebar}
-          className="p-2 rounded-md text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-all"
-          aria-label="Toggle chat sidebar"
-          title="Toggle sidebar"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-          </svg>
-        </button>
-
         {/* Current Title & Badge */}
         <div className="flex items-center gap-2">
           <span className="text-xs sm:text-sm font-semibold text-text-primary max-w-[180px] sm:max-w-xs md:max-w-md truncate">

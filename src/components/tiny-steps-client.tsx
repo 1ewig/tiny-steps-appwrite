@@ -171,35 +171,41 @@ export function TinyStepsClient() {
           hasActiveSteps={steps.length > 0}
           granularity={granularity}
           peekFuture={peekFuture}
-          onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           onOpenFocusTunnel={() => setFocusTunnel(true)}
           onSelectGranularity={setGranularity}
           onTogglePeek={togglePeek}
         />
 
-        {/* Scrollable Feed */}
-        <main className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 scroll-smooth">
-          <div className="max-w-2xl mx-auto space-y-6 pb-28">
-            {currentSession?.messages.length === 0 ? (
-              <HeroWelcome onSelectPreset={handleSendMessage} />
-            ) : (
-              <MessageFeed
-                messages={currentSession?.messages || []}
-                isTyping={isTyping}
-                onToggleStep={(msgId, stepId) => toggleStepCompletion(currentSession.id, msgId, stepId)}
-                onShrinkStep={(msgId, stepIdx) => shrinkStep(currentSession.id, msgId, stepIdx)}
-                onSkipStep={(msgId, stepIdx) => skipStep(currentSession.id, msgId, stepIdx)}
-                onOpenFocusTunnel={() => setFocusTunnel(true)}
-              />
-            )}
-          </div>
-        </main>
+        {/* Scrollable Feed or Centered Welcome */}
+        {!currentSession || currentSession.messages.length === 0 ? (
+          <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 pb-12 overflow-y-auto">
+            <div className="w-full max-w-2xl mx-auto space-y-6">
+              <HeroWelcome />
+              <ChatInput disabled={isTyping} onSubmit={handleSendMessage} isCentered />
+            </div>
+          </main>
+        ) : (
+          <>
+            <main className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 scroll-smooth">
+              <div className="max-w-2xl mx-auto space-y-6 pb-28">
+                <MessageFeed
+                  messages={currentSession.messages}
+                  isTyping={isTyping}
+                  onToggleStep={(msgId, stepId) => toggleStepCompletion(currentSession.id, msgId, stepId)}
+                  onShrinkStep={(msgId, stepIdx) => shrinkStep(currentSession.id, msgId, stepIdx)}
+                  onSkipStep={(msgId, stepIdx) => skipStep(currentSession.id, msgId, stepIdx)}
+                  onOpenFocusTunnel={() => setFocusTunnel(true)}
+                />
+              </div>
+            </main>
 
-        {/* Floating Chat Input */}
-        <ChatInput
-          disabled={isTyping}
-          onSubmit={handleSendMessage}
-        />
+            {/* Floating Chat Input at Bottom */}
+            <ChatInput
+              disabled={isTyping}
+              onSubmit={handleSendMessage}
+            />
+          </>
+        )}
       </div>
 
       {/* Focus Tunnel Modal */}
