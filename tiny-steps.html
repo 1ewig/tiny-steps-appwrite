@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tiny Steps — Low-Friction Task Companion</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans for soft, high-legibility characters -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          colors: {
+            oatmeal: {
+              50: '#FAF9F5',
+              100: '#F7F6F2',
+              200: '#EFECE6',
+              300: '#E2DDD5',
+            },
+            sage: {
+              50: '#F2F7F4',
+              100: '#E1EDE6',
+              200: '#C5DDD0',
+              500: '#5F8D75',
+              600: '#4B735E',
+              700: '#3B5B4A',
+            },
+            dim: {
+              900: '#161817',
+              800: '#1F2321',
+              700: '#2A2F2C',
+              600: '#383F3B',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Ultra-smooth, non-jarring transitions */
+    * {
+      transition: background-color 0.25s ease, border-color 0.25s ease, opacity 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), filter 0.3s ease;
+    }
+
+    body {
+      -webkit-font-smoothing: antialiased;
+      selection-background-color: #C5DDD0;
+    }
+
+    /* Gentle blur for future steps to prevent scanning ahead & panicking */
+    .future-step-blur {
+      filter: blur(1.75px);
+      opacity: 0.42;
+      user-select: none;
+    }
+    .future-step-blur:hover,
+    .peek-enabled .future-step-blur {
+      filter: blur(0px);
+      opacity: 0.7;
+    }
+
+    /* Soft completion pulse */
+    @keyframes gentlePulse {
+      0% { box-shadow: 0 0 0 0 rgba(95, 141, 117, 0.35); }
+      70% { box-shadow: 0 0 0 12px rgba(95, 141, 117, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(95, 141, 117, 0); }
+    }
+    .pulse-ring {
+      animation: gentlePulse 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Subtle fade-in for newly split steps */
+    @keyframes slideFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .step-enter {
+      animation: slideFadeIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* Hide scrollbar clutter */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(150, 150, 145, 0.25);
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+
+<body class="bg-oatmeal-100 text-stone-800 dark:bg-dim-900 dark:text-stone-200 min-h-screen flex flex-col justify-between">
+
+  <!-- Ambient Top Progress Bar (No stressful numbers or timers) -->
+  <div class="fixed top-0 left-0 right-0 h-1.5 bg-oatmeal-200 dark:bg-dim-800 z-50 overflow-hidden">
+    <div id="ambientProgress" class="h-full bg-sage-500 w-0 transition-all duration-700 ease-out rounded-r-full"></div>
+  </div>
+
+  <!-- Minimal Header -->
+  <header class="w-full max-w-2xl mx-auto px-6 pt-8 pb-4 flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <div class="w-3 h-3 rounded-full bg-sage-500"></div>
+      <span class="font-semibold tracking-tight text-stone-700 dark:text-stone-300 text-sm">tiny steps</span>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <!-- Mode Toggle (Only visible when a task is active) -->
+      <button id="viewModeBtn" onclick="toggleFocusMode()" class="hidden items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium bg-oatmeal-200/80 hover:bg-oatmeal-300/70 dark:bg-dim-800 dark:hover:bg-dim-700 text-stone-700 dark:text-stone-300">
+        <span id="viewModeIcon">◎</span>
+        <span id="viewModeLabel">One step at a time</span>
+      </button>
+
+      <!-- Reset / New Task Button (Only visible when a task is active) -->
+      <button id="resetBtn" onclick="resetToHome()" class="hidden px-3 py-1.5 rounded-full text-xs font-medium text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200 hover:bg-oatmeal-200/50 dark:hover:bg-dim-800">
+        Start fresh
+      </button>
+
+      <!-- Sensory Dim Mode Toggle -->
+      <button onclick="toggleTheme()" aria-label="Toggle Dim Mode" class="p-2 rounded-full bg-oatmeal-200/70 hover:bg-oatmeal-300/60 dark:bg-dim-800 dark:hover:bg-dim-700 text-stone-600 dark:text-stone-400" title="Switch light/dim mode">
+        <svg id="sunIcon" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+        </svg>
+        <svg id="moonIcon" class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="flex-1 w-full max-w-xl mx-auto px-6 py-6 flex flex-col justify-center">
+
+    <!-- ================= VIEW A: THE GENTLE START (INPUT) ================= -->
+    <section id="startView" class="space-y-8 step-enter">
+      <div class="space-y-2 text-center sm:text-left">
+        <h1 class="text-2xl sm:text-3xl font-semibold text-stone-800 dark:text-stone-100 tracking-tight leading-snug">
+          What feels heavy right now?
+        </h1>
+        <p class="text-stone-500 dark:text-stone-400 text-sm sm:text-base">
+          We’ll shrink it into tiny, zero-pressure steps so you don't have to hold it all in your head.
+        </p>
+      </div>
+
+      <!-- Input Card -->
+      <div class="bg-oatmeal-50 dark:bg-dim-800 p-5 sm:p-6 rounded-3xl border border-oatmeal-300/80 dark:border-dim-700 shadow-sm space-y-6">
+        <div>
+          <label for="taskInput" class="sr-only">Task name</label>
+          <input
+            id="taskInput"
+            type="text"
+            placeholder="e.g., Clean my messy desk, reply to that email..."
+            class="w-full bg-oatmeal-100 dark:bg-dim-900/90 text-stone-800 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 px-4 py-3.5 rounded-2xl border border-oatmeal-300 dark:border-dim-700 focus:outline-none focus:border-sage-500 text-base"
+            onkeydown="if(event.key === 'Enter') startTaskFromInput()"
+          />
+        </div>
+
+        <!-- Overwhelm Level Selector -->
+        <div class="space-y-2.5">
+          <div class="flex justify-between items-center text-xs text-stone-500 dark:text-stone-400 px-1">
+            <span>How stuck are you feeling?</span>
+            <span id="granularityHint" class="text-sage-600 dark:text-sage-200 font-medium">Small, gentle steps</span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 bg-oatmeal-200/70 dark:bg-dim-900 p-1.5 rounded-2xl">
+            <button type="button" onclick="setGranularity(1)" id="gran-1" class="gran-btn py-2 px-3 rounded-xl text-xs font-medium text-stone-600 dark:text-stone-400">
+              A little stuck
+            </button>
+            <button type="button" onclick="setGranularity(2)" id="gran-2" class="gran-btn py-2 px-3 rounded-xl text-xs font-medium bg-oatmeal-50 dark:bg-dim-700 text-stone-800 dark:text-stone-100 shadow-sm">
+              Overwhelmed
+            </button>
+            <button type="button" onclick="setGranularity(3)" id="gran-3" class="gran-btn py-2 px-3 rounded-xl text-xs font-medium text-stone-600 dark:text-stone-400">
+              Full paralysis
+            </button>
+          </div>
+        </div>
+
+        <button
+          onclick="startTaskFromInput()"
+          class="w-full py-3.5 px-6 rounded-2xl bg-sage-500 hover:bg-sage-600 active:scale-[0.99] text-white font-medium text-base shadow-sm flex items-center justify-center gap-2"
+        >
+          <span>Make it tiny</span>
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
+
+      <!-- 1-Click Starter Chips (For when typing feels like too much) -->
+      <div class="space-y-3">
+        <p class="text-xs font-medium text-stone-400 dark:text-stone-500 uppercase tracking-wider text-center sm:text-left px-1">
+          Or pick one without typing
+        </p>
+        <div class="flex flex-wrap gap-2 justify-center sm:justify-start">
+          <button onclick="loadPreset('desk')" class="px-3.5 py-2 rounded-2xl text-xs sm:text-sm bg-oatmeal-200/70 hover:bg-oatmeal-300/70 dark:bg-dim-800 dark:hover:bg-dim-700 text-stone-700 dark:text-stone-300 border border-transparent hover:border-stone-300 dark:hover:border-dim-600">
+            ☕ Clear my messy desk
+          </button>
+          <button onclick="loadPreset('email')" class="px-3.5 py-2 rounded-2xl text-xs sm:text-sm bg-oatmeal-200/70 hover:bg-oatmeal-300/70 dark:bg-dim-800 dark:hover:bg-dim-700 text-stone-700 dark:text-stone-300 border border-transparent hover:border-stone-300 dark:hover:border-dim-600">
+            ✉️ Reply to an avoided message
+          </button>
+          <button onclick="loadPreset('laundry')" class="px-3.5 py-2 rounded-2xl text-xs sm:text-sm bg-oatmeal-200/70 hover:bg-oatmeal-300/70 dark:bg-dim-800 dark:hover:bg-dim-700 text-stone-700 dark:text-stone-300 border border-transparent hover:border-stone-300 dark:hover:border-dim-600">
+            🧺 Deal with the laundry pile
+          </button>
+          <button onclick="loadPreset('shower')" class="px-3.5 py-2 rounded-2xl text-xs sm:text-sm bg-oatmeal-200/70 hover:bg-oatmeal-300/70 dark:bg-dim-800 dark:hover:bg-dim-700 text-stone-700 dark:text-stone-300 border border-transparent hover:border-stone-300 dark:hover:border-dim-600">
+            🚿 Take a shower & reset
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW B: CASCADING MICRO-STEP LIST ================= -->
+    <section id="listView" class="hidden space-y-6 step-enter">
+      <!-- Task Title Header -->
+      <div class="flex items-baseline justify-between gap-4 border-b border-oatmeal-300/70 dark:border-dim-800 pb-4">
+        <div>
+          <span class="text-xs font-medium text-sage-600 dark:text-sage-200 uppercase tracking-wider">Current Focus</span>
+          <h2 id="activeTaskTitle" class="text-xl sm:text-2xl font-semibold text-stone-800 dark:text-stone-100 mt-0.5"></h2>
+        </div>
+        <button onclick="togglePeek()" id="peekBtn" class="text-xs text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 shrink-0">
+          Unblur future steps
+        </button>
+      </div>
+
+      <!-- Steps Container -->
+      <div id="stepsListContainer" class="space-y-3"></div>
+
+      <!-- Add custom tiny step at bottom -->
+      <div class="pt-2">
+        <button onclick="promptAddStep()" class="text-xs text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 flex items-center gap-1.5 px-2 py-1 rounded-lg">
+          <span>+ Add a tiny step at the end</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= VIEW C: SINGLE-STEP TUNNEL (FOCUS MODE) ================= -->
+    <section id="focusView" class="hidden my-auto py-8 step-enter">
+      <div class="bg-oatmeal-50 dark:bg-dim-800 border border-oatmeal-300 dark:border-dim-700 rounded-3xl p-7 sm:p-10 shadow-sm text-center space-y-8">
+        
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sage-50 dark:bg-dim-700 text-sage-700 dark:text-sage-200 text-xs font-medium">
+          <span>Just this one tiny thing</span>
+          <span>•</span>
+          <span id="focusStepEffort">~1 min</span>
+        </div>
+
+        <p id="focusStepText" class="text-2xl sm:text-3xl font-semibold text-stone-800 dark:text-stone-100 leading-relaxed max-w-md mx-auto"></p>
+
+        <div class="pt-2 space-y-3 max-w-xs mx-auto">
+          <button
+            onclick="completeCurrentStep()"
+            class="w-full py-4 px-6 rounded-2xl bg-sage-500 hover:bg-sage-600 active:scale-[0.98] text-white font-medium text-base shadow-sm flex items-center justify-center gap-2"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span>Done, what's next?</span>
+          </button>
+
+          <div class="flex items-center justify-center gap-2 pt-1">
+            <button
+              id="focusBreakBtn"
+              onclick="breakDownCurrentStep()"
+              class="flex-1 py-2.5 px-3 rounded-xl bg-oatmeal-200/70 hover:bg-oatmeal-300/70 dark:bg-dim-700 dark:hover:bg-dim-600 text-stone-600 dark:text-stone-300 text-xs font-medium"
+            >
+              ✨ Still too big? Shrink it
+            </button>
+            <button
+              onclick="skipCurrentStep()"
+              class="py-2.5 px-3 rounded-xl bg-oatmeal-200/70 hover:bg-oatmeal-300/70 dark:bg-dim-700 dark:hover:bg-dim-600 text-stone-500 dark:text-stone-400 text-xs font-medium"
+              title="Move to later or skip without guilt"
+            >
+              Skip for now
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW D: GENTLE COMPLETION CELEBRATION ================= -->
+    <section id="doneView" class="hidden text-center space-y-6 my-auto py-12 step-enter">
+      <div class="w-16 h-16 rounded-full bg-sage-100 dark:bg-dim-800 text-sage-600 dark:text-sage-200 mx-auto flex items-center justify-center text-2xl pulse-ring">
+        🌿
+      </div>
+      <div class="space-y-2 max-w-sm mx-auto">
+        <h2 class="text-2xl font-semibold text-stone-800 dark:text-stone-100">
+          You made it through.
+        </h2>
+        <p class="text-stone-500 dark:text-stone-400 text-sm leading-relaxed">
+          Take a breath and unclench your jaw. You turned something heavy into momentum.
+        </p>
+      </div>
+      <div class="pt-2">
+        <button
+          onclick="resetToHome()"
+          class="px-6 py-3 rounded-2xl bg-oatmeal-200 hover:bg-oatmeal-300 dark:bg-dim-800 dark:hover:bg-dim-700 text-stone-700 dark:text-stone-200 text-sm font-medium"
+        >
+          Rest, or start another tiny thing
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Reassuring Footer -->
+  <footer class="w-full max-w-xl mx-auto px-6 py-6 text-center">
+    <p id="reassuranceText" class="text-xs text-stone-400 dark:text-stone-500">
+      Permission slip: Doing just one tiny step and stopping is still a complete win.
+    </p>
+  </footer>
+
+  <!-- Application Logic -->
+  <script>
+    // --- Curated Multi-Granularity Templates ---
+    const PRESETS = {
+      desk: {
+        title: "Clear my messy desk",
+        levels: {
+          1: [
+            { text: "Grab any dishes, mugs, or wrappers and take them to the kitchen", effort: "~2 min" },
+            { text: "Toss obvious trash or scraps into a bin", effort: "~1 min" },
+            { text: "Stack loose papers and notebooks into one neat pile", effort: "~2 min" },
+            { text: "Wipe down the open surface in front of your keyboard", effort: "~1 min" }
+          ],
+          2: [
+            { text: "Take one deep breath and look only at the left corner of your desk", effort: "10 sec" },
+            { text: "Pick up just the empty cups or mugs and set them near the door", effort: "~1 min" },
+            { text: "Throw away 3 pieces of trash you can see right now", effort: "~1 min" },
+            { text: "Put pens and small items into a single container or corner", effort: "~1 min" },
+            { text: "Clear a clean spot just big enough for your hands and laptop", effort: "~1 min" }
+          ],
+          3: [
+            { text: "Exhale slowly. You do not have to clean the whole desk today.", effort: "5 sec" },
+            { text: "Touch just ONE item on your desk that belongs in the trash", effort: "10 sec" },
+            { text: "Drop that single item into the bin", effort: "15 sec" },
+            { text: "Move any cups or dishes to the edge of the desk", effort: "30 sec" },
+            { text: "Push everything else slightly back so you have 6 inches of breathing room", effort: "30 sec" }
+          ]
+        }
+      },
+      email: {
+        title: "Reply to an avoided message",
+        levels: {
+          1: [
+            { text: "Open your inbox or messaging app and find the message", effort: "~1 min" },
+            { text: "Read what they actually asked for (ignore the guilt)", effort: "~1 min" },
+            { text: "Write a rough, imperfect 2-sentence reply", effort: "~2 min" },
+            { text: "Hit send and immediately close the tab", effort: "10 sec" }
+          ],
+          2: [
+            { text: "Remind yourself: a late, short reply is always better than none", effort: "10 sec" },
+            { text: "Open the message without pressure to reply yet", effort: "30 sec" },
+            { text: "Type 'Hi! Sorry for the delay—' in the reply box", effort: "20 sec" },
+            { text: "Answer their main question in one plain sentence", effort: "~1 min" },
+            { text: "Press send without re-reading it 5 times", effort: "10 sec" }
+          ],
+          3: [
+            { text: "Unclench your shoulders. Nobody is mad at you.", effort: "10 sec" },
+            { text: "Open a blank note (not your email yet) so it feels safe", effort: "15 sec" },
+            { text: "Type one messy sentence saying what you need to tell them", effort: "~1 min" },
+            { text: "Open the actual message and paste that sentence in", effort: "30 sec" },
+            { text: "Click send and take a sip of water", effort: "15 sec" }
+          ]
+        }
+      },
+      laundry: {
+        title: "Deal with the laundry pile",
+        levels: {
+          1: [
+            { text: "Gather clothes from the floor/chair into one basket", effort: "~2 min" },
+            { text: "Carry the basket to the washing machine", effort: "~1 min" },
+            { text: "Toss one load in, add detergent, and press start", effort: "~2 min" }
+          ],
+          2: [
+            { text: "Place your laundry basket or a bag in the middle of the room", effort: "20 sec" },
+            { text: "Pick up just 5 pieces of clothing and toss them in", effort: "~1 min" },
+            { text: "Toss the rest of the obvious pile into the basket", effort: "~1 min" },
+            { text: "Set the basket by the door or washer", effort: "30 sec" },
+            { text: "Load the washer and press start", effort: "~1 min" }
+          ],
+          3: [
+            { text: "Stand up and stretch your arms for 5 seconds", effort: "5 sec" },
+            { text: "Pick up just ONE shirt or pair of socks from the floor", effort: "10 sec" },
+            { text: "Put it into the hamper or basket", effort: "10 sec" },
+            { text: "Grab 3 more easy items and drop them in too", effort: "30 sec" },
+            { text: "Slide the basket closer to the door—you can stop here or keep going", effort: "20 sec" }
+          ]
+        }
+      },
+      shower: {
+        title: "Take a shower & reset",
+        levels: {
+          1: [
+            { text: "Grab a clean towel and comfortable clothes", effort: "~1 min" },
+            { text: "Turn on the shower water so it warms up", effort: "30 sec" },
+            { text: "Step in and rinse off (even a 2-minute rinse counts)", effort: "~3 min" },
+            { text: "Dry off and put on fresh clothes", effort: "~2 min" }
+          ],
+          2: [
+            { text: "Grab your easiest, comfiest outfit (pajamas or sweats)", effort: "~1 min" },
+            { text: "Walk into the bathroom and turn the warm water on", effort: "30 sec" },
+            { text: "Remind yourself you don't have to wash everything—just standing in warm water counts", effort: "10 sec" },
+            { text: "Step in and let the warm water hit your shoulders", effort: "~2 min" },
+            { text: "Wrap up in a towel and get cozy", effort: "~1 min" }
+          ],
+          3: [
+            { text: "Put both feet flat on the floor right where you are", effort: "5 sec" },
+            { text: "Stand up and walk just to the bathroom door", effort: "15 sec" },
+            { text: "Turn on the bathroom light and the warm shower tap", effort: "15 sec" },
+            { text: "Sit or stand under the warm water for just 60 seconds", effort: "~1 min" },
+            { text: "Wrap yourself in a towel—you did it", effort: "~1 min" }
+          ]
+        }
+      }
+    };
+
+    // --- State Management ---
+    let state = {
+      taskTitle: "",
+      granularity: 2, // 1: A little stuck, 2: Overwhelmed, 3: Full paralysis
+      steps: [],      // Array of { id, text, effort, completed, canSplit }
+      focusMode: false,
+      peekFuture: false
+    };
+
+    // --- Initialization ---
+    window.addEventListener('DOMContentLoaded', () => {
+      // Load saved theme
+      const savedTheme = localStorage.getItem('tinyStepsTheme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+
+      // Restore saved task if available
+      const savedState = localStorage.getItem('tinyStepsState');
+      if (savedState) {
+        try {
+          const parsed = JSON.parse(savedState);
+          if (parsed && parsed.steps && parsed.steps.length > 0) {
+            state = parsed;
+            renderApp();
+            return;
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+      setGranularity(2);
+    });
+
+    // Keyboard shortcut: Spacebar or Enter completes current step in Focus Mode
+    window.addEventListener('keydown', (e) => {
+      if (state.focusMode && state.steps.length > 0 && document.activeElement.tagName !== 'INPUT') {
+        if (e.code === 'Space' || e.code === 'Enter') {
+          e.preventDefault();
+          completeCurrentStep();
+        }
+      }
+    });
+
+    function saveState() {
+      localStorage.setItem('tinyStepsState', JSON.stringify(state));
+    }
+
+    // --- Theme Toggle ---
+    function toggleTheme() {
+      const html = document.documentElement;
+      html.classList.toggle('dark');
+      localStorage.setItem('tinyStepsTheme', html.classList.contains('dark') ? 'dark' : 'light');
+    }
+
+    // --- Granularity Selector ---
+    function setGranularity(level) {
+      state.granularity = level;
+      const hints = {
+        1: "Clear, manageable steps",
+        2: "Small, gentle steps",
+        3: "Absurdly tiny, zero-pressure micro-steps"
+      };
+      document.getElementById('granularityHint').textContent = hints[level];
+
+      [1, 2, 3].forEach(i => {
+        const btn = document.getElementById(`gran-${i}`);
+        if (i === level) {
+          btn.className = "gran-btn py-2 px-3 rounded-xl text-xs font-medium bg-oatmeal-50 dark:bg-dim-700 text-stone-800 dark:text-stone-100 shadow-sm";
+        } else {
+          btn.className = "gran-btn py-2 px-3 rounded-xl text-xs font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200";
+        }
+      });
+    }
+
+    // --- Smart Local Task Breakdown Generator ---
+    function generateCustomSteps(rawTask, level) {
+      const clean = rawTask.trim();
+      const lower = clean.toLowerCase();
+
+      // Check if input loosely matches one of our rich presets
+      if (lower.includes('desk') || lower.includes('room') || lower.includes('clean')) {
+        return PRESETS.desk.levels[level].map(s => ({ ...s }));
+      }
+      if (lower.includes('email') || lower.includes('text') || lower.includes('reply') || lower.includes('message') || lower.includes('call')) {
+        return PRESETS.email.levels[level].map(s => ({ ...s }));
+      }
+      if (lower.includes('laundry') || lower.includes('clothes') || lower.includes('wash')) {
+        return PRESETS.laundry.levels[level].map(s => ({ ...s }));
+      }
+      if (lower.includes('shower') || lower.includes('brush') || lower.includes('teeth') || lower.includes('get ready')) {
+        return PRESETS.shower.levels[level].map(s => ({ ...s }));
+      }
+
+      // Universal empathetic breakdown for any custom task based on overwhelm level
+      if (level === 1) {
+        return [
+          { text: `Gather only what you need to start "${clean}"`, effort: "~1 min" },
+          { text: `Do the easiest, most obvious 2-minute piece of "${clean}"`, effort: "~2 min" },
+          { text: `Spend 5 gentle minutes making a dent—imperfect is fine`, effort: "~5 min" },
+          { text: `Wrap up a good stopping point and take a breath`, effort: "~1 min" }
+        ];
+      } else if (level === 2) {
+        return [
+          { text: `Take one slow breath and drop your shoulders`, effort: "10 sec" },
+          { text: `Open or walk over to where "${clean}" happens`, effort: "30 sec" },
+          { text: `Set up just the very first thing you need (nothing else yet)`, effort: "~1 min" },
+          { text: `Do the tiniest first action for just 60 seconds`, effort: "~1 min" },
+          { text: `Finish one small piece and check in with your energy`, effort: "~2 min" }
+        ];
+      } else {
+        // Level 3: Full paralysis
+        return [
+          { text: `Exhale slowly. You only have to do 1% of "${clean}" right now.`, effort: "5 sec" },
+          { text: `Put both feet flat on the floor or sit up slightly`, effort: "10 sec" },
+          { text: `Look at or open the place where "${clean}" lives (don't start yet)`, effort: "15 sec" },
+          { text: `Touch or type just the very first word/object involved`, effort: "20 sec" },
+          { text: `Spend 45 seconds doing the easiest micro-piece, then you have permission to stop`, effort: "45 sec" }
+        ];
+      }
+    }
+
+    // --- Start Task Flows ---
+    function loadPreset(key) {
+      const preset = PRESETS[key];
+      state.taskTitle = preset.title;
+      const rawSteps = preset.levels[state.granularity];
+      state.steps = rawSteps.map((s, idx) => ({
+        id: Date.now() + idx,
+        text: s.text,
+        effort: s.effort,
+        completed: false,
+        canSplit: true
+      }));
+      // Automatically enter single-step focus mode if user chose "Full paralysis"
+      state.focusMode = (state.granularity === 3);
+      saveState();
+      renderApp();
+    }
+
+    function startTaskFromInput() {
+      const input = document.getElementById('taskInput');
+      const val = input.value.trim();
+      if (!val) {
+        input.focus();
+        input.classList.add('ring-2', 'ring-sage-500');
+        setTimeout(() => input.classList.remove('ring-2', 'ring-sage-500'), 800);
+        return;
+      }
+
+      state.taskTitle = val;
+      const rawSteps = generateCustomSteps(val, state.granularity);
+      state.steps = rawSteps.map((s, idx) => ({
+        id: Date.now() + idx,
+        text: s.text,
+        effort: s.effort,
+        completed: false,
+        canSplit: true
+      }));
+      state.focusMode = (state.granularity === 3);
+      input.value = '';
+      saveState();
+      renderApp();
+    }
+
+    // --- Step Manipulation ("Still too big?", Complete, Skip) ---
+    function getActiveStepIndex() {
+      return state.steps.findIndex(s => !s.completed);
+    }
+
+    function completeStepById(id) {
+      const step = state.steps.find(s => s.id === id);
+      if (step) {
+        step.completed = !step.completed;
+        saveState();
+        renderApp();
+      }
+    }
+
+    function completeCurrentStep() {
+      const idx = getActiveStepIndex();
+      if (idx !== -1) {
+        state.steps[idx].completed = true;
+        saveState();
+        renderApp();
+      }
+    }
+
+    function skipCurrentStep() {
+      const idx = getActiveStepIndex();
+      if (idx !== -1 && state.steps.length > idx + 1) {
+        // Gently move current step one spot down so user can do an easier one first
+        const [skipped] = state.steps.splice(idx, 1);
+        state.steps.splice(idx + 1, 0, skipped);
+        saveState();
+        renderApp();
+      } else if (idx !== -1) {
+        // If it's the last step, mark it done with zero guilt
+        state.steps[idx].completed = true;
+        saveState();
+        renderApp();
+      }
+    }
+
+    // Splits the active step into 3 even smaller micro-steps
+    function breakDownStep(index) {
+      const target = state.steps[index];
+      if (!target) return;
+
+      const originalText = target.text;
+      const subSteps = [
+        {
+          id: Date.now() + 1,
+          text: `Prep: Just look at or reach for what you need to "${originalText.toLowerCase()}"`,
+          effort: "15 sec",
+          completed: false,
+          canSplit: false
+        },
+        {
+          id: Date.now() + 2,
+          text: `Start: Do the first 20 seconds of "${originalText}"`,
+          effort: "20 sec",
+          completed: false,
+          canSplit: false
+        },
+        {
+          id: Date.now() + 3,
+          text: `Finish: Complete the rest of "${originalText}" cleanly`,
+          effort: "40 sec",
+          completed: false,
+          canSplit: false
+        }
+      ];
+
+      state.steps.splice(index, 1, ...subSteps);
+      saveState();
+      renderApp();
+    }
+
+    function breakDownCurrentStep() {
+      const idx = getActiveStepIndex();
+      if (idx !== -1) {
+        breakDownStep(idx);
+      }
+    }
+
+    function promptAddStep() {
+      const text = prompt("What tiny step would you like to add?");
+      if (text && text.trim()) {
+        state.steps.push({
+          id: Date.now(),
+          text: text.trim(),
+          effort: "~1 min",
+          completed: false,
+          canSplit: true
+        });
+        saveState();
+        renderApp();
+      }
+    }
+
+    // --- View Toggles ---
+    function toggleFocusMode() {
+      state.focusMode = !state.focusMode;
+      saveState();
+      renderApp();
+    }
+
+    function togglePeek() {
+      state.peekFuture = !state.peekFuture;
+      const listContainer = document.getElementById('stepsListContainer');
+      const peekBtn = document.getElementById('peekBtn');
+      if (state.peekFuture) {
+        listContainer.classList.add('peek-enabled');
+        peekBtn.textContent = "Blur future steps";
+      } else {
+        listContainer.classList.remove('peek-enabled');
+        peekBtn.textContent = "Unblur future steps";
+      }
+    }
+
+    function resetToHome() {
+      state.taskTitle = "";
+      state.steps = [];
+      state.focusMode = false;
+      localStorage.removeItem('tinyStepsState');
+      renderApp();
+    }
+
+    // --- Master Render Function ---
+    function renderApp() {
+      const startView = document.getElementById('startView');
+      const listView = document.getElementById('listView');
+      const focusView = document.getElementById('focusView');
+      const doneView = document.getElementById('doneView');
+      const viewModeBtn = document.getElementById('viewModeBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const ambientProgress = document.getElementById('ambientProgress');
+
+      // 1. No active task -> Show Gentle Start View
+      if (!state.steps || state.steps.length === 0) {
+        startView.classList.remove('hidden');
+        listView.classList.add('hidden');
+        focusView.classList.add('hidden');
+        doneView.classList.add('hidden');
+        viewModeBtn.classList.add('hidden');
+        resetBtn.classList.add('hidden');
+        ambientProgress.style.width = '0%';
+        return;
+      }
+
+      // Calculate progress
+      const total = state.steps.length;
+      const completedCount = state.steps.filter(s => s.completed).length;
+      const progressPct = Math.round((completedCount / total) * 100);
+      ambientProgress.style.width = `${progressPct}%`;
+
+      resetBtn.classList.remove('hidden');
+
+      // 2. All steps completed -> Show Gentle Celebration View
+      const activeIdx = getActiveStepIndex();
+      if (activeIdx === -1) {
+        startView.classList.add('hidden');
+        listView.classList.add('hidden');
+        focusView.classList.add('hidden');
+        doneView.classList.remove('hidden');
+        viewModeBtn.classList.add('hidden');
+        return;
+      }
+
+      // Show mode switcher in header
+      viewModeBtn.classList.remove('hidden');
+      viewModeBtn.classList.add('flex');
+      document.getElementById('viewModeLabel').textContent = state.focusMode ? "See full list" : "One step at a time";
+      document.getElementById('viewModeIcon').textContent = state.focusMode ? "☰" : "◎";
+
+      startView.classList.add('hidden');
+      doneView.classList.add('hidden');
+
+      // 3. Render either Single-Step Focus Mode OR Cascading List View
+      if (state.focusMode) {
+        listView.classList.add('hidden');
+        focusView.classList.remove('hidden');
+
+        const activeStep = state.steps[activeIdx];
+        document.getElementById('focusStepText').textContent = activeStep.text;
+        document.getElementById('focusStepEffort').textContent = activeStep.effort || "~1 min";
+
+        const focusBreakBtn = document.getElementById('focusBreakBtn');
+        if (activeStep.canSplit) {
+          focusBreakBtn.classList.remove('hidden');
+        } else {
+          focusBreakBtn.classList.add('hidden');
+        }
+      } else {
+        focusView.classList.add('hidden');
+        listView.classList.remove('hidden');
+
+        document.getElementById('activeTaskTitle').textContent = state.taskTitle;
+        const container = document.getElementById('stepsListContainer');
+        container.innerHTML = '';
+
+        state.steps.forEach((step, idx) => {
+          const isCompleted = step.completed;
+          const isCurrent = (idx === activeIdx);
+          const isFuture = (idx > activeIdx);
+
+          const card = document.createElement('div');
+          card.className = `step-enter rounded-2xl p-4 sm:p-5 border transition-all ${
+            isCompleted
+              ? 'bg-oatmeal-100/50 dark:bg-dim-900/40 border-oatmeal-200 dark:border-dim-800 opacity-50'
+              : isCurrent
+              ? 'bg-oatmeal-50 dark:bg-dim-800 border-sage-500/60 dark:border-sage-500/50 shadow-sm ring-1 ring-sage-500/20'
+              : 'bg-oatmeal-50/60 dark:bg-dim-800/40 border-oatmeal-200 dark:border-dim-800 future-step-blur'
+          }`;
+
+          card.innerHTML = `
+            <div class="flex items-start gap-3.5">
+              <!-- Checkbox button -->
+              <button
+                onclick="completeStepById(${step.id})"
+                aria-label="Mark step complete"
+                class="mt-0.5 w-6 h-6 rounded-full flex items-center justify-center shrink-0 border transition-all ${
+                  isCompleted
+                    ? 'bg-sage-500 border-sage-500 text-white'
+                    : isCurrent
+                    ? 'border-2 border-sage-500 hover:bg-sage-50 dark:hover:bg-dim-700'
+                    : 'border-stone-300 dark:border-dim-600'
+                }"
+              >
+                ${isCompleted ? `
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                ` : ''}
+              </button>
+
+              <!-- Step Content -->
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="${
+                    isCompleted
+                      ? 'line-through text-stone-400 dark:text-stone-500 text-sm'
+                      : isCurrent
+                      ? 'text-stone-800 dark:text-stone-100 font-medium text-base sm:text-lg leading-snug'
+                      : 'text-stone-600 dark:text-stone-400 text-sm sm:text-base'
+                  }">
+                    ${escapeHtml(step.text)}
+                  </span>
+
+                  <span class="shrink-0 text-[11px] px-2.5 py-0.5 rounded-full ${
+                    isCurrent
+                      ? 'bg-sage-50 dark:bg-dim-700 text-sage-700 dark:text-sage-200 font-medium'
+                      : 'text-stone-400 dark:text-stone-500'
+                  }">
+                    ${step.effort || '~1 min'}
+                  </span>
+                </div>
+
+                <!-- Active Step Supportive Actions -->
+                ${isCurrent ? `
+                  <div class="mt-3.5 pt-3 border-t border-oatmeal-200/80 dark:border-dim-700/80 flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                      ${step.canSplit ? `
+                        <button
+                          onclick="breakDownStep(${idx})"
+                          class="text-xs px-3 py-1.5 rounded-xl bg-oatmeal-200/70 hover:bg-oatmeal-300/70 dark:bg-dim-700 dark:hover:bg-dim-600 text-stone-600 dark:text-stone-300 font-medium flex items-center gap-1"
+                        >
+                          <span>✨ Still too big? Break it down</span>
+                        </button>
+                      ` : `
+                        <span class="text-xs text-stone-400 dark:text-stone-500">Micro-step active</span>
+                      `}
+                    </div>
+
+                    <button
+                      onclick="completeCurrentStep()"
+                      class="text-xs px-4 py-1.5 rounded-xl bg-sage-500 hover:bg-sage-600 text-white font-medium shadow-sm"
+                    >
+                      Done ✓
+                    </button>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          `;
+
+          container.appendChild(card);
+        });
+      }
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>
