@@ -1,16 +1,24 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ChatInputProps {
   disabled?: boolean;
   onSubmit: (text: string) => void;
   isCentered?: boolean;
+  collapsible?: boolean;
 }
 
-export function ChatInput({ disabled, onSubmit, isCentered = false }: ChatInputProps) {
+export function ChatInput({
+  disabled,
+  onSubmit,
+  isCentered = false,
+  collapsible = false,
+}: ChatInputProps) {
   const [text, setText] = useState('');
   const [isMultiline, setIsMultiline] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -40,14 +48,19 @@ export function ChatInput({ disabled, onSubmit, isCentered = false }: ChatInputP
     onSubmit(trimmed);
     setText('');
     setIsMultiline(false);
+    if (collapsible) {
+      setIsExpanded(false);
+    }
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
   };
 
   useEffect(() => {
-    textareaRef.current?.focus();
-  }, []);
+    if (isCentered) {
+      textareaRef.current?.focus();
+    }
+  }, [isCentered]);
 
   const inputBlock = (
     <div className="max-w-2xl mx-auto pointer-events-auto w-full">
@@ -91,6 +104,62 @@ export function ChatInput({ disabled, onSubmit, isCentered = false }: ChatInputP
 
   if (isCentered) {
     return <div className="w-full px-4">{inputBlock}</div>;
+  }
+
+  if (collapsible) {
+    return (
+      <AnimatePresence mode="wait">
+        {!isExpanded ? (
+          <motion.div
+            key="collapsed-chip"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.16 }}
+            className="absolute bottom-0 left-0 right-0 p-4 sm:p-5 flex justify-center pointer-events-none z-capsule"
+          >
+            <button
+              type="button"
+              onClick={() => {
+                setIsExpanded(true);
+                setTimeout(() => textareaRef.current?.focus(), 50);
+              }}
+              className="pointer-events-auto px-4 py-2 rounded-full bg-surface/95 hover:bg-surface border border-border-subtle shadow-card text-xs font-medium text-text-secondary hover:text-text-primary flex items-center gap-2 transition-all backdrop-blur-md active:scale-95 group"
+            >
+              <span className="text-sm group-hover:scale-110 transition-transform">💬</span>
+              <span>Need to tweak or vent?</span>
+            </button>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="expanded-input"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 12 }}
+            transition={{ duration: 0.16 }}
+            className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 bg-gradient-to-t from-canvas via-canvas/95 to-transparent pointer-events-none z-capsule"
+          >
+            <div className="max-w-2xl mx-auto pointer-events-auto w-full space-y-1.5">
+              <div className="flex items-center justify-between px-2 text-2xs text-text-tertiary">
+                <span>Adjust your task or vent freely</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsExpanded(false);
+                    setText('');
+                  }}
+                  className="hover:text-text-primary px-2 py-0.5 rounded hover:bg-surface-subtle transition-colors flex items-center gap-1 font-medium"
+                >
+                  <span>✕</span>
+                  <span>Close</span>
+                </button>
+              </div>
+              {inputBlock}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    );
   }
 
   return (

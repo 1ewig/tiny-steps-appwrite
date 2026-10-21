@@ -45,7 +45,7 @@ export function TinyStepsClient() {
     skipStep,
   } = useTaskStore();
 
-  const { decomposeTask } = useOfflineAssistant();
+  const { interpretUserIntent, generateMicroSteps } = useOfflineAssistant();
 
   const currentSession = sessions.find((s) => s.id === currentSessionId) || sessions[0];
 
@@ -79,46 +79,27 @@ export function TinyStepsClient() {
     setTimeout(() => {
       setIsTyping(false);
 
-      const lower = text.toLowerCase();
-      const lastAssistantMsg = [...currentSession.messages]
-        .reverse()
-        .find((m) => m.role === 'assistant' && m.steps && m.steps.length > 0);
+      const intent = interpretUserIntent(text, steps, granularity);
 
-      // Check if user is completing an ongoing step
-      if (
-        lastAssistantMsg &&
-        (lower.includes('done') || lower.includes('finished') || lower.includes('next') || lower.includes('did it'))
-      ) {
-        const nextIncomplete = lastAssistantMsg.steps?.find((s) => !s.completed);
-        if (nextIncomplete) {
-          toggleStepCompletion(currentSession.id, lastAssistantMsg.id, nextIncomplete.id);
-        }
+      if (intent.type === 'complete_step' && latestMessageWithSteps) {
+        toggleStepCompletion(currentSession.id, latestMessageWithSteps.id, intent.targetStepId);
         addMessage(currentSession.id, {
           role: 'assistant',
-          text: 'Incredible work! 🎉 Notice how taking that one microscopic action did not break you. Take a brief breath. Here is your next step:',
-          steps: lastAssistantMsg.steps,
+          text: intent.dialogue,
+          steps: latestMessageWithSteps.steps,
         });
-      } else if (
-        lastAssistantMsg &&
-        (lower.includes('too hard') || lower.includes('too big') || lower.includes('stuck') || lower.includes('scared') || lower.includes('shrink'))
-      ) {
-        // Shrink the current step
-        const curIdx = lastAssistantMsg.steps?.findIndex((s) => !s.completed) ?? -1;
-        if (curIdx !== -1) {
-          shrinkStep(currentSession.id, lastAssistantMsg.id, curIdx);
-        }
+      } else if (intent.type === 'shrink_step' && latestMessageWithSteps) {
+        shrinkStep(currentSession.id, latestMessageWithSteps.id, intent.targetStepIndex, intent.microSteps);
         addMessage(currentSession.id, {
           role: 'assistant',
-          text: 'No problem at all! If a step makes you hesitate, that is just your brain saying it is still too large. I shrank it into tiny bite-sized pieces for you:',
-          steps: lastAssistantMsg.steps,
+          text: intent.dialogue,
+          steps: latestMessageWithSteps.steps,
         });
-      } else {
-        // Decompose new task
-        const breakdown = decomposeTask(text, granularity);
+      } else if (intent.type === 'new_task') {
         addMessage(currentSession.id, {
           role: 'assistant',
-          text: breakdown.dialogue,
-          steps: breakdown.steps,
+          text: intent.dialogue,
+          steps: intent.steps,
         });
       }
     }, 600);
@@ -192,17 +173,22 @@ export function TinyStepsClient() {
                   messages={currentSession.messages}
                   isTyping={isTyping}
                   onToggleStep={(msgId, stepId) => toggleStepCompletion(currentSession.id, msgId, stepId)}
-                  onShrinkStep={(msgId, stepIdx) => shrinkStep(currentSession.id, msgId, stepIdx)}
+                  onShrinkStep={(msgId, stepIdx) => {
+                    const target = steps[stepIdx];
+                    const subSteps = target ? generateMicroSteps(target.text) : undefined;
+                    shrinkStep(currentSession.id, msgId, stepIdx, subSteps);
+                  }}
                   onSkipStep={(msgId, stepIdx) => skipStep(currentSession.id, msgId, stepIdx)}
                   onOpenFocusTunnel={() => setFocusTunnel(true)}
                 />
               </div>
             </main>
 
-            {/* Floating Chat Input at Bottom */}
+            {/* Collapsed Chat Chip at Bottom (expands on demand) */}
             <ChatInput
               disabled={isTyping}
               onSubmit={handleSendMessage}
+              collapsible
             />
           </>
         )}
@@ -220,8 +206,9 @@ export function TinyStepsClient() {
           }
         }}
         onShrink={() => {
-          if (activeStepIndex !== -1 && latestMessageWithSteps) {
-            shrinkStep(currentSession.id, latestMessageWithSteps.id, activeStepIndex);
+          if (activeStepIndex !== -1 && latestMessageWithSteps && activeStep) {
+            const subSteps = generateMicroSteps(activeStep.text);
+            shrinkStep(currentSession.id, latestMessageWithSteps.id, activeStepIndex, subSteps);
           }
         }}
         onSkip={() => {

@@ -212,5 +212,115 @@ export function useOfflineAssistant() {
     }
   };
 
-  return { decomposeTask };
+  const interpretUserIntent = (
+    input: string,
+    activeSteps: Step[],
+    level: GranularityLevel
+  ): AssistantIntent => {
+    const lower = input.trim().toLowerCase();
+    const nextIncomplete = activeSteps.find((s) => !s.completed);
+    const nextIncompleteIdx = nextIncomplete ? activeSteps.findIndex((s) => s.id === nextIncomplete.id) : -1;
+
+    // 1. Step Completion Intent
+    if (
+      activeSteps.length > 0 &&
+      nextIncomplete &&
+      (lower.includes('done') ||
+        lower.includes('finished') ||
+        lower.includes('next') ||
+        lower.includes('did it') ||
+        lower === 'k' ||
+        lower === 'ok')
+    ) {
+      return {
+        type: 'complete_step',
+        targetStepId: nextIncomplete.id,
+        dialogue:
+          'Incredible work! 🎉 Notice how taking that one microscopic action did not break you. Take a brief breath. Here is your next step:',
+      };
+    }
+
+    // 2. Overwhelm / Shrink Intent
+    if (
+      activeSteps.length > 0 &&
+      nextIncomplete &&
+      nextIncompleteIdx !== -1 &&
+      (lower.includes('too hard') ||
+        lower.includes('too big') ||
+        lower.includes('stuck') ||
+        lower.includes('scared') ||
+        lower.includes('shrink') ||
+        lower.includes('cannot') ||
+        lower.includes("can't"))
+    ) {
+      return {
+        type: 'shrink_step',
+        targetStepIndex: nextIncompleteIdx,
+        microSteps: generateMicroSteps(nextIncomplete.text),
+        dialogue:
+          'No problem at all! If a step makes you hesitate, that is just your brain saying it is still too large. I shrank it into tiny bite-sized pieces for you:',
+      };
+    }
+
+    // 3. New Task Decomposition
+    const breakdown = decomposeTask(input, level);
+    return {
+      type: 'new_task',
+      title: breakdown.title,
+      dialogue: breakdown.dialogue,
+      steps: breakdown.steps,
+    };
+  };
+
+  return {
+    decomposeTask,
+    generateMicroSteps,
+    interpretUserIntent,
+  };
+}
+
+export type AssistantIntent =
+  | {
+      type: 'complete_step';
+      targetStepId: number;
+      dialogue: string;
+    }
+  | {
+      type: 'shrink_step';
+      targetStepIndex: number;
+      microSteps: Step[];
+      dialogue: string;
+    }
+  | {
+      type: 'new_task';
+      title: string;
+      dialogue: string;
+      steps: Step[];
+    };
+
+export function generateMicroSteps(parentStepText: string): Step[] {
+  const baseTime = Date.now();
+  return [
+    {
+      id: baseTime + 1,
+      text: `Prep: Just look at what you need to "${parentStepText.toLowerCase()}"`,
+      effort: '10 sec',
+      completed: false,
+      canSplit: false,
+    },
+    {
+      id: baseTime + 2,
+      text: `Touch: Do the first 20 seconds of "${parentStepText}"`,
+      effort: '20 sec',
+      completed: false,
+      canSplit: false,
+    },
+    {
+      id: baseTime + 3,
+      text: `Finish: Complete just that piece cleanly`,
+      effort: '30 sec',
+      completed: false,
+      canSplit: false,
+    },
+  ];
 }

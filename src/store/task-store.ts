@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { TaskState, ChatSession, GranularityLevel, Step } from '@/types/task';
+import { generateMicroSteps } from '@/hooks/use-offline-assistant';
 
 const initialSessionId = 'session_' + Date.now();
 
@@ -137,36 +138,14 @@ export const useTaskStore = create<TaskState>()(
         });
       },
 
-      shrinkStep: (sessionId: string, messageId: string, stepIndex: number) => {
+      shrinkStep: (sessionId: string, messageId: string, stepIndex: number, subSteps?: Step[]) => {
         set((state) => {
           const sessions = state.sessions.map((sess) => {
             if (sess.id !== sessionId) return sess;
             const messages = sess.messages.map((msg) => {
               if (msg.id !== messageId || !msg.steps || !msg.steps[stepIndex]) return msg;
               const original = msg.steps[stepIndex];
-              const microSteps: Step[] = [
-                {
-                  id: Date.now() + 1,
-                  text: `Prep: Just look at what you need to "${original.text.toLowerCase()}"`,
-                  effort: '10 sec',
-                  completed: false,
-                  canSplit: false,
-                },
-                {
-                  id: Date.now() + 2,
-                  text: `Touch: Do the first 20 seconds of "${original.text}"`,
-                  effort: '20 sec',
-                  completed: false,
-                  canSplit: false,
-                },
-                {
-                  id: Date.now() + 3,
-                  text: `Finish: Complete just that piece cleanly`,
-                  effort: '30 sec',
-                  completed: false,
-                  canSplit: false,
-                },
-              ];
+              const microSteps = subSteps ?? generateMicroSteps(original.text);
 
               const updatedSteps = [...msg.steps];
               updatedSteps.splice(stepIndex, 1, ...microSteps);
