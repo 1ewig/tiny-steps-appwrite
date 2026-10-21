@@ -29,37 +29,42 @@ Action does not follow motivation; **motivation follows microscopic physical mom
 
 ## ✨ Key Features
 
-### 1. 🤖 Modern AI Chatbot Interface
-* **Conversational Dialogue**: Vent your raw thoughts or describe what feels heavy. Tiny Steps validates your cognitive load first before offering a solution.
-* **Embedded Interactive Steps**: Dynamic checklists live directly inside the conversation stream with real-time checkmarks and progress tracking.
+### 1. 📋 The Single Living Task Card (Anti-Overwhelm)
+* **One Checklist Rule**: Tweaking or venting updates the **existing card in-place** instead of stacking duplicate checklists that cause panic.
+* **Preserves Progress**: Completed steps remain checked off; only the pending steps adjust.
+* **Distraction-Free Workspace**: No cluttered SMS-style chat bubbles or avatars. Just clean, validated guidance and your interactive checklist.
 
-### 2. 🎚️ Elastic Sensitivity Modes
+### 2. 🎯 Centered Hero & Collapsible Tweak Chip
+* **Empty State**: The prompt input is centered directly under the gentle greeting, inviting step #1 with zero visual noise.
+* **Active Working Mode**: Once steps are generated, the input collapses into a quiet bottom chip (`💬 Need to tweak or vent?`), keeping 98% of the screen clear for execution. Click anytime to expand and adjust.
+
+### 3. 🎚️ Elastic Sensitivity Modes
 Users experience task resistance differently depending on their daily energy:
 * **🌱 A little stuck**: Clear, manageable 2–5 minute chunks.
 * **🌿 Overwhelmed (Default)**: Small, gentle 1-minute steps with warm reassuring tone.
 * **🪴 Full paralysis**: Absurdly tiny 5–30 second micro-actions (*"Exhale slowly. You only have to do 10 seconds of motion right now"*).
 
-### 3. ✨ On-Demand Step Shrinking ("Still too big?")
+### 4. ✨ On-Demand Step Shrinking ("Still too big?")
 If any step triggers hesitation or fear, click **"✨ Shrink this step"** to split it dynamically into 3 bite-sized pieces:
 1. **Prep**: Glance at or reach for what you need (zero pressure to work).
 2. **Touch**: Do just the first 15–20 seconds.
 3. **Finish**: Complete just that piece cleanly.
 
-### 4. ◎ Focus Tunnel (Monotasking Mode)
+### 5. ◎ Focus Tunnel (Monotasking Mode)
 * A full-screen, distraction-free view isolating the present task in large bold typography.
 * Controlled via keyboard shortcuts (`Space` or `Enter` to advance).
 * Gentle celebration screen upon completion (*"Take a breath and unclench your jaw. You turned something heavy into momentum"*).
 
-### 5. 👁️ Progressive Disclosure (Anti-Scan Panic)
+### 6. 👁️ Progressive Disclosure (Anti-Scan Panic)
 * Future steps are softly blurred by default (`future-step-blur`) to prevent users from scanning ahead and quitting.
-* Toggleable peek button to unblur future steps whenever you feel ready.
+* Single-click header toggle to unblur future steps whenever you feel ready.
 
-### 6. 🎨 Sensory-Friendly Design System
+### 7. 🎨 Sensory-Friendly Design System
 * Warm oatmeal canvas, gentle sage green accents, and a soothing **Dim Mode** toggle.
 * Zero harsh alert reds, countdown clocks, or aggressive urgency triggers.
 * Fully accessible with `@media (prefers-reduced-motion)` support.
 
-### 7. 🔒 100% Offline & Private
+### 8. 🔒 100% Offline & Private
 * Requires **no API keys** and sends **no personal data** to external servers.
 * All sessions and step progress are automatically saved to `localStorage`.
 
@@ -96,26 +101,32 @@ src/
 │   │
 │   ├── layout/
 │   │   ├── ambient-progress.tsx       # Top ambient progress bar
-│   │   ├── app-header.tsx             # Header with title, sensitivity dropdown & tunnel launcher
-│   │   └── sidebar.tsx                # Collapsible session drawer (history, sensitivity, theme)
+│   │   ├── app-header.tsx             # Header with title, peek toggle, sensitivity & tunnel launcher
+│   │   └── sidebar.tsx                # Collapsible session drawer (history & theme)
 │   │
 │   ├── chat/
-│   │   ├── hero-welcome.tsx           # Empty state with breathing orb
+│   │   ├── hero-welcome.tsx           # Centered empty state greeting
 │   │   ├── message-feed.tsx           # Auto-scrolling task feed
-│   │   ├── assistant-bubble.tsx       # Assistant dialogue & task card
+│   │   ├── assistant-bubble.tsx       # Assistant guidance & living task card
 │   │   ├── steps-checklist.tsx        # Framer Motion animated checklist (Shrink / Skip / Done)
 │   │   ├── typing-indicator.tsx       # Calm shimmer dots
-│   │   └── chat-input.tsx             # Floating single-row chat input block
+│   │   └── chat-input.tsx             # Adaptive input (centered pill / collapsible bottom chip)
 │   │
 │   └── focus/
 │       └── focus-tunnel-modal.tsx     # Distraction-free single-task execution modal
 │
+├── constants/
+│   └── presets.ts                     # Task decomposition templates (desk, email, laundry, braindump)
+│
+├── lib/
+│   └── assistant-engine.ts            # Pure domain logic (decomposition, intent parsing, micro-steps)
+│
 ├── hooks/
-│   ├── use-offline-assistant.ts       # NLP decomposition & multi-turn breakdown engine
+│   ├── use-offline-assistant.ts       # React hook adapter for assistant engine
 │   └── use-keyboard-shortcuts.ts      # Global Ctrl+K, Space, and Enter listeners
 │
 ├── store/
-│   └── task-store.ts                  # Persisted Zustand state (multi-session management)
+│   └── task-store.ts                  # Persisted Zustand state (multi-session & in-place step updates)
 └── types/
     └── task.ts                        # Strongly-typed data models
 ```
