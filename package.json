@@ -7,9 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "oxlint",
-    "lint:fix": "oxlint --fix",
-    "typecheck": "tsc --noEmit",
-    "typecheck:bun": "bun check",
     "check": "bun check"
   },
   "dependencies": {
