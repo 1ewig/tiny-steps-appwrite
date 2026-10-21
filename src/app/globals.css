@@ -2,47 +2,209 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@theme {
-  --color-oatmeal-50: #FAF9F6;
-  --color-oatmeal-100: #F6F4EF;
-  --color-oatmeal-200: #EFECE4;
-  --color-oatmeal-300: #E1DCD3;
-  --color-oatmeal-400: #C8C1B4;
+/* ==========================================================================
+   DESIGN TOKENS — ROOT (LIGHT MODE)
+   ========================================================================== */
+:root {
+  /* --- Semantic Colors (Light) --- */
+  --color-canvas: #FAF9F6;           /* Main background, warm calming oatmeal */
+  --color-canvas-subtle: #F6F4EF;    /* Slightly deeper canvas layer */
+  --color-surface: #FFFFFF;          /* Pure card/container surface */
+  --color-surface-subtle: #EFECE4;   /* Secondary buttons, pill chips, hover surface */
+  --color-surface-elevated: #FAF9F6; /* Elevated dropdowns, modals */
 
-  --color-sage-50: #F2F7F4;
-  --color-sage-100: #E2ECE6;
-  --color-sage-200: #C5DDD0;
-  --color-sage-300: #9FC3AF;
-  --color-sage-400: #7AA98E;
-  --color-sage-500: #5A8A70;
-  --color-sage-600: #47705B;
-  --color-sage-700: #385848;
-  --color-sage-800: #2A4337;
+  --color-border-subtle: #E6E1D8;    /* Ultra-soft dividers */
+  --color-border-muted: #D8D2C6;     /* Secondary borders, inactive states */
+  --color-border-focus: #5A8A70;     /* Sage accent focus ring */
 
-  --color-dim-950: #0E1110;
-  --color-dim-900: #141716;
-  --color-dim-850: #191D1B;
-  --color-dim-800: #1F2422;
-  --color-dim-750: #262C2A;
-  --color-dim-700: #2E3532;
-  --color-dim-600: #3D4642;
-  --color-dim-500: #545F5B;
+  --color-text-primary: #1C1E1D;     /* High-legibility deep charcoal */
+  --color-text-secondary: #5C625E;   /* Muted body copy & descriptions */
+  --color-text-tertiary: #8C938E;    /* Captions, subtle hints, placeholders */
+  --color-text-inverse: #FFFFFF;     /* White text on accent backgrounds */
 
-  --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.04);
-  --shadow-capsule: 0 10px 40px -10px rgba(90, 138, 112, 0.12), 0 4px 18px rgba(0, 0, 0, 0.04);
-  --shadow-float: 0 20px 45px -12px rgba(0, 0, 0, 0.1), 0 8px 24px -4px rgba(0, 0, 0, 0.05);
+  --color-accent-primary: #5A8A70;   /* Calming Sage Green */
+  --color-accent-hover: #48725C;     /* Sage hover state */
+  --color-accent-subtle: #E2ECE6;    /* Light sage tint for badges & active states */
+  --color-accent-text: #2A4337;      /* High contrast dark sage text */
+
+  --color-danger-primary: #D9534F;   /* Soft red */
+  --color-danger-subtle: #FDF2F2;    /* Soft red tint */
+  --color-danger-text: #9B2C2C;      /* Red text */
+
+  /* --- Spacing Scale Tokens --- */
+  --space-2xs: 0.25rem;  /* 4px */
+  --space-xs:  0.5rem;   /* 8px */
+  --space-sm:  0.75rem;  /* 12px */
+  --space-md:  1rem;     /* 16px */
+  --space-lg:  1.5rem;   /* 24px */
+  --space-xl:  2rem;     /* 32px */
+  --space-2xl: 3rem;     /* 48px */
+  --space-3xl: 4rem;     /* 64px */
+
+  /* --- Typography Scale Tokens --- */
+  --text-2xs:  0.6875rem; /* 11px */
+  --text-xs:   0.75rem;   /* 12px */
+  --text-sm:   0.875rem;  /* 14px */
+  --text-base: 1rem;      /* 16px */
+  --text-lg:   1.125rem;  /* 18px */
+  --text-xl:   1.25rem;   /* 20px */
+  --text-2xl:  1.5rem;    /* 24px */
+  --text-3xl:  1.875rem;  /* 30px */
+  --text-4xl:  2.25rem;   /* 36px */
+
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --leading-none: 1;
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+
+  /* --- Border Radii Tokens --- */
+  --radius-xs: 0.375rem;   /* 6px */
+  --radius-sm: 0.5rem;     /* 8px */
+  --radius-md: 0.75rem;    /* 12px */
+  --radius-lg: 1rem;       /* 16px */
+  --radius-xl: 1.25rem;    /* 20px */
+  --radius-2xl: 1.5rem;    /* 24px */
+  --radius-capsule: 2rem;  /* 32px */
+  --radius-full: 9999px;   /* Pills & circular badges */
+
+  /* --- Shadows & Elevations (Light) --- */
+  --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-card:   0 8px 24px -4px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.02);
+  --shadow-capsule: 0 12px 36px -8px rgba(90, 138, 112, 0.15), 0 4px 16px rgba(0, 0, 0, 0.04);
+  --shadow-modal:  0 24px 60px -12px rgba(0, 0, 0, 0.12), 0 12px 28px -6px rgba(0, 0, 0, 0.06);
+
+  /* --- Motion & Transitions --- */
+  --ease-calm: cubic-bezier(0.2, 0.9, 0.3, 1);
+  --duration-instant: 100ms;
+  --duration-fast:    180ms;
+  --duration-normal:  280ms;
+  --duration-slow:    450ms;
+
+  /* --- Z-Index Hierarchy Tokens --- */
+  --z-base: 1;
+  --z-header: 20;
+  --z-capsule: 30;
+  --z-backdrop: 40;
+  --z-sidebar: 45;
+  --z-modal: 50;
+  --z-toast: 60;
 }
 
-/* Transitions & Micro-interactions */
+/* ==========================================================================
+   DESIGN TOKENS — DARK MODE (.dark)
+   ========================================================================== */
+.dark {
+  /* --- Semantic Colors (Dark) --- */
+  --color-canvas: #0E1110;           /* Deep sensory midnight */
+  --color-canvas-subtle: #141716;    /* Surface container base */
+  --color-surface: #191D1B;          /* Card & chat bubble base */
+  --color-surface-subtle: #242A27;   /* Secondary chips & hover */
+  --color-surface-elevated: #28302C; /* Elevated modals & popovers */
+
+  --color-border-subtle: #262D29;    /* Non-intrusive dark dividers */
+  --color-border-muted: #343C37;     /* Standard borders */
+  --color-border-focus: #7AA98E;     /* Soft sage focus */
+
+  --color-text-primary: #F2F4F3;     /* Soft white (prevents harsh eye fatigue) */
+  --color-text-secondary: #A6AFA9;   /* Readable muted text */
+  --color-text-tertiary: #6E7771;    /* Low contrast hints */
+  --color-text-inverse: #0E1110;     /* Inverted dark text */
+
+  --color-accent-primary: #5A8A70;   /* Balanced sage */
+  --color-accent-hover: #6D9E83;     /* Lighter sage hover in dark */
+  --color-accent-subtle: #1D2B23;    /* Deep sage tint */
+  --color-accent-text: #B4D7C3;      /* Crisp pale sage */
+
+  --color-danger-primary: #E06C75;
+  --color-danger-subtle: #2E1B1D;
+  --color-danger-text: #FFA5AB;
+
+  /* --- Shadows & Elevations (Dark) --- */
+  --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-card:   0 8px 24px -4px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --shadow-capsule: 0 16px 40px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(90, 138, 112, 0.2);
+  --shadow-modal:  0 24px 60px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+/* ==========================================================================
+   TAILWIND V4 THEME MAPPINGS
+   ========================================================================== */
+@theme {
+  /* Font Family */
+  --font-sans: var(--font-jakarta), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Colors */
+  --color-canvas: var(--color-canvas);
+  --color-canvas-subtle: var(--color-canvas-subtle);
+  --color-surface: var(--color-surface);
+  --color-surface-subtle: var(--color-surface-subtle);
+  --color-surface-elevated: var(--color-surface-elevated);
+
+  --color-border-subtle: var(--color-border-subtle);
+  --color-border-muted: var(--color-border-muted);
+  --color-border-focus: var(--color-border-focus);
+
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-tertiary: var(--color-text-tertiary);
+  --color-text-inverse: var(--color-text-inverse);
+
+  --color-accent: var(--color-accent-primary);
+  --color-accent-hover: var(--color-accent-hover);
+  --color-accent-subtle: var(--color-accent-subtle);
+  --color-accent-text: var(--color-accent-text);
+
+  --color-danger: var(--color-danger-primary);
+  --color-danger-subtle: var(--color-danger-subtle);
+  --color-danger-text: var(--color-danger-text);
+
+  /* Radii */
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+  --radius-capsule: var(--radius-capsule);
+  --radius-full: var(--radius-full);
+
+  /* Shadows */
+  --shadow-subtle: var(--shadow-subtle);
+  --shadow-card: var(--shadow-card);
+  --shadow-capsule: var(--shadow-capsule);
+  --shadow-modal: var(--shadow-modal);
+
+  /* Transitions */
+  --ease-calm: var(--ease-calm);
+}
+
+/* ==========================================================================
+   BASE STYLES & BEHAVIOR
+   ========================================================================== */
 * {
-  transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease, transform 0.2s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.2s ease;
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: var(--ease-calm);
+  transition-duration: var(--duration-fast);
 }
 
 body {
+  background-color: var(--color-canvas);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Animations */
+/* ==========================================================================
+   ANIMATIONS & ACCESSIBILITY
+   ========================================================================== */
 @keyframes chatFadeUp {
   from {
     opacity: 0;
@@ -55,7 +217,7 @@ body {
 }
 
 .chat-enter {
-  animation: chatFadeUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: chatFadeUp var(--duration-normal) var(--ease-calm) forwards;
 }
 
 @keyframes calmPulse {
@@ -70,12 +232,12 @@ body {
 }
 
 .orb-pulse {
-  animation: calmPulse 3.5s infinite ease-in-out;
+  animation: calmPulse 3.5s infinite var(--ease-calm);
 }
 
 @keyframes shimmer {
-  0% { opacity: 0.3; transform: scale(0.85); }
-  50% { opacity: 1; transform: scale(1.1); }
+  0%   { opacity: 0.3; transform: scale(0.85); }
+  50%  { opacity: 1;   transform: scale(1.1);  }
   100% { opacity: 0.3; transform: scale(0.85); }
 }
 
@@ -83,23 +245,7 @@ body {
 .dot-2 { animation: shimmer 1.2s infinite ease-in-out 0.2s; }
 .dot-3 { animation: shimmer 1.2s infinite ease-in-out 0.4s; }
 
-/* Custom thin scrollbar */
-::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(160, 160, 150, 0.25);
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(160, 160, 150, 0.4);
-}
-
-/* Gentle blur for future steps */
+/* Future Step Gentle Blur (Anti-Scan Panic) */
 .future-step-blur {
   filter: blur(1.5px);
   opacity: 0.45;
@@ -110,4 +256,32 @@ body {
   filter: blur(0px);
   opacity: 0.85;
   user-select: auto;
+}
+
+/* Custom Minimal Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-subtle);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-muted);
+}
+
+/* Reduced Motion Override for Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
