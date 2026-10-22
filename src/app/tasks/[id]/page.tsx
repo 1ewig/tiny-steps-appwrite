@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { TaskWorkspaceClient } from '@/components/task-workspace-client';
 
+export const instant = false;
+
 export const metadata: Metadata = {
   title: 'Task Workspace — Tiny Steps',
   description: 'Your gentle, living task checklist.',
