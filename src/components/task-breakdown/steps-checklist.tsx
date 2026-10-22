@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Sparkle, Check } from '@phosphor-icons/react';
 import type { Step } from '@/types/task';
+
+const EASE_CALM = [0.2, 0.9, 0.3, 1] as const;
 
 interface StepsChecklistProps {
   steps: Step[];
@@ -17,8 +19,16 @@ export function StepsChecklist({
   onShrinkStep,
 }: StepsChecklistProps) {
   const [openStepId, setOpenStepId] = useState<number | null>(null);
+  const reduceMotion = useReducedMotion();
 
   if (!steps || steps.length === 0) return null;
+
+  const expandTransition = reduceMotion
+    ? { duration: 0 }
+    : {
+        height: { duration: 0.26, ease: EASE_CALM },
+        opacity: { duration: 0.18, ease: EASE_CALM },
+      };
 
   const firstIncomplete = steps.find((s) => !s.completed);
   const openStep =
@@ -49,12 +59,8 @@ export function StepsChecklist({
           const isCurrent = idx === openIdx;
 
           return (
-            <motion.div
+            <div
               key={st.id}
-              layout
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.18 }}
               onClick={() => {
                 if (!isCompleted) setOpenStepId(st.id);
               }}
@@ -101,42 +107,53 @@ export function StepsChecklist({
                   </div>
 
                   {/* Active Step Actions & Effort Badge */}
-                  {isCurrent && (
-                    <div className="mt-3 flex items-center justify-between gap-2">
-                      <span className="shrink-0 text-2xs text-text-tertiary font-medium">
-                        {st.effort || '~1 min'}
-                      </span>
+                  <AnimatePresence initial={false}>
+                    {isCurrent && (
+                      <motion.div
+                        key="actions"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={expandTransition}
+                        className="overflow-hidden"
+                      >
+                        <div className="pt-3 flex items-center justify-between gap-2">
+                          <span className="shrink-0 text-2xs text-text-tertiary font-medium">
+                            {st.effort || '~1 min'}
+                          </span>
 
-                      <div className="flex items-center gap-1.5 ml-auto">
-                        {st.canSplit && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onShrinkStep(idx);
-                            }}
-                            className="text-2xs px-2.5 py-1 rounded-md bg-surface-subtle hover:bg-surface-subtle/80 text-text-primary font-medium flex items-center gap-1.5 transition-all"
-                          >
-                            <Sparkle size={12} weight="duotone" className="text-accent" />
-                            <span>Break down</span>
-                          </button>
-                        )}
+                          <div className="flex items-center gap-1.5 ml-auto">
+                            {st.canSplit && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onShrinkStep(idx);
+                                }}
+                                className="text-2xs px-2.5 py-1 rounded-md bg-surface-subtle hover:bg-surface-subtle/80 text-text-primary font-medium flex items-center gap-1.5 transition-all"
+                              >
+                                <Sparkle size={12} weight="duotone" className="text-accent" />
+                                <span>Break down</span>
+                              </button>
+                            )}
 
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleToggle(st, idx);
-                          }}
-                          className="text-2xs px-3 py-1 rounded-md bg-accent hover:bg-accent-hover text-text-inverse font-medium shadow-subtle transition-all active:scale-95 flex items-center gap-1"
-                        >
-                          <Check size={12} weight="bold" />
-                          <span>Done</span>
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggle(st, idx);
+                              }}
+                              className="text-2xs px-3 py-1 rounded-md bg-accent hover:bg-accent-hover text-text-inverse font-medium shadow-subtle transition-all active:scale-95 flex items-center gap-1"
+                            >
+                              <Check size={12} weight="bold" />
+                              <span>Done</span>
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
-            </motion.div>
+            </div>
           );
         })}
       </div>
