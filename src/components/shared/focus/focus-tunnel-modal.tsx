@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Step } from '@/types/task';
 
@@ -22,6 +23,18 @@ export function FocusTunnelModal({
   onShrink,
   onSkip,
 }: FocusTunnelModalProps) {
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -29,109 +42,120 @@ export function FocusTunnelModal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-modal bg-canvas/95 backdrop-blur-md flex flex-col justify-between p-6 sm:p-10 select-none"
+          className="fixed inset-0 z-modal bg-canvas/95 backdrop-blur-md flex flex-col items-center justify-between p-6 sm:p-10 select-none overflow-y-auto"
         >
-          {/* Focus Header */}
-          <div className="max-w-xl w-full mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-semibold text-text-secondary">
-              <span className="w-2 h-2 rounded-full bg-accent" />
-              <span>{sessionTitle || 'Focus Tunnel'}</span>
+          {/* Top Bar: Task Name on Top Left, Close on Top Right */}
+          <div className="w-full flex items-center justify-between z-10 shrink-0">
+            {/* Task Name on Top Left Corner */}
+            <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-text-secondary max-w-[70vw] sm:max-w-md truncate">
+              <span className="w-2 h-2 rounded-full bg-accent animate-pulse shrink-0" />
+              <span className="truncate">{sessionTitle || 'Focus Tunnel'}</span>
             </div>
 
+            {/* Close Button on Top Right Corner */}
             <button
               onClick={onClose}
-              className="px-3 py-1.5 rounded-lg bg-surface-subtle hover:bg-surface-subtle/80 text-xs font-medium text-text-primary transition-all"
+              className="p-2.5 rounded-full bg-surface-subtle/80 hover:bg-surface-subtle text-text-secondary hover:text-text-primary transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent"
+              aria-label="Close Focus Tunnel"
+              title="Back to chat (Esc)"
             >
-              ✕ Back to Chat
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
 
-          {/* Center Focus Card */}
+          {/* Centered Task (No Box Container) */}
           <motion.div
-            initial={{ scale: 0.95, y: 10 }}
-            animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0.95, y: 10 }}
-            className="max-w-lg w-full mx-auto my-auto py-8"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            className="flex-1 flex flex-col items-center justify-center text-center px-4 py-8 max-w-3xl mx-auto w-full my-auto"
           >
-            <div className="bg-surface border border-border-subtle rounded-capsule p-7 sm:p-10 shadow-modal text-center space-y-8">
-              {activeStep ? (
-                <>
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-accent-subtle text-accent-text text-xs font-medium border border-accent/20">
-                    <span>Just this one single thing</span>
-                    <span>•</span>
-                    <span>{activeStep.effort || '~1 min'}</span>
-                  </div>
-
-                  <p className="text-2xl sm:text-3xl font-bold text-text-primary leading-relaxed">
-                    {activeStep.text}
-                  </p>
-
-                  <div className="pt-2 space-y-3 max-w-xs mx-auto">
-                    {/* Main Done Button */}
-                    <button
-                      onClick={onComplete}
-                      className="w-full py-4 px-6 rounded-xl bg-accent hover:bg-accent-hover active:scale-95 text-text-inverse font-medium text-base shadow-subtle flex items-center justify-center gap-2 group transition-all"
-                    >
-                      <svg
-                        className="w-5 h-5 group-hover:scale-110 transition-transform"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span>Done! What is next?</span>
-                    </button>
-
-                    {/* Shrink & Skip Actions */}
-                    <div className="flex items-center justify-center gap-2 pt-1">
-                      {activeStep.canSplit && (
-                        <button
-                          onClick={onShrink}
-                          className="flex-1 py-2.5 px-3 rounded-lg bg-surface-subtle hover:bg-surface-subtle/80 text-text-primary text-xs font-medium transition-all"
-                        >
-                          ✨ Still too big? Shrink it
-                        </button>
-                      )}
-                      <button
-                        onClick={onSkip}
-                        className="py-2.5 px-3 rounded-lg bg-surface-subtle hover:bg-surface-subtle/80 text-text-secondary text-xs font-medium transition-all"
-                        title="Move to end without guilt"
-                      >
-                        Skip for now
-                      </button>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="space-y-6 py-4">
-                  {/* Gentle All-Completed Celebration */}
-                  <div className="w-16 h-16 rounded-full bg-accent-subtle text-accent mx-auto flex items-center justify-center text-3xl orb-pulse">
-                    🌿
-                  </div>
-                  <div className="space-y-2">
-                    <h2 className="text-2xl font-bold text-text-primary">You made it through.</h2>
-                    <p className="text-text-secondary text-sm leading-relaxed max-w-xs mx-auto">
-                      Take a breath and unclench your jaw. You took on something heavy and turned it into momentum.
-                    </p>
-                  </div>
-                  <button
-                    onClick={onClose}
-                    className="px-6 py-3 rounded-xl bg-accent hover:bg-accent-hover text-text-inverse text-sm font-medium shadow-subtle transition-all"
-                  >
-                    Rest, or head back to chat
-                  </button>
+            {activeStep ? (
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary leading-snug sm:leading-tight tracking-tight text-center max-w-2xl">
+                {activeStep.text}
+              </h1>
+            ) : (
+              <div className="space-y-4 max-w-md">
+                <div className="w-16 h-16 rounded-2xl bg-accent-subtle text-accent flex items-center justify-center text-3xl orb-pulse mx-auto">
+                  🌿
                 </div>
-              )}
-            </div>
+                <div className="space-y-2">
+                  <h1 className="text-3xl sm:text-4xl font-bold text-text-primary leading-tight">
+                    You made it through.
+                  </h1>
+                  <p className="text-text-secondary text-base leading-relaxed">
+                    Take a breath and unclench your jaw. You took on something heavy and turned it into momentum.
+                  </p>
+                </div>
+              </div>
+            )}
           </motion.div>
 
-          {/* Focus Footer Shortcut Hint */}
-          <div className="max-w-xl w-full mx-auto text-center text-xs text-text-tertiary">
-            Press <kbd className="px-1.5 py-0.5 rounded bg-surface-subtle text-text-secondary">Space</kbd> or{' '}
-            <kbd className="px-1.5 py-0.5 rounded bg-surface-subtle text-text-secondary">Enter</kbd> to mark done
-          </div>
+          {/* Bottom Action Area (Centered, Equal-Sized Buttons) */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            className="w-full max-w-2xl mx-auto flex flex-col items-center gap-4 pb-2 shrink-0"
+          >
+            {activeStep ? (
+              <>
+                <div className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-3 w-full max-w-xl">
+                  {/* Primary Complete Button */}
+                  <button
+                    onClick={onComplete}
+                    className="flex-1 min-w-[150px] sm:w-48 h-12 px-5 rounded-xl bg-accent hover:bg-accent-hover active:scale-95 text-text-inverse font-medium text-sm shadow-subtle flex items-center justify-center gap-2 group transition-all"
+                  >
+                    <svg
+                      className="w-4 h-4 group-hover:scale-110 transition-transform shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="truncate">Done! What is next?</span>
+                  </button>
+
+                  {/* Shrink Step Button */}
+                  {activeStep.canSplit && (
+                    <button
+                      onClick={onShrink}
+                      className="flex-1 min-w-[150px] sm:w-48 h-12 px-5 rounded-xl bg-surface-subtle hover:bg-surface-subtle/80 text-text-primary text-sm font-medium transition-all active:scale-95 flex items-center justify-center gap-1.5"
+                    >
+                      <span>✨</span>
+                      <span className="truncate">Shrink it</span>
+                    </button>
+                  )}
+
+                  {/* Skip Step Button */}
+                  <button
+                    onClick={onSkip}
+                    className="flex-1 min-w-[150px] sm:w-48 h-12 px-5 rounded-xl bg-surface-subtle hover:bg-surface-subtle/80 text-text-secondary hover:text-text-primary text-sm font-medium transition-all active:scale-95 flex items-center justify-center"
+                    title="Move to end without guilt"
+                  >
+                    <span className="truncate">Skip for now</span>
+                  </button>
+                </div>
+
+                <div className="text-xs text-text-tertiary text-center">
+                  Press <kbd className="px-1.5 py-0.5 rounded bg-surface-subtle text-text-secondary font-mono text-[11px]">Space</kbd> or{' '}
+                  <kbd className="px-1.5 py-0.5 rounded bg-surface-subtle text-text-secondary font-mono text-[11px]">Enter</kbd> to mark done •{' '}
+                  <kbd className="px-1.5 py-0.5 rounded bg-surface-subtle text-text-secondary font-mono text-[11px]">Esc</kbd> to exit
+                </div>
+              </>
+            ) : (
+              <button
+                onClick={onClose}
+                className="h-12 px-6 rounded-xl bg-accent hover:bg-accent-hover active:scale-95 text-text-inverse text-sm font-medium shadow-subtle transition-all flex items-center justify-center"
+              >
+                Rest, or head back to chat
+              </button>
+            )}
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
