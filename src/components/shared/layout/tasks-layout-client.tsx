@@ -94,9 +94,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
   if (!mounted) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-canvas text-text-tertiary">
-        <span className="orb-pulse flex items-center justify-center">
-          <AppIcon size={36} className="rounded-xl shadow-subtle" />
-        </span>
+        <AppIcon size={52} animated className="rounded-2xl shadow-subtle" />
       </div>
     );
   }

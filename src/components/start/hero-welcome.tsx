@@ -5,7 +5,7 @@ import { AppIcon } from '@/components/shared/app-icon';
 export function HeroWelcome() {
   return (
     <div className="text-center max-w-xl mx-auto space-y-4 chat-enter">
-      <div className="mx-auto flex items-center justify-center orb-pulse">
+      <div className="mx-auto flex items-center justify-center">
         <AppIcon size={52} className="shadow-subtle rounded-2xl" />
       </div>
 
