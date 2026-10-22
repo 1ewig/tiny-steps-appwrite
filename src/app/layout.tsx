@@ -11,6 +11,9 @@ const jakartaSans = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "Tiny Steps — Low-Friction AI Task Companion",
   description: "Empathetic, zero-pressure task breakdown for ADHD paralysis, burnout, and executive dysfunction.",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({

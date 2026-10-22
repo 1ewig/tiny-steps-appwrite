@@ -1,12 +1,12 @@
 'use client';
 
-import { Plant } from '@phosphor-icons/react';
+import { AppIcon } from '@/components/shared/app-icon';
 
 export function TypingIndicator() {
   return (
     <div className="flex items-start gap-3 chat-enter">
-      <div className="w-8 h-8 rounded-xl bg-accent-subtle text-accent-text flex items-center justify-center shrink-0">
-        <Plant size={16} weight="duotone" className="text-accent" />
+      <div className="w-8 h-8 flex items-center justify-center shrink-0">
+        <AppIcon size={28} className="rounded-lg shadow-subtle" />
       </div>
       <div className="bg-surface border border-border-subtle rounded-xl px-4 py-3 flex items-center gap-1.5 shadow-subtle">
         <span className="w-1.5 h-1.5 rounded-full bg-accent dot-1" />

@@ -1,7 +1,8 @@
 'use client';
 
 import type { ChatSession } from '@/types/task';
-import { Plant, CheckCircle, ChatText } from '@phosphor-icons/react';
+import { AppIcon } from '@/components/shared/app-icon';
+import { CheckCircle, ChatText } from '@phosphor-icons/react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -49,8 +50,8 @@ export function Sidebar({
         <div className="p-4 space-y-3 border-b border-border-subtle">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-accent-subtle text-accent-text flex items-center justify-center font-bold text-sm">
-                <Plant size={18} weight="duotone" className="text-accent" />
+              <div className="w-7 h-7 flex items-center justify-center shrink-0">
+                <AppIcon size={28} className="rounded-lg shadow-subtle" />
               </div>
               <div>
                 <span className="font-bold text-sm tracking-tight text-text-primary block leading-none">
