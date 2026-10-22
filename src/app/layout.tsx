@@ -19,7 +19,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${jakartaSans.variable} h-full antialiased`}>
+    <html lang="en" suppressHydrationWarning className={`${jakartaSans.variable} h-full antialiased`}>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var raw=localStorage.getItem('tinysteps_zustand_store');if(raw){var data=JSON.parse(raw);if(data&&data.state&&data.state.theme==='dark'){document.documentElement.classList.add('dark');}}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className="h-full flex flex-col font-sans bg-oatmeal-100 text-stone-800 dark:bg-dim-950 dark:text-stone-200">
         {children}
       </body>

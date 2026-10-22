@@ -53,6 +53,15 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     }
   }, [routeSessionId, currentSessionId, switchSession]);
 
+  // Ensure DOM matches store theme on mount and changes
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
+
   const activeSession = sessions.find((s) => s.id === activeSessionId);
 
   const latestMessageWithSteps = activeSession?.messages

@@ -182,6 +182,11 @@ export const useTaskStore = create<TaskState>()(
     {
       name: 'tinysteps_zustand_store',
       storage: createJSONStorage(() => (typeof window !== 'undefined' ? localStorage : dummyStorage)),
+      onRehydrateStorage: () => (state) => {
+        if (typeof document !== 'undefined' && state?.theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      },
       merge: (persistedState, currentState) => {
         const state = persistedState as Partial<TaskState> | undefined;
         if (!state) return currentState;
