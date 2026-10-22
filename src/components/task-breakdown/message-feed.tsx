@@ -9,8 +9,6 @@ interface MessageFeedProps {
   isTyping: boolean;
   onToggleStep: (messageId: string, stepId: number) => void;
   onShrinkStep: (messageId: string, stepIndex: number) => void;
-  onSkipStep: (messageId: string, stepIndex: number) => void;
-  onOpenFocusTunnel: () => void;
 }
 
 export function MessageFeed({
@@ -18,8 +16,6 @@ export function MessageFeed({
   isTyping,
   onToggleStep,
   onShrinkStep,
-  onSkipStep,
-  onOpenFocusTunnel,
 }: MessageFeedProps) {
   const assistantMessages = messages.filter((m) => m.role === 'assistant');
 
@@ -31,8 +27,6 @@ export function MessageFeed({
           message={msg}
           onToggleStep={(stepId) => onToggleStep(msg.id, stepId)}
           onShrinkStep={(stepIndex) => onShrinkStep(msg.id, stepIndex)}
-          onSkipStep={(stepIndex) => onSkipStep(msg.id, stepIndex)}
-          onOpenFocusTunnel={onOpenFocusTunnel}
         />
       ))}
 

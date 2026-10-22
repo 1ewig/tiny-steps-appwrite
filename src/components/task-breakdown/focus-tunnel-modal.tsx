@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkle } from '@phosphor-icons/react';
+import { Sparkle, Check } from '@phosphor-icons/react';
 import type { Step } from '@/types/task';
 
 interface FocusTunnelModalProps {
@@ -45,115 +45,112 @@ export function FocusTunnelModal({
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-modal bg-canvas/95 backdrop-blur-md flex flex-col items-center justify-between p-6 sm:p-10 select-none overflow-y-auto"
         >
-          {/* Top Bar: Task Name on Top Left, Close on Top Right */}
+          {/* Top Bar: Session Name & Minimal Close */}
           <div className="w-full flex items-center justify-between z-10 shrink-0">
-            {/* Task Name on Top Left Corner */}
-            <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-text-secondary max-w-[70vw] sm:max-w-md truncate">
-              <span className="w-2 h-2 rounded-full bg-accent animate-pulse shrink-0" />
-              <span className="truncate">{sessionTitle || 'Focus Tunnel'}</span>
+            <div className="flex items-center gap-2 text-xs font-medium text-text-secondary max-w-[70vw] sm:max-w-md truncate">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse shrink-0" />
+              <span className="truncate">{sessionTitle || 'Focus'}</span>
             </div>
 
-            {/* Close Button on Top Right Corner */}
             <button
               onClick={onClose}
-              className="p-2.5 rounded-full bg-surface-subtle/80 hover:bg-surface-subtle text-text-secondary hover:text-text-primary transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent"
+              className="p-2 rounded-full text-text-tertiary hover:text-text-primary hover:bg-surface-subtle transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent"
               aria-label="Close Focus Tunnel"
-              title="Back to chat (Esc)"
+              title="Exit (Esc)"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
-          {/* Centered Task (No Box Container) */}
+          {/* Centered Active Step */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.98 }}
+            key={activeStep ? activeStep.id : 'completed'}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.2 }}
             className="flex-1 flex flex-col items-center justify-center text-center px-4 py-8 max-w-3xl mx-auto w-full my-auto"
           >
             {activeStep ? (
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary leading-snug sm:leading-tight tracking-tight text-center max-w-2xl">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-text-primary leading-snug sm:leading-tight tracking-tight text-center max-w-2xl">
                 {activeStep.text}
               </h1>
             ) : (
               <div className="space-y-4 max-w-md">
-                <div className="w-16 h-16 rounded-2xl bg-accent-subtle text-accent flex items-center justify-center orb-pulse mx-auto">
-                  <Sparkle size={36} weight="duotone" className="text-accent" />
+                <div className="w-12 h-12 rounded-2xl bg-accent-subtle text-accent flex items-center justify-center orb-pulse mx-auto">
+                  <Sparkle size={28} weight="duotone" className="text-accent" />
                 </div>
-                <div className="space-y-2">
-                  <h1 className="text-3xl sm:text-4xl font-bold text-text-primary leading-tight">
+                <div className="space-y-1.5">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-text-primary leading-tight">
                     You made it through.
                   </h1>
-                  <p className="text-text-secondary text-base leading-relaxed">
-                    Take a breath and unclench your jaw. You took on something heavy and turned it into momentum.
+                  <p className="text-text-secondary text-sm sm:text-base leading-relaxed">
+                    Take a breath and unclench your jaw. You turned something heavy into momentum.
                   </p>
                 </div>
               </div>
             )}
           </motion.div>
 
-          {/* Bottom Action Area (Centered, Equal-Sized Buttons) */}
+          {/* Bottom Action Area: Compact, Single-Word Pills */}
           <motion.div
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-            className="w-full max-w-2xl mx-auto flex flex-col items-center gap-4 pb-2 shrink-0"
+            exit={{ opacity: 0, y: 6 }}
+            className="w-full flex flex-col items-center gap-3 pb-1 shrink-0"
           >
             {activeStep ? (
               <>
-                <div className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-3 w-full max-w-xl">
-                  {/* Primary Complete Button */}
+                <div className="flex items-center justify-center gap-2">
+                  {/* Primary: Done */}
                   <button
                     onClick={onComplete}
-                    className="flex-1 min-w-[150px] sm:w-48 h-12 px-5 rounded-xl bg-accent hover:bg-accent-hover active:scale-95 text-text-inverse font-medium text-sm shadow-subtle flex items-center justify-center gap-2 group transition-all"
+                    className="h-9 sm:h-10 px-4 sm:px-5 rounded-full bg-accent hover:bg-accent-hover active:scale-95 text-text-inverse font-medium text-xs sm:text-sm shadow-subtle flex items-center gap-1.5 transition-all"
                   >
-                    <svg
-                      className="w-4 h-4 group-hover:scale-110 transition-transform shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="truncate">Done! What is next?</span>
+                    <Check size={14} weight="bold" />
+                    <span>Done</span>
                   </button>
 
-                  {/* Shrink Step Button */}
+                  {/* Secondary: Shrink */}
                   {activeStep.canSplit && (
                     <button
                       onClick={onShrink}
-                      className="flex-1 min-w-[150px] sm:w-48 h-12 px-5 rounded-xl bg-surface-subtle hover:bg-surface-subtle/80 text-text-primary text-sm font-medium transition-all active:scale-95 flex items-center justify-center gap-1.5"
+                      className="h-9 sm:h-10 px-3.5 rounded-full bg-surface-subtle/80 hover:bg-surface-subtle text-text-secondary hover:text-text-primary text-xs sm:text-sm font-medium transition-all active:scale-95 flex items-center gap-1.5"
                     >
-                      <Sparkle size={15} weight="duotone" className="text-accent" />
-                      <span className="truncate">Shrink it</span>
+                      <Sparkle size={13} weight="duotone" className="text-accent" />
+                      <span>Shrink</span>
                     </button>
                   )}
 
-                  {/* Skip Step Button */}
+                  {/* Tertiary: Skip */}
                   <button
                     onClick={onSkip}
-                    className="flex-1 min-w-[150px] sm:w-48 h-12 px-5 rounded-xl bg-surface-subtle hover:bg-surface-subtle/80 text-text-secondary hover:text-text-primary text-sm font-medium transition-all active:scale-95 flex items-center justify-center"
+                    className="h-9 sm:h-10 px-3 rounded-full hover:bg-surface-subtle text-text-tertiary hover:text-text-secondary text-xs sm:text-sm font-medium transition-all active:scale-95"
                     title="Move to end without guilt"
                   >
-                    <span className="truncate">Skip for now</span>
+                    Skip
                   </button>
                 </div>
 
-                <div className="text-xs text-text-tertiary text-center">
-                  Press <kbd className="px-1.5 py-0.5 rounded bg-surface-subtle text-text-secondary font-mono text-[11px]">Space</kbd> or{' '}
-                  <kbd className="px-1.5 py-0.5 rounded bg-surface-subtle text-text-secondary font-mono text-[11px]">Enter</kbd> to mark done •{' '}
-                  <kbd className="px-1.5 py-0.5 rounded bg-surface-subtle text-text-secondary font-mono text-[11px]">Esc</kbd> to exit
+                {/* Micro Keyboard Hint */}
+                <div className="text-2xs text-text-tertiary opacity-70 flex items-center gap-2">
+                  <span>
+                    <kbd className="font-mono text-text-secondary">Space</kbd> done
+                  </span>
+                  <span aria-hidden="true">·</span>
+                  <span>
+                    <kbd className="font-mono text-text-secondary">Esc</kbd> exit
+                  </span>
                 </div>
               </>
             ) : (
               <button
                 onClick={onClose}
-                className="h-12 px-6 rounded-xl bg-accent hover:bg-accent-hover active:scale-95 text-text-inverse text-sm font-medium shadow-subtle transition-all flex items-center justify-center"
+                className="h-9 sm:h-10 px-5 rounded-full bg-accent hover:bg-accent-hover active:scale-95 text-text-inverse text-xs sm:text-sm font-medium shadow-subtle transition-all"
               >
-                Rest, or head back to chat
+                Close
               </button>
             )}
           </motion.div>

@@ -8,16 +8,12 @@ interface StepsChecklistProps {
   steps: Step[];
   onToggleStep: (stepId: number) => void;
   onShrinkStep: (stepIndex: number) => void;
-  onSkipStep: (stepIndex: number) => void;
-  onOpenFocusTunnel: () => void;
 }
 
 export function StepsChecklist({
   steps,
   onToggleStep,
   onShrinkStep,
-  onSkipStep,
-  onOpenFocusTunnel,
 }: StepsChecklistProps) {
   if (!steps || steps.length === 0) return null;
 
@@ -28,29 +24,19 @@ export function StepsChecklist({
 
   return (
     <div className="mt-4 pt-3 border-t border-border-subtle space-y-3">
-      {/* Minimal Header: Visual Progress + Focus Trigger */}
-      <div className="flex items-center justify-between gap-4 px-1">
-        <div className="flex items-center gap-2.5 flex-1 max-w-[200px]">
-          <div className="h-1.5 flex-1 bg-surface-subtle rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-accent rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${progressPercent}%` }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-            />
-          </div>
-          <span className="text-2xs font-medium text-text-tertiary tabular-nums shrink-0">
-            {completedCount}/{total}
-          </span>
+      {/* Minimal Header: Visual Progress */}
+      <div className="flex items-center gap-2.5 px-1 max-w-[200px]">
+        <div className="h-1.5 flex-1 bg-surface-subtle rounded-full overflow-hidden">
+          <motion.div
+            className="h-full bg-accent rounded-full"
+            initial={{ width: 0 }}
+            animate={{ width: `${progressPercent}%` }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+          />
         </div>
-
-        <button
-          onClick={onOpenFocusTunnel}
-          className="text-xs text-accent font-medium hover:underline flex items-center gap-1 transition-all shrink-0"
-        >
-          <span>Focus Mode</span>
-          <span aria-hidden="true">→</span>
-        </button>
+        <span className="text-2xs font-medium text-text-tertiary tabular-nums shrink-0">
+          {completedCount}/{total}
+        </span>
       </div>
 
       {/* Step List: Compact rows for inactive, Spotlight card for active */}
@@ -92,10 +78,10 @@ export function StepsChecklist({
 
                 {/* Step Content */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
+                  <div>
                     <span
                       onClick={() => !isCurrent && onToggleStep(st.id)}
-                      className={` leading-snug select-none ${isCompleted
+                      className={`leading-snug select-none block ${isCompleted
                           ? 'text-xs line-through text-text-tertiary cursor-pointer'
                           : isCurrent
                             ? 'text-sm text-text-primary font-semibold'
@@ -104,19 +90,16 @@ export function StepsChecklist({
                     >
                       {st.text}
                     </span>
-
-                    {/* Only show effort badge on the active step to prevent column clutter */}
-                    {isCurrent && (
-                      <span className="shrink-0 text-2xs px-2 py-0.5 rounded-full bg-accent-subtle text-accent-text font-medium">
-                        {st.effort || '~1 min'}
-                      </span>
-                    )}
                   </div>
 
-                  {/* Active Step Supportive Actions */}
+                  {/* Active Step Actions & Effort Badge */}
                   {isCurrent && (
                     <div className="mt-3 flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1">
+                      <span className="shrink-0 text-2xs text-text-tertiary font-medium">
+                        {st.effort || '~1 min'}
+                      </span>
+
+                      <div className="flex items-center gap-1.5 ml-auto">
                         {st.canSplit && (
                           <button
                             onClick={() => onShrinkStep(idx)}
@@ -128,21 +111,13 @@ export function StepsChecklist({
                         )}
 
                         <button
-                          onClick={() => onSkipStep(idx)}
-                          className="text-2xs px-2 py-1 rounded-md hover:bg-surface-subtle text-text-tertiary hover:text-text-secondary transition-all"
-                          title="Move to the end without guilt"
+                          onClick={() => onToggleStep(st.id)}
+                          className="text-2xs px-3 py-1 rounded-md bg-accent hover:bg-accent-hover text-text-inverse font-medium shadow-subtle transition-all active:scale-95 flex items-center gap-1"
                         >
-                          Skip for now
+                          <Check size={12} weight="bold" />
+                          <span>Done</span>
                         </button>
                       </div>
-
-                      <button
-                        onClick={() => onToggleStep(st.id)}
-                        className="text-2xs px-3 py-1 rounded-md bg-accent hover:bg-accent-hover text-text-inverse font-medium shadow-subtle transition-all active:scale-95 flex items-center gap-1 ml-auto"
-                      >
-                        <Check size={12} weight="bold" />
-                        <span>Done</span>
-                      </button>
                     </div>
                   )}
                 </div>

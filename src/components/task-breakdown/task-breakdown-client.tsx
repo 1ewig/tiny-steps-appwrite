@@ -23,12 +23,10 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
     peekFuture,
     togglePeek,
     focusTunnelOpen,
-    setFocusTunnel,
     addMessage,
     updateAssistantMessage,
     toggleStepCompletion,
     shrinkStep,
-    skipStep,
   } = useTaskStore();
 
   const { interpretUserIntent, generateMicroSteps } = useOfflineAssistant();
@@ -135,8 +133,6 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
               const subSteps = target ? generateMicroSteps(target.text) : undefined;
               shrinkStep(currentSession.id, msgId, stepIdx, subSteps);
             }}
-            onSkipStep={(msgId, stepIdx) => skipStep(currentSession.id, msgId, stepIdx)}
-            onOpenFocusTunnel={() => setFocusTunnel(true)}
           />
         </div>
       </main>
