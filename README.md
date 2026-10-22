@@ -111,6 +111,7 @@ src/
 │   │   ├── assistant-bubble.tsx       # Assistant guidance & living task card
 │   │   ├── message-feed.tsx           # Auto-scrolling task feed
 │   │   ├── steps-checklist.tsx        # Framer Motion animated checklist (Shrink / Skip / Done)
+│   │   ├── peek-toggle.tsx            # Floating round future-step blur/unblur toggle
 │   │   └── typing-indicator.tsx       # Calm shimmer dots
 │   │
 │   └── shared/
@@ -120,7 +121,7 @@ src/
 │       └── layout/
 │           ├── tasks-layout-client.tsx # Persistent layout shell (header, sidebar, progress, modal)
 │           ├── ambient-progress.tsx   # Top ambient progress bar
-│           ├── app-header.tsx         # Header with title, peek toggle, sensitivity & tunnel launcher
+│           ├── app-header.tsx         # Header with title, sensitivity & tunnel launcher
 │           └── sidebar.tsx            # Collapsible session drawer (history & theme)
 │
 ├── constants/

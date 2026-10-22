@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { useOfflineAssistant } from '@/hooks/use-offline-assistant';
 import { MessageFeed } from '@/components/workspace/message-feed';
+import { PeekToggle } from '@/components/workspace/peek-toggle';
 import { ChatInput } from '@/components/shared/chat-input';
 
 interface TaskWorkspaceClientProps {
@@ -18,6 +19,9 @@ export function TaskWorkspaceClient({ sessionId }: TaskWorkspaceClientProps) {
   const {
     sessions,
     granularity,
+    peekFuture,
+    togglePeek,
+    focusTunnelOpen,
     setFocusTunnel,
     addMessage,
     updateAssistantMessage,
@@ -138,6 +142,11 @@ export function TaskWorkspaceClient({ sessionId }: TaskWorkspaceClientProps) {
 
       {/* Collapsed Chat Chip at Bottom (expands on demand for venting/tweaking) */}
       <ChatInput disabled={isTyping} onSubmit={handleSendMessage} collapsible />
+
+      {/* Floating Round Blur/Peek Toggle (Bottom-Right) */}
+      {steps.length > 0 && !focusTunnelOpen && (
+        <PeekToggle isPeekEnabled={peekFuture} onToggle={togglePeek} />
+      )}
     </>
   );
 }

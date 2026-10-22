@@ -35,7 +35,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     switchSession,
     deleteSession,
     setGranularity,
-    togglePeek,
     setFocusTunnel,
     toggleTheme,
     toggleStepCompletion,
@@ -130,11 +129,9 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
           sessionTitle={activeSession ? activeSession.title : 'New gentle task'}
           hasActiveSteps={Boolean(activeSession && steps.length > 0)}
           granularity={granularity}
-          peekFuture={peekFuture}
           onToggleSidebar={() => setSidebarOpen(true)}
           onOpenFocusTunnel={activeSession && steps.length > 0 ? () => setFocusTunnel(true) : undefined}
           onSelectGranularity={activeSessionId ? setGranularity : undefined}
-          onTogglePeek={activeSession ? togglePeek : undefined}
           showNewTaskButton={Boolean(activeSessionId)}
           onNewTask={() => {
             switchSession(null);
