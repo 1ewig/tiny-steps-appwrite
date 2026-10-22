@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useSyncExternalStore } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useSyncExternalStore } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { generateMicroSteps } from '@/lib/assistant-engine';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
@@ -14,6 +14,8 @@ const emptySubscribe = () => () => {};
 
 export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const params = useParams();
+  const routeSessionId = typeof params?.id === 'string' ? params.id : null;
 
   const mounted = useSyncExternalStore(
     emptySubscribe,
@@ -41,7 +43,18 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     skipStep,
   } = useTaskStore();
 
-  const activeSession = sessions.find((s) => s.id === currentSessionId);
+  const activeSessionId = routeSessionId ?? currentSessionId;
+
+  // Sync route session with Zustand store
+  useEffect(() => {
+    if (routeSessionId && routeSessionId !== currentSessionId) {
+      switchSession(routeSessionId);
+    } else if (!routeSessionId && currentSessionId !== null) {
+      switchSession(null);
+    }
+  }, [routeSessionId, currentSessionId, switchSession]);
+
+  const activeSession = sessions.find((s) => s.id === activeSessionId);
 
   const latestMessageWithSteps = activeSession?.messages
     ? [...activeSession.messages].reverse().find((m) => m.steps && m.steps.length > 0)
@@ -82,13 +95,13 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
   return (
     <div className={`h-screen flex overflow-hidden font-sans ${peekFuture ? 'peek-enabled' : ''}`}>
       {/* Ambient Top Progress Bar - Persistent & Static */}
-      <AmbientProgress progressPercentage={currentSessionId ? progressPct : 0} />
+      <AmbientProgress progressPercentage={activeSessionId ? progressPct : 0} />
 
       {/* Collapsible Sidebar - Persistent & Static */}
       <Sidebar
         isOpen={sidebarOpen}
         sessions={sessions}
-        currentSessionId={currentSessionId}
+        currentSessionId={activeSessionId}
         theme={theme}
         onClose={() => setSidebarOpen(false)}
         onNewSession={() => {
@@ -103,7 +116,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
         }}
         onDeleteSession={(id) => {
           deleteSession(id);
-          if (id === currentSessionId) {
+          if (id === activeSessionId) {
             router.push('/tasks');
           }
         }}
@@ -122,7 +135,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
           onOpenFocusTunnel={activeSession && steps.length > 0 ? () => setFocusTunnel(true) : undefined}
           onSelectGranularity={setGranularity}
           onTogglePeek={activeSession ? togglePeek : undefined}
-          showNewTaskButton={Boolean(currentSessionId)}
+          showNewTaskButton={Boolean(activeSessionId)}
           onNewTask={() => {
             switchSession(null);
             router.push('/tasks');

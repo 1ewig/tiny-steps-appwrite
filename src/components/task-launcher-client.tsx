@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { decomposeTask } from '@/lib/assistant-engine';
@@ -12,18 +12,10 @@ export function TaskLauncherClient() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
-    currentSessionId,
-    switchSession,
     granularity,
     createNewSession,
     addMessage,
   } = useTaskStore();
-
-  useEffect(() => {
-    if (currentSessionId !== null) {
-      switchSession(null);
-    }
-  }, [currentSessionId, switchSession]);
 
   const handleStartTask = (text: string) => {
     if (!text.trim() || isSubmitting) return;

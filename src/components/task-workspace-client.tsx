@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { useOfflineAssistant } from '@/hooks/use-offline-assistant';
@@ -17,8 +17,6 @@ export function TaskWorkspaceClient({ sessionId }: TaskWorkspaceClientProps) {
 
   const {
     sessions,
-    currentSessionId,
-    switchSession,
     granularity,
     setFocusTunnel,
     addMessage,
@@ -27,12 +25,6 @@ export function TaskWorkspaceClient({ sessionId }: TaskWorkspaceClientProps) {
     shrinkStep,
     skipStep,
   } = useTaskStore();
-
-  useEffect(() => {
-    if (sessionId && currentSessionId !== sessionId) {
-      switchSession(sessionId);
-    }
-  }, [sessionId, currentSessionId, switchSession]);
 
   const { interpretUserIntent, generateMicroSteps } = useOfflineAssistant();
 
