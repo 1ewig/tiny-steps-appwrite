@@ -116,7 +116,7 @@ export function TaskLauncherClient() {
 
         <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 pb-12 overflow-y-auto">
           <div className="w-full max-w-2xl mx-auto space-y-6">
-            <HeroWelcome onSelectPreset={handleStartTask} />
+            <HeroWelcome />
             <ChatInput disabled={isSubmitting} onSubmit={handleStartTask} isCentered />
           </div>
         </main>
