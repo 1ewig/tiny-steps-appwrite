@@ -31,7 +31,6 @@ export function TaskLauncherClient() {
     theme,
     createNewSession,
     deleteSession,
-    clearAllSessions,
     setGranularity,
     toggleTheme,
     addMessage,
@@ -101,7 +100,6 @@ export function TaskLauncherClient() {
           router.push(`/tasks/${id}`);
         }}
         onDeleteSession={(id) => deleteSession(id)}
-        onClearAll={clearAllSessions}
         onToggleTheme={toggleTheme}
       />
 

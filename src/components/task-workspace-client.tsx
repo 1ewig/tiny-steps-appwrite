@@ -39,7 +39,6 @@ export function TaskWorkspaceClient({ sessionId }: TaskWorkspaceClientProps) {
     theme,
     switchSession,
     deleteSession,
-    clearAllSessions,
     setGranularity,
     togglePeek,
     setFocusTunnel,
@@ -177,7 +176,6 @@ export function TaskWorkspaceClient({ sessionId }: TaskWorkspaceClientProps) {
             router.push(`/tasks/${id}`);
           }}
           onDeleteSession={(id) => deleteSession(id)}
-          onClearAll={clearAllSessions}
           onToggleTheme={toggleTheme}
         />
 
@@ -239,10 +237,6 @@ export function TaskWorkspaceClient({ sessionId }: TaskWorkspaceClientProps) {
           if (id === currentSession.id) {
             router.push('/tasks');
           }
-        }}
-        onClearAll={() => {
-          clearAllSessions();
-          router.push('/tasks');
         }}
         onToggleTheme={toggleTheme}
       />

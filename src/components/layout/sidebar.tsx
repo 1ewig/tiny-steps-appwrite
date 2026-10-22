@@ -11,7 +11,6 @@ interface SidebarProps {
   onNewSession: () => void;
   onSelectSession: (sessionId: string) => void;
   onDeleteSession: (sessionId: string) => void;
-  onClearAll: () => void;
   onToggleTheme: () => void;
 }
 
@@ -24,7 +23,6 @@ export function Sidebar({
   onNewSession,
   onSelectSession,
   onDeleteSession,
-  onClearAll,
   onToggleTheme,
 }: SidebarProps) {
   return (
@@ -145,41 +143,30 @@ export function Sidebar({
           )}
         </div>
 
-        {/* Bottom: Theme Toggle & Clear History */}
+        {/* Bottom: Theme Toggle */}
         <div className="p-3 border-t border-border-subtle bg-canvas/40">
-
-          {/* Theme & Clear History Row */}
-          <div className="flex items-center justify-between pt-1 px-1">
-            <button
-              onClick={onToggleTheme}
-              className="flex items-center gap-1.5 text-xs text-text-secondary hover:text-text-primary p-1.5 rounded-md hover:bg-surface-subtle transition-all"
-              title="Toggle sensory light/dim mode"
-            >
+          <button
+            onClick={onToggleTheme}
+            className="w-full flex items-center justify-between text-xs text-text-secondary hover:text-text-primary p-2 rounded-md hover:bg-surface-subtle transition-all"
+            title="Toggle sensory light/dim mode"
+          >
+            <span className="flex items-center gap-2">
               {theme === 'dark' ? (
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-accent" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <circle cx="12" cy="12" r="4" />
                   <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
                 </svg>
               ) : (
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-accent" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
                 </svg>
               )}
-              <span>{theme === 'dark' ? 'Light mode' : 'Dim mode'}</span>
-            </button>
-
-            <button
-              onClick={() => {
-                if (window.confirm('Clear all task history? This gives you a completely clean, calm slate.')) {
-                  onClearAll();
-                }
-              }}
-              className="text-2xs text-text-tertiary hover:text-danger-text p-1.5 rounded-md hover:bg-danger-subtle transition-all"
-              title="Clear all saved history"
-            >
-              Clear history
-            </button>
-          </div>
+              <span className="font-medium">{theme === 'dark' ? 'Light mode' : 'Dim mode'}</span>
+            </span>
+            <span className="text-2xs text-text-tertiary">
+              {theme === 'dark' ? 'Sensory light' : 'Sensory dim'}
+            </span>
+          </button>
         </div>
       </aside>
     </>
