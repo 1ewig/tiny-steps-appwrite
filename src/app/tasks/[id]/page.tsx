@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { TaskWorkspaceClient } from '@/components/task-workspace-client';
+import { TaskWorkspaceClient } from '@/components/workspace/task-workspace-client';
 
 export const instant = false;
 

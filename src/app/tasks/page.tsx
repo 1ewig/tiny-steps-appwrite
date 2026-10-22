@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { TaskLauncherClient } from '@/components/task-launcher-client';
+import { TaskLauncherClient } from '@/components/launcher/task-launcher-client';
 
 export const instant = false;
 

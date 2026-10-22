@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { decomposeTask } from '@/lib/assistant-engine';
-import { HeroWelcome } from '@/components/chat/hero-welcome';
-import { ChatInput } from '@/components/chat/chat-input';
+import { HeroWelcome } from '@/components/launcher/hero-welcome';
+import { ChatInput } from '@/components/shared/chat-input';
 
 export function TaskLauncherClient() {
   const router = useRouter();

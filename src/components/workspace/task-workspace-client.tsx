@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { useOfflineAssistant } from '@/hooks/use-offline-assistant';
-import { MessageFeed } from '@/components/chat/message-feed';
-import { ChatInput } from '@/components/chat/chat-input';
+import { MessageFeed } from '@/components/workspace/message-feed';
+import { ChatInput } from '@/components/shared/chat-input';
 
 interface TaskWorkspaceClientProps {
   sessionId: string;

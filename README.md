@@ -101,24 +101,26 @@ src/
 │   └── globals.css                    # Complete design tokens (colors, radii, shadows, typography)
 │
 ├── components/
-│   ├── task-launcher-client.tsx       # Launcher orchestrator for /tasks
-│   ├── task-workspace-client.tsx      # Dynamic task workspace orchestrator for /tasks/[id]
-│   │
-│   ├── layout/
-│   │   ├── ambient-progress.tsx       # Top ambient progress bar
-│   │   ├── app-header.tsx             # Header with title, peek toggle, sensitivity & tunnel launcher
-│   │   └── sidebar.tsx                # Collapsible session drawer (history & theme)
-│   │
-│   ├── chat/
+│   ├── launcher/
 │   │   ├── hero-welcome.tsx           # Centered empty state greeting
-│   │   ├── message-feed.tsx           # Auto-scrolling task feed
-│   │   ├── assistant-bubble.tsx       # Assistant guidance & living task card
-│   │   ├── steps-checklist.tsx        # Framer Motion animated checklist (Shrink / Skip / Done)
-│   │   ├── typing-indicator.tsx       # Calm shimmer dots
-│   │   └── chat-input.tsx             # Adaptive input (centered pill / collapsible bottom chip)
+│   │   └── task-launcher-client.tsx   # Launcher orchestrator for /tasks
 │   │
-│   └── focus/
-│       └── focus-tunnel-modal.tsx     # Distraction-free single-task execution modal
+│   ├── workspace/
+│   │   ├── task-workspace-client.tsx  # Dynamic task workspace orchestrator for /tasks/[id]
+│   │   ├── assistant-bubble.tsx       # Assistant guidance & living task card
+│   │   ├── message-feed.tsx           # Auto-scrolling task feed
+│   │   ├── steps-checklist.tsx        # Framer Motion animated checklist (Shrink / Skip / Done)
+│   │   └── typing-indicator.tsx       # Calm shimmer dots
+│   │
+│   └── shared/
+│       ├── chat-input.tsx             # Adaptive input (centered pill / collapsible bottom chip)
+│       ├── focus/
+│       │   └── focus-tunnel-modal.tsx # Distraction-free single-task execution modal
+│       └── layout/
+│           ├── tasks-layout-client.tsx # Persistent layout shell (header, sidebar, progress, modal)
+│           ├── ambient-progress.tsx   # Top ambient progress bar
+│           ├── app-header.tsx         # Header with title, peek toggle, sensitivity & tunnel launcher
+│           └── sidebar.tsx            # Collapsible session drawer (history & theme)
 │
 ├── constants/
 │   └── presets.ts                     # Task decomposition templates (desk, email, laundry, braindump)

@@ -5,10 +5,10 @@ import { useRouter, useParams } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { generateMicroSteps } from '@/lib/assistant-engine';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
-import { AmbientProgress } from '@/components/layout/ambient-progress';
-import { AppHeader } from '@/components/layout/app-header';
-import { Sidebar } from '@/components/layout/sidebar';
-import { FocusTunnelModal } from '@/components/focus/focus-tunnel-modal';
+import { AmbientProgress } from '@/components/shared/layout/ambient-progress';
+import { AppHeader } from '@/components/shared/layout/app-header';
+import { Sidebar } from '@/components/shared/layout/sidebar';
+import { FocusTunnelModal } from '@/components/shared/focus/focus-tunnel-modal';
 
 const emptySubscribe = () => () => {};
 

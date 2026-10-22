@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { TasksLayoutClient } from '@/components/tasks-layout-client';
+import { TasksLayoutClient } from '@/components/shared/layout/tasks-layout-client';
 
 export const instant = false;
 
