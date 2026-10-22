@@ -9,6 +9,7 @@ import { AmbientProgress } from '@/components/shared/layout/ambient-progress';
 import { AppHeader } from '@/components/shared/layout/app-header';
 import { Sidebar } from '@/components/shared/layout/sidebar';
 import { FocusTunnelModal } from '@/components/task-breakdown/focus-tunnel-modal';
+import { FocusLoader } from '@/components/shared/focus-loader';
 import { AppIcon } from '@/components/shared/app-icon';
 
 const emptySubscribe = () => () => {};
@@ -31,12 +32,15 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     currentSessionId,
     granularity,
     peekFuture,
-    focusTunnelOpen,
+    focusTunnelSessionId,
+    isGeneratingTask,
     theme,
     switchSession,
     deleteSession,
     setGranularity,
-    setFocusTunnel,
+    openFocusTunnel,
+    closeFocusTunnel,
+    setGeneratingTask,
     toggleTheme,
     toggleStepCompletion,
     shrinkStep,
@@ -63,6 +67,9 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
   }, [theme]);
 
   const activeSession = sessions.find((s) => s.id === activeSessionId);
+  const focusTunnelOpen = Boolean(
+    activeSessionId && focusTunnelSessionId === activeSessionId
+  );
 
   const latestMessageWithSteps = activeSession?.messages
     ? [...activeSession.messages].reverse().find((m) => m.steps && m.steps.length > 0)
@@ -76,9 +83,33 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
   const completedSteps = steps.filter((s) => s.completed).length;
   const progressPct = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
 
+  useEffect(() => {
+    if (!focusTunnelSessionId || isGeneratingTask) return;
+    if (!routeSessionId || focusTunnelSessionId !== routeSessionId) {
+      closeFocusTunnel();
+    }
+  }, [routeSessionId, focusTunnelSessionId, isGeneratingTask, closeFocusTunnel]);
+
+  useEffect(() => {
+    if (!isGeneratingTask) return;
+    if (!routeSessionId || focusTunnelSessionId !== routeSessionId) return;
+    if (steps.length === 0) return;
+
+    const timer = setTimeout(() => setGeneratingTask(false), 200);
+    return () => clearTimeout(timer);
+  }, [
+    isGeneratingTask,
+    routeSessionId,
+    focusTunnelSessionId,
+    steps.length,
+    setGeneratingTask,
+  ]);
+
   // Global Keyboard Shortcuts
   useKeyboardShortcuts({
     onNewSession: () => {
+      if (isGeneratingTask) return;
+      closeFocusTunnel();
       switchSession(null);
       router.push('/tasks');
     },
@@ -87,7 +118,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
         toggleStepCompletion(activeSession.id, latestMessageWithSteps.id, activeStep.id);
       }
     },
-    isFocusTunnelActive: focusTunnelOpen,
+    isFocusTunnelActive: focusTunnelOpen && !isGeneratingTask,
   });
 
   if (!mounted) {
@@ -112,15 +143,20 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
         onClose={() => setSidebarOpen(false)}
         onNewSession={() => {
           setSidebarOpen(false);
+          closeFocusTunnel();
           switchSession(null);
           router.push('/tasks');
         }}
         onSelectSession={(id) => {
           setSidebarOpen(false);
+          closeFocusTunnel();
           switchSession(id);
           router.push(`/tasks/${id}`);
         }}
         onDeleteSession={(id) => {
+          if (focusTunnelSessionId === id) {
+            closeFocusTunnel();
+          }
           deleteSession(id);
           if (id === activeSessionId) {
             router.push('/tasks');
@@ -137,10 +173,15 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
           hasActiveSteps={Boolean(activeSession && steps.length > 0)}
           granularity={granularity}
           onToggleSidebar={() => setSidebarOpen(true)}
-          onOpenFocusTunnel={activeSession && steps.length > 0 ? () => setFocusTunnel(true) : undefined}
+          onOpenFocusTunnel={
+            activeSession && activeSessionId && steps.length > 0
+              ? () => openFocusTunnel(activeSessionId)
+              : undefined
+          }
           onSelectGranularity={activeSessionId ? setGranularity : undefined}
           showNewTaskButton={Boolean(activeSessionId)}
           onNewTask={() => {
+            closeFocusTunnel();
             switchSession(null);
             router.push('/tasks');
           }}
@@ -153,9 +194,10 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
       {/* Focus Tunnel Modal - Persistent */}
       <FocusTunnelModal
         isOpen={focusTunnelOpen}
+        isBusy={isGeneratingTask}
         activeStep={activeStep}
         sessionTitle={activeSession?.title || 'Focus Tunnel'}
-        onClose={() => setFocusTunnel(false)}
+        onClose={closeFocusTunnel}
         onComplete={() => {
           if (activeStep && latestMessageWithSteps && activeSession) {
             toggleStepCompletion(activeSession.id, latestMessageWithSteps.id, activeStep.id);
@@ -168,6 +210,8 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
           }
         }}
       />
+
+      <FocusLoader isVisible={isGeneratingTask} />
     </div>
   );
 }

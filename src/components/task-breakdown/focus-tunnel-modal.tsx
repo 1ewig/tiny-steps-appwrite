@@ -7,6 +7,7 @@ import type { Step } from '@/types/task';
 
 interface FocusTunnelModalProps {
   isOpen: boolean;
+  isBusy?: boolean;
   activeStep: Step | null;
   sessionTitle: string;
   onClose: () => void;
@@ -16,6 +17,7 @@ interface FocusTunnelModalProps {
 
 export function FocusTunnelModal({
   isOpen,
+  isBusy = false,
   activeStep,
   sessionTitle,
   onClose,
@@ -23,7 +25,7 @@ export function FocusTunnelModal({
   onShrink,
 }: FocusTunnelModalProps) {
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || isBusy) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
@@ -32,7 +34,7 @@ export function FocusTunnelModal({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, isBusy, onClose]);
 
   return (
     <AnimatePresence>

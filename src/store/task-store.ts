@@ -10,7 +10,8 @@ export const useTaskStore = create<TaskState>()(
       currentSessionId: null,
       granularity: 2,
       peekFuture: false,
-      focusTunnelOpen: false,
+      focusTunnelSessionId: null,
+      isGeneratingTask: false,
       theme: 'light',
 
       createNewSession: (switchImmediately = true) => {
@@ -40,6 +41,8 @@ export const useTaskStore = create<TaskState>()(
           return {
             sessions: filtered,
             currentSessionId: state.currentSessionId === sessionId ? null : state.currentSessionId,
+            focusTunnelSessionId:
+              state.focusTunnelSessionId === sessionId ? null : state.focusTunnelSessionId,
           };
         });
       },
@@ -48,6 +51,7 @@ export const useTaskStore = create<TaskState>()(
         set({
           sessions: [],
           currentSessionId: null,
+          focusTunnelSessionId: null,
         });
       },
 
@@ -59,8 +63,16 @@ export const useTaskStore = create<TaskState>()(
         set((state) => ({ peekFuture: !state.peekFuture }));
       },
 
-      setFocusTunnel: (open: boolean) => {
-        set({ focusTunnelOpen: open });
+      openFocusTunnel: (sessionId: string) => {
+        set({ focusTunnelSessionId: sessionId });
+      },
+
+      closeFocusTunnel: () => {
+        set({ focusTunnelSessionId: null });
+      },
+
+      setGeneratingTask: (isGenerating: boolean) => {
+        set({ isGeneratingTask: isGenerating });
       },
 
       toggleTheme: () => {
@@ -162,6 +174,13 @@ export const useTaskStore = create<TaskState>()(
     {
       name: 'tinysteps_zustand_store',
       storage: createJSONStorage(() => (typeof window !== 'undefined' ? localStorage : dummyStorage)),
+      partialize: (state) => ({
+        sessions: state.sessions,
+        currentSessionId: state.currentSessionId,
+        granularity: state.granularity,
+        peekFuture: state.peekFuture,
+        theme: state.theme,
+      }),
       onRehydrateStorage: () => (state) => {
         if (typeof document !== 'undefined' && state?.theme === 'dark') {
           document.documentElement.classList.add('dark');

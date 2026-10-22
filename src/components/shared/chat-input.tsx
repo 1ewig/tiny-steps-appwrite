@@ -9,6 +9,7 @@ interface ChatInputProps {
   onSubmit: (text: string) => void;
   isCentered?: boolean;
   collapsible?: boolean;
+  initialText?: string;
 }
 
 export function ChatInput({
@@ -16,9 +17,12 @@ export function ChatInput({
   onSubmit,
   isCentered = false,
   collapsible = false,
+  initialText = '',
 }: ChatInputProps) {
-  const [text, setText] = useState('');
-  const [isMultiline, setIsMultiline] = useState(false);
+  const [text, setText] = useState(initialText);
+  const [isMultiline, setIsMultiline] = useState(
+    initialText.includes('\n') || initialText.length > 36
+  );
   const [isExpanded, setIsExpanded] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -65,6 +69,13 @@ export function ChatInput({
       return () => clearTimeout(timer);
     }
   }, [isCentered, disabled]);
+
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, 140)}px`;
+  }, []);
 
   const inputBlock = (
     <div className="max-w-2xl mx-auto pointer-events-auto w-full">

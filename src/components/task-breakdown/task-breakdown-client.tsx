@@ -22,7 +22,7 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
     granularity,
     peekFuture,
     togglePeek,
-    focusTunnelOpen,
+    focusTunnelSessionId,
     addMessage,
     updateAssistantMessage,
     toggleStepCompletion,
@@ -32,6 +32,7 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
   const { interpretUserIntent, generateMicroSteps } = useOfflineAssistant();
 
   const currentSession = sessions.find((s) => s.id === sessionId);
+  const focusTunnelOpen = focusTunnelSessionId === sessionId;
 
   // Latest message with steps
   const latestMessageWithSteps = currentSession?.messages

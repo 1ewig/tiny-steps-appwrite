@@ -96,6 +96,7 @@
   --z-sidebar: 45;
   --z-modal: 50;
   --z-toast: 60;
+  --z-loader: 70;
 }
 
 /* ==========================================================================
@@ -201,6 +202,10 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.focus-loader {
+  z-index: var(--z-loader);
 }
 
 /* ==========================================================================

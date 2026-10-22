@@ -30,7 +30,8 @@ export interface TaskState {
   currentSessionId: string | null;
   granularity: GranularityLevel;
   peekFuture: boolean;
-  focusTunnelOpen: boolean;
+  focusTunnelSessionId: string | null;
+  isGeneratingTask: boolean;
   theme: 'light' | 'dark';
 
   // Actions
@@ -40,7 +41,9 @@ export interface TaskState {
   clearAllSessions: () => void;
   setGranularity: (level: GranularityLevel) => void;
   togglePeek: () => void;
-  setFocusTunnel: (open: boolean) => void;
+  openFocusTunnel: (sessionId: string) => void;
+  closeFocusTunnel: () => void;
+  setGeneratingTask: (isGenerating: boolean) => void;
   toggleTheme: () => void;
 
   // Chat & Step Actions
