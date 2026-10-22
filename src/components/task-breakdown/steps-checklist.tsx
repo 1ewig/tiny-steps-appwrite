@@ -18,27 +18,9 @@ export function StepsChecklist({
   if (!steps || steps.length === 0) return null;
 
   const activeIdx = steps.findIndex((s) => !s.completed);
-  const total = steps.length;
-  const completedCount = steps.filter((s) => s.completed).length;
-  const progressPercent = Math.round((completedCount / total) * 100);
 
   return (
     <div className="mt-4 pt-3 border-t border-border-subtle space-y-3">
-      {/* Minimal Header: Visual Progress */}
-      <div className="flex items-center gap-2.5 px-1 max-w-[200px]">
-        <div className="h-1.5 flex-1 bg-surface-subtle rounded-full overflow-hidden">
-          <motion.div
-            className="h-full bg-accent rounded-full"
-            initial={{ width: 0 }}
-            animate={{ width: `${progressPercent}%` }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
-          />
-        </div>
-        <span className="text-2xs font-medium text-text-tertiary tabular-nums shrink-0">
-          {completedCount}/{total}
-        </span>
-      </div>
-
       {/* Step List: Compact rows for inactive, Spotlight card for active */}
       <div className="space-y-1">
         {steps.map((st, idx) => {
