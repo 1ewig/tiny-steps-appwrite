@@ -113,7 +113,7 @@ src/
 │   │   ├── task-breakdown-client.tsx  # Dynamic task breakdown orchestrator for /tasks/[id]
 │   │   ├── assistant-bubble.tsx       # Assistant guidance & living task card
 │   │   ├── message-feed.tsx           # Auto-scrolling task feed (stable scroll on step toggles)
-│   │   ├── steps-checklist.tsx        # Framer Motion animated checklist (Shrink / Skip / Done)
+│   │   ├── steps-checklist.tsx        # Framer Motion animated checklist (Shrink / Done)
 │   │   ├── focus-tunnel-modal.tsx     # Distraction-free single-task execution modal
 │   │   ├── peek-toggle.tsx            # Floating round future-step blur/unblur toggle
 │   │   └── typing-indicator.tsx       # Calm shimmer dots with cairn avatar

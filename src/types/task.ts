@@ -51,5 +51,4 @@ export interface TaskState {
   ) => void;
   toggleStepCompletion: (sessionId: string, messageId: string, stepId: number) => void;
   shrinkStep: (sessionId: string, messageId: string, stepIndex: number, subSteps?: Step[]) => void;
-  skipStep: (sessionId: string, messageId: string, stepIndex: number) => void;
 }

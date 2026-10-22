@@ -12,7 +12,6 @@ interface FocusTunnelModalProps {
   onClose: () => void;
   onComplete: () => void;
   onShrink: () => void;
-  onSkip: () => void;
 }
 
 export function FocusTunnelModal({
@@ -22,7 +21,6 @@ export function FocusTunnelModal({
   onClose,
   onComplete,
   onShrink,
-  onSkip,
 }: FocusTunnelModalProps) {
   useEffect(() => {
     if (!isOpen) return;
@@ -124,14 +122,6 @@ export function FocusTunnelModal({
                     </button>
                   )}
 
-                  {/* Tertiary: Skip */}
-                  <button
-                    onClick={onSkip}
-                    className="h-9 sm:h-10 px-3 rounded-full hover:bg-surface-subtle text-text-tertiary hover:text-text-secondary text-xs sm:text-sm font-medium transition-all active:scale-95"
-                    title="Move to end without guilt"
-                  >
-                    Skip
-                  </button>
                 </div>
 
                 {/* Micro Keyboard Hint */}

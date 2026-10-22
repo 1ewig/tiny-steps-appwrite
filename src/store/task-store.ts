@@ -158,26 +158,6 @@ export const useTaskStore = create<TaskState>()(
         });
       },
 
-      skipStep: (sessionId: string, messageId: string, stepIndex: number) => {
-        set((state) => {
-          const sessions = state.sessions.map((sess) => {
-            if (sess.id !== sessionId) return sess;
-            const messages = sess.messages.map((msg) => {
-              if (msg.id !== messageId || !msg.steps || !msg.steps[stepIndex]) return msg;
-              const updatedSteps = [...msg.steps];
-              if (updatedSteps.length > stepIndex + 1) {
-                const [skipped] = updatedSteps.splice(stepIndex, 1);
-                updatedSteps.splice(stepIndex + 1, 0, skipped);
-              } else {
-                updatedSteps[stepIndex] = { ...updatedSteps[stepIndex], completed: true };
-              }
-              return { ...msg, steps: updatedSteps };
-            });
-            return { ...sess, messages };
-          });
-          return { sessions };
-        });
-      },
     }),
     {
       name: 'tinysteps_zustand_store',

@@ -40,7 +40,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     toggleTheme,
     toggleStepCompletion,
     shrinkStep,
-    skipStep,
   } = useTaskStore();
 
   const activeSessionId = routeSessionId ?? currentSessionId;
@@ -166,11 +165,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
           if (activeStepIndex !== -1 && latestMessageWithSteps && activeStep && activeSession) {
             const subSteps = generateMicroSteps(activeStep.text);
             shrinkStep(activeSession.id, latestMessageWithSteps.id, activeStepIndex, subSteps);
-          }
-        }}
-        onSkip={() => {
-          if (activeStepIndex !== -1 && latestMessageWithSteps && activeSession) {
-            skipStep(activeSession.id, latestMessageWithSteps.id, activeStepIndex);
           }
         }}
       />
