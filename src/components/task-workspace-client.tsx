@@ -1,20 +1,26 @@
 'use client';
 
-import { useState, useSyncExternalStore } from 'react';
+import { useState, useEffect, useSyncExternalStore } from 'react';
+import { useRouter } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { useOfflineAssistant } from '@/hooks/use-offline-assistant';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { AmbientProgress } from '@/components/layout/ambient-progress';
 import { AppHeader } from '@/components/layout/app-header';
 import { Sidebar } from '@/components/layout/sidebar';
-import { HeroWelcome } from '@/components/chat/hero-welcome';
 import { MessageFeed } from '@/components/chat/message-feed';
 import { ChatInput } from '@/components/chat/chat-input';
 import { FocusTunnelModal } from '@/components/focus/focus-tunnel-modal';
 
 const emptySubscribe = () => () => {};
 
-export function TinyStepsClient() {
+interface TaskWorkspaceClientProps {
+  sessionId: string;
+}
+
+export function TaskWorkspaceClient({ sessionId }: TaskWorkspaceClientProps) {
+  const router = useRouter();
+
   const mounted = useSyncExternalStore(
     emptySubscribe,
     () => true,
@@ -31,7 +37,6 @@ export function TinyStepsClient() {
     peekFuture,
     focusTunnelOpen,
     theme,
-    createNewSession,
     switchSession,
     deleteSession,
     clearAllSessions,
@@ -48,7 +53,14 @@ export function TinyStepsClient() {
 
   const { interpretUserIntent, generateMicroSteps } = useOfflineAssistant();
 
-  const currentSession = sessions.find((s) => s.id === currentSessionId) || sessions[0];
+  const currentSession = sessions.find((s) => s.id === sessionId);
+
+  // Sync store's currentSessionId when viewing this task
+  useEffect(() => {
+    if (currentSession && currentSessionId !== sessionId) {
+      switchSession(sessionId);
+    }
+  }, [sessionId, currentSession, currentSessionId, switchSession]);
 
   // Latest message with steps
   const latestMessageWithSteps = currentSession?.messages
@@ -64,7 +76,7 @@ export function TinyStepsClient() {
   const completedSteps = steps.filter((s) => s.completed).length;
   const progressPct = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
 
-  // Handle User Message Submission
+  // Handle User Message Submission (Tweaking / Venting)
   const handleSendMessage = (text: string) => {
     if (!currentSession) return;
 
@@ -114,7 +126,7 @@ export function TinyStepsClient() {
           });
         }
       } else {
-        // Initial breakdown in a fresh session
+        // Initial breakdown fallback
         const initialSteps = intent.type === 'new_task' ? intent.steps : [];
         addMessage(currentSession.id, {
           role: 'assistant',
@@ -127,9 +139,9 @@ export function TinyStepsClient() {
 
   // Keyboard Shortcuts
   useKeyboardShortcuts({
-    onNewSession: () => createNewSession(true),
+    onNewSession: () => router.push('/tasks'),
     onCompleteFocusStep: () => {
-      if (activeStep && latestMessageWithSteps) {
+      if (activeStep && latestMessageWithSteps && currentSession) {
         toggleStepCompletion(currentSession.id, latestMessageWithSteps.id, activeStep.id);
       }
     },
@@ -146,6 +158,62 @@ export function TinyStepsClient() {
     );
   }
 
+  // Graceful 404 / Missing Session Screen
+  if (!currentSession) {
+    return (
+      <div className="h-screen flex overflow-hidden font-sans">
+        <Sidebar
+          isOpen={sidebarOpen}
+          sessions={sessions}
+          currentSessionId={currentSessionId}
+          theme={theme}
+          onClose={() => setSidebarOpen(false)}
+          onNewSession={() => {
+            setSidebarOpen(false);
+            router.push('/tasks');
+          }}
+          onSelectSession={(id) => {
+            setSidebarOpen(false);
+            router.push(`/tasks/${id}`);
+          }}
+          onDeleteSession={(id) => deleteSession(id)}
+          onClearAll={clearAllSessions}
+          onToggleTheme={toggleTheme}
+        />
+
+        <div className="flex-1 flex flex-col h-full overflow-hidden">
+          <AppHeader
+            sessionTitle="Task not found"
+            hasActiveSteps={false}
+            granularity={granularity}
+            peekFuture={false}
+            onToggleSidebar={() => setSidebarOpen(true)}
+            showNewTaskButton
+            onNewTask={() => router.push('/tasks')}
+          />
+
+          <main className="flex-1 flex flex-col items-center justify-center px-4 text-center space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-surface-subtle text-text-tertiary flex items-center justify-center text-xl shadow-subtle">
+              🔍
+            </div>
+            <div className="space-y-1.5 max-w-sm">
+              <h2 className="text-lg font-bold text-text-primary">This task could not be found</h2>
+              <p className="text-text-secondary text-xs sm:text-sm leading-relaxed">
+                It may have been cleared from local storage or created in another browser session.
+              </p>
+            </div>
+            <button
+              onClick={() => router.push('/tasks')}
+              className="py-2.5 px-5 rounded-xl bg-accent hover:bg-accent-hover text-text-inverse text-xs font-semibold shadow-subtle transition-all active:scale-95"
+            >
+              Start a new gentle task
+            </button>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`h-screen flex overflow-hidden font-sans ${peekFuture ? 'peek-enabled' : ''}`}>
       {/* Ambient Top Progress Bar */}
@@ -155,70 +223,72 @@ export function TinyStepsClient() {
       <Sidebar
         isOpen={sidebarOpen}
         sessions={sessions}
-        currentSessionId={currentSessionId}
+        currentSessionId={currentSession.id}
         theme={theme}
         onClose={() => setSidebarOpen(false)}
-        onNewSession={() => createNewSession(true)}
-        onSelectSession={(id) => switchSession(id)}
-        onDeleteSession={(id) => deleteSession(id)}
-        onClearAll={clearAllSessions}
+        onNewSession={() => {
+          setSidebarOpen(false);
+          router.push('/tasks');
+        }}
+        onSelectSession={(id) => {
+          setSidebarOpen(false);
+          router.push(`/tasks/${id}`);
+        }}
+        onDeleteSession={(id) => {
+          deleteSession(id);
+          if (id === currentSession.id) {
+            router.push('/tasks');
+          }
+        }}
+        onClearAll={() => {
+          clearAllSessions();
+          router.push('/tasks');
+        }}
         onToggleTheme={toggleTheme}
       />
 
-      {/* Main Chat Area */}
+      {/* Main Workspace Area */}
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
         <AppHeader
-          sessionTitle={currentSession?.title || 'New session'}
+          sessionTitle={currentSession.title || 'Gentle Task'}
           hasActiveSteps={steps.length > 0}
           granularity={granularity}
           peekFuture={peekFuture}
+          onToggleSidebar={() => setSidebarOpen(true)}
           onOpenFocusTunnel={() => setFocusTunnel(true)}
           onSelectGranularity={setGranularity}
           onTogglePeek={togglePeek}
+          showNewTaskButton
+          onNewTask={() => router.push('/tasks')}
         />
 
-        {/* Scrollable Feed or Centered Welcome */}
-        {!currentSession || currentSession.messages.length === 0 ? (
-          <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 pb-12 overflow-y-auto">
-            <div className="w-full max-w-2xl mx-auto space-y-6">
-              <HeroWelcome />
-              <ChatInput disabled={isTyping} onSubmit={handleSendMessage} isCentered />
-            </div>
-          </main>
-        ) : (
-          <>
-            <main className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 scroll-smooth">
-              <div className="max-w-2xl mx-auto space-y-6 pb-28">
-                <MessageFeed
-                  messages={currentSession.messages}
-                  isTyping={isTyping}
-                  onToggleStep={(msgId, stepId) => toggleStepCompletion(currentSession.id, msgId, stepId)}
-                  onShrinkStep={(msgId, stepIdx) => {
-                    const target = steps[stepIdx];
-                    const subSteps = target ? generateMicroSteps(target.text) : undefined;
-                    shrinkStep(currentSession.id, msgId, stepIdx, subSteps);
-                  }}
-                  onSkipStep={(msgId, stepIdx) => skipStep(currentSession.id, msgId, stepIdx)}
-                  onOpenFocusTunnel={() => setFocusTunnel(true)}
-                />
-              </div>
-            </main>
-
-            {/* Collapsed Chat Chip at Bottom (expands on demand) */}
-            <ChatInput
-              disabled={isTyping}
-              onSubmit={handleSendMessage}
-              collapsible
+        {/* Scrollable Feed */}
+        <main className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 scroll-smooth">
+          <div className="max-w-2xl mx-auto space-y-6 pb-28">
+            <MessageFeed
+              messages={currentSession.messages}
+              isTyping={isTyping}
+              onToggleStep={(msgId, stepId) => toggleStepCompletion(currentSession.id, msgId, stepId)}
+              onShrinkStep={(msgId, stepIdx) => {
+                const target = steps[stepIdx];
+                const subSteps = target ? generateMicroSteps(target.text) : undefined;
+                shrinkStep(currentSession.id, msgId, stepIdx, subSteps);
+              }}
+              onSkipStep={(msgId, stepIdx) => skipStep(currentSession.id, msgId, stepIdx)}
+              onOpenFocusTunnel={() => setFocusTunnel(true)}
             />
-          </>
-        )}
+          </div>
+        </main>
+
+        {/* Collapsed Chat Chip at Bottom (expands on demand for venting/tweaking) */}
+        <ChatInput disabled={isTyping} onSubmit={handleSendMessage} collapsible />
       </div>
 
       {/* Focus Tunnel Modal */}
       <FocusTunnelModal
         isOpen={focusTunnelOpen}
         activeStep={activeStep}
-        sessionTitle={currentSession?.title || 'Focus Tunnel'}
+        sessionTitle={currentSession.title || 'Focus Tunnel'}
         onClose={() => setFocusTunnel(false)}
         onComplete={() => {
           if (activeStep && latestMessageWithSteps) {

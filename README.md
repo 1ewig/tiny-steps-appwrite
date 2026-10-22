@@ -93,11 +93,16 @@ Built with a high-performance modern web stack:
 src/
 ├── app/
 │   ├── layout.tsx                     # Root layout (Plus Jakarta Sans, globals.css tokens)
-│   ├── page.tsx                       # Lightweight React Server Component (RSC entry point)
+│   ├── page.tsx                       # Root redirect -> /tasks (reserved for future landing page)
+│   ├── tasks/
+│   │   ├── page.tsx                   # Task launcher / new task creator (/tasks)
+│   │   └── [id]/
+│   │       └── page.tsx               # Dedicated task workspace with partial prerendering (/tasks/[id])
 │   └── globals.css                    # Complete design tokens (colors, radii, shadows, typography)
 │
 ├── components/
-│   ├── tiny-steps-client.tsx          # Client Orchestrator ("use client" coordinator)
+│   ├── task-launcher-client.tsx       # Launcher orchestrator for /tasks
+│   ├── task-workspace-client.tsx      # Dynamic task workspace orchestrator for /tasks/[id]
 │   │
 │   ├── layout/
 │   │   ├── ambient-progress.tsx       # Top ambient progress bar
