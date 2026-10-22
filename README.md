@@ -111,13 +111,12 @@ src/
 │   │   ├── assistant-bubble.tsx       # Assistant guidance & living task card
 │   │   ├── message-feed.tsx           # Auto-scrolling task feed
 │   │   ├── steps-checklist.tsx        # Framer Motion animated checklist (Shrink / Skip / Done)
+│   │   ├── focus-tunnel-modal.tsx     # Distraction-free single-task execution modal
 │   │   ├── peek-toggle.tsx            # Floating round future-step blur/unblur toggle
 │   │   └── typing-indicator.tsx       # Calm shimmer dots
 │   │
 │   └── shared/
 │       ├── chat-input.tsx             # Adaptive input (centered pill / collapsible bottom chip)
-│       ├── focus/
-│       │   └── focus-tunnel-modal.tsx # Distraction-free single-task execution modal
 │       └── layout/
 │           ├── tasks-layout-client.tsx # Persistent layout shell (header, sidebar, progress, modal)
 │           ├── ambient-progress.tsx   # Top ambient progress bar

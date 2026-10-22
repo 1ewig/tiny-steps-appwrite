@@ -8,7 +8,7 @@ import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { AmbientProgress } from '@/components/shared/layout/ambient-progress';
 import { AppHeader } from '@/components/shared/layout/app-header';
 import { Sidebar } from '@/components/shared/layout/sidebar';
-import { FocusTunnelModal } from '@/components/shared/focus/focus-tunnel-modal';
+import { FocusTunnelModal } from '@/components/workspace/focus-tunnel-modal';
 
 const emptySubscribe = () => () => {};
 
