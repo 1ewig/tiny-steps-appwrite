@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { Sparkle, Check } from '@phosphor-icons/react';
 import type { Step } from '@/types/task';
 
 interface StepsChecklistProps {
@@ -120,9 +121,10 @@ export function StepsChecklist({
                         {st.canSplit ? (
                           <button
                             onClick={() => onShrinkStep(idx)}
-                            className="text-2xs px-2.5 py-1 rounded-md bg-surface-subtle hover:bg-surface-subtle/80 text-text-primary font-medium flex items-center gap-1 transition-all"
+                            className="text-2xs px-2.5 py-1 rounded-md bg-surface-subtle hover:bg-surface-subtle/80 text-text-primary font-medium flex items-center gap-1.5 transition-all"
                           >
-                            <span>✨ Shrink this step</span>
+                            <Sparkle size={12} weight="duotone" className="text-accent" />
+                            <span>Shrink this step</span>
                           </button>
                         ) : (
                           <span className="text-2xs text-text-tertiary">Micro-step active</span>
@@ -139,9 +141,10 @@ export function StepsChecklist({
 
                       <button
                         onClick={() => onToggleStep(st.id)}
-                        className="text-2xs px-3 py-1 rounded-md bg-accent hover:bg-accent-hover text-text-inverse font-medium shadow-subtle transition-all active:scale-95"
+                        className="text-2xs px-3 py-1 rounded-md bg-accent hover:bg-accent-hover text-text-inverse font-medium shadow-subtle transition-all active:scale-95 flex items-center gap-1"
                       >
-                        Done ✓
+                        <Check size={12} weight="bold" />
+                        <span>Done</span>
                       </button>
                     </div>
                   )}

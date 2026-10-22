@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ChatCircleDots, X } from '@phosphor-icons/react';
 
 interface ChatInputProps {
   disabled?: boolean;
@@ -131,7 +132,7 @@ export function ChatInput({
               }}
               className="pointer-events-auto px-4 py-2 rounded-full bg-surface/95 hover:bg-surface border border-border-subtle shadow-card text-xs font-medium text-text-secondary hover:text-text-primary flex items-center gap-2 transition-all backdrop-blur-md active:scale-95 group"
             >
-              <span className="text-sm group-hover:scale-110 transition-transform">💬</span>
+              <ChatCircleDots size={16} weight="regular" className="text-accent group-hover:scale-110 transition-transform shrink-0" />
               <span>Need to tweak or vent?</span>
             </button>
           </motion.div>
@@ -155,7 +156,7 @@ export function ChatInput({
                   }}
                   className="hover:text-text-primary px-2 py-0.5 rounded hover:bg-surface-subtle transition-colors flex items-center gap-1 font-medium"
                 >
-                  <span>✕</span>
+                  <X size={12} weight="bold" />
                   <span>Close</span>
                 </button>
               </div>

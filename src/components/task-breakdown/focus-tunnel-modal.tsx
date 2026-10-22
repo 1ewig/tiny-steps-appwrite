@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Sparkle } from '@phosphor-icons/react';
 import type { Step } from '@/types/task';
 
 interface FocusTunnelModalProps {
@@ -78,8 +79,8 @@ export function FocusTunnelModal({
               </h1>
             ) : (
               <div className="space-y-4 max-w-md">
-                <div className="w-16 h-16 rounded-2xl bg-accent-subtle text-accent flex items-center justify-center text-3xl orb-pulse mx-auto">
-                  🌿
+                <div className="w-16 h-16 rounded-2xl bg-accent-subtle text-accent flex items-center justify-center orb-pulse mx-auto">
+                  <Sparkle size={36} weight="duotone" className="text-accent" />
                 </div>
                 <div className="space-y-2">
                   <h1 className="text-3xl sm:text-4xl font-bold text-text-primary leading-tight">
@@ -126,7 +127,7 @@ export function FocusTunnelModal({
                       onClick={onShrink}
                       className="flex-1 min-w-[150px] sm:w-48 h-12 px-5 rounded-xl bg-surface-subtle hover:bg-surface-subtle/80 text-text-primary text-sm font-medium transition-all active:scale-95 flex items-center justify-center gap-1.5"
                     >
-                      <span>✨</span>
+                      <Sparkle size={15} weight="duotone" className="text-accent" />
                       <span className="truncate">Shrink it</span>
                     </button>
                   )}

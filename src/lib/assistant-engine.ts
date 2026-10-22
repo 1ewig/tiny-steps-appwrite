@@ -202,7 +202,7 @@ export function interpretUserIntent(
       type: 'complete_step',
       targetStepId: nextIncomplete.id,
       dialogue:
-        'Incredible work! 🎉 Notice how taking that one microscopic action did not break you. Take a brief breath. Here is your next step:',
+        'Incredible work! Notice how taking that one microscopic action did not break you. Take a brief breath. Here is your next step:',
     };
   }
 

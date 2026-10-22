@@ -9,6 +9,7 @@ import { AmbientProgress } from '@/components/shared/layout/ambient-progress';
 import { AppHeader } from '@/components/shared/layout/app-header';
 import { Sidebar } from '@/components/shared/layout/sidebar';
 import { FocusTunnelModal } from '@/components/task-breakdown/focus-tunnel-modal';
+import { Plant } from '@phosphor-icons/react';
 
 const emptySubscribe = () => () => {};
 
@@ -93,8 +94,8 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
   if (!mounted) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-canvas text-text-tertiary">
-        <span className="w-6 h-6 rounded-full bg-accent/20 orb-pulse flex items-center justify-center text-xs">
-          🌱
+        <span className="w-8 h-8 rounded-full bg-accent-subtle orb-pulse flex items-center justify-center">
+          <Plant size={18} weight="duotone" className="text-accent" />
         </span>
       </div>
     );

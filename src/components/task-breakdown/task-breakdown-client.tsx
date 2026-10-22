@@ -7,6 +7,7 @@ import { useOfflineAssistant } from '@/hooks/use-offline-assistant';
 import { MessageFeed } from '@/components/task-breakdown/message-feed';
 import { PeekToggle } from '@/components/task-breakdown/peek-toggle';
 import { ChatInput } from '@/components/shared/chat-input';
+import { MagnifyingGlass } from '@phosphor-icons/react';
 
 interface TaskBreakdownClientProps {
   sessionId: string;
@@ -101,8 +102,8 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
   if (!currentSession) {
     return (
       <main className="flex-1 flex flex-col items-center justify-center px-4 text-center space-y-4">
-        <div className="w-12 h-12 rounded-2xl bg-surface-subtle text-text-tertiary flex items-center justify-center text-xl shadow-subtle">
-          🔍
+        <div className="w-12 h-12 rounded-2xl bg-surface-subtle text-text-tertiary flex items-center justify-center shadow-subtle">
+          <MagnifyingGlass size={24} weight="duotone" className="text-text-tertiary" />
         </div>
         <div className="space-y-1.5 max-w-sm">
           <h2 className="text-lg font-bold text-text-primary">This task could not be found</h2>
