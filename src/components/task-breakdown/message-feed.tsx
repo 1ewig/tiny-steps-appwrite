@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import type { ChatMessage } from '@/types/task';
 import { AssistantBubble } from './assistant-bubble';
 import { TypingIndicator } from './typing-indicator';
@@ -22,12 +21,6 @@ export function MessageFeed({
   onSkipStep,
   onOpenFocusTunnel,
 }: MessageFeedProps) {
-  const bottomRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isTyping]);
-
   const assistantMessages = messages.filter((m) => m.role === 'assistant');
 
   return (
@@ -44,8 +37,6 @@ export function MessageFeed({
       ))}
 
       {isTyping && <TypingIndicator />}
-
-      <div ref={bottomRef} className="h-4" />
     </div>
   );
 }
