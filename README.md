@@ -103,6 +103,7 @@ src/
 ├── components/
 │   ├── launcher/
 │   │   ├── hero-welcome.tsx           # Centered empty state greeting
+│   │   ├── energy-selector.tsx        # Tactile energy sensitivity pills (paralysis / overwhelmed / stuck)
 │   │   └── task-launcher-client.tsx   # Launcher orchestrator for /tasks
 │   │
 │   ├── workspace/

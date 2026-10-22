@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { decomposeTask } from '@/lib/assistant-engine';
 import { HeroWelcome } from '@/components/launcher/hero-welcome';
+import { EnergySelector } from '@/components/launcher/energy-selector';
 import { ChatInput } from '@/components/shared/chat-input';
 
 export function TaskLauncherClient() {
@@ -13,6 +14,7 @@ export function TaskLauncherClient() {
 
   const {
     granularity,
+    setGranularity,
     createNewSession,
     addMessage,
   } = useTaskStore();
@@ -52,7 +54,14 @@ export function TaskLauncherClient() {
     <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 pb-12 overflow-y-auto">
       <div className="w-full max-w-2xl mx-auto space-y-6">
         <HeroWelcome />
-        <ChatInput disabled={isSubmitting} onSubmit={handleStartTask} isCentered />
+        <div className="space-y-4">
+          <ChatInput disabled={isSubmitting} onSubmit={handleStartTask} isCentered />
+          <EnergySelector
+            currentLevel={granularity}
+            onSelect={setGranularity}
+            disabled={isSubmitting}
+          />
+        </div>
       </div>
     </main>
   );

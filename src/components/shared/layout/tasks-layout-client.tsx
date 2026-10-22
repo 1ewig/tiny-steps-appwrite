@@ -133,7 +133,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
           peekFuture={peekFuture}
           onToggleSidebar={() => setSidebarOpen(true)}
           onOpenFocusTunnel={activeSession && steps.length > 0 ? () => setFocusTunnel(true) : undefined}
-          onSelectGranularity={setGranularity}
+          onSelectGranularity={activeSessionId ? setGranularity : undefined}
           onTogglePeek={activeSession ? togglePeek : undefined}
           showNewTaskButton={Boolean(activeSessionId)}
           onNewTask={() => {
