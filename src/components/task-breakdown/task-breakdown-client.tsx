@@ -4,15 +4,15 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { useOfflineAssistant } from '@/hooks/use-offline-assistant';
-import { MessageFeed } from '@/components/workspace/message-feed';
-import { PeekToggle } from '@/components/workspace/peek-toggle';
+import { MessageFeed } from '@/components/task-breakdown/message-feed';
+import { PeekToggle } from '@/components/task-breakdown/peek-toggle';
 import { ChatInput } from '@/components/shared/chat-input';
 
-interface TaskWorkspaceClientProps {
+interface TaskBreakdownClientProps {
   sessionId: string;
 }
 
-export function TaskWorkspaceClient({ sessionId }: TaskWorkspaceClientProps) {
+export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
   const router = useRouter();
   const [isTyping, setIsTyping] = useState(false);
 

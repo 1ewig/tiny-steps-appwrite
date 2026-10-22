@@ -101,13 +101,13 @@ src/
 │   └── globals.css                    # Complete design tokens (colors, radii, shadows, typography)
 │
 ├── components/
-│   ├── launcher/
+│   ├── start/
 │   │   ├── hero-welcome.tsx           # Centered empty state greeting
 │   │   ├── energy-selector.tsx        # Tactile energy sensitivity pills (paralysis / overwhelmed / stuck)
-│   │   └── task-launcher-client.tsx   # Launcher orchestrator for /tasks
+│   │   └── start-client.tsx           # Start orchestrator for /tasks
 │   │
-│   ├── workspace/
-│   │   ├── task-workspace-client.tsx  # Dynamic task workspace orchestrator for /tasks/[id]
+│   ├── task-breakdown/
+│   │   ├── task-breakdown-client.tsx  # Dynamic task breakdown orchestrator for /tasks/[id]
 │   │   ├── assistant-bubble.tsx       # Assistant guidance & living task card
 │   │   ├── message-feed.tsx           # Auto-scrolling task feed
 │   │   ├── steps-checklist.tsx        # Framer Motion animated checklist (Shrink / Skip / Done)

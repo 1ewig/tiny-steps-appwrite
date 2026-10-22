@@ -4,11 +4,11 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { decomposeTask } from '@/lib/assistant-engine';
-import { HeroWelcome } from '@/components/launcher/hero-welcome';
-import { EnergySelector } from '@/components/launcher/energy-selector';
+import { HeroWelcome } from '@/components/start/hero-welcome';
+import { EnergySelector } from '@/components/start/energy-selector';
 import { ChatInput } from '@/components/shared/chat-input';
 
-export function TaskLauncherClient() {
+export function StartClient() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 

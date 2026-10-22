@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import { TaskWorkspaceClient } from '@/components/workspace/task-workspace-client';
+import { TaskBreakdownClient } from '@/components/task-breakdown/task-breakdown-client';
 
 export const instant = false;
 
 export const metadata: Metadata = {
-  title: 'Task Workspace — Tiny Steps',
+  title: 'Task Breakdown — Tiny Steps',
   description: 'Your gentle, living task checklist.',
 };
 
@@ -14,5 +14,5 @@ export default async function TaskDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return <TaskWorkspaceClient sessionId={id} />;
+  return <TaskBreakdownClient sessionId={id} />;
 }
