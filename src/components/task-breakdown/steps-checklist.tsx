@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkle, Check } from '@phosphor-icons/react';
 import type { Step } from '@/types/task';
@@ -15,9 +16,29 @@ export function StepsChecklist({
   onToggleStep,
   onShrinkStep,
 }: StepsChecklistProps) {
+  const [openStepId, setOpenStepId] = useState<number | null>(null);
+
   if (!steps || steps.length === 0) return null;
 
-  const activeIdx = steps.findIndex((s) => !s.completed);
+  const firstIncomplete = steps.find((s) => !s.completed);
+  const openStep =
+    steps.find((s) => s.id === openStepId && !s.completed) ?? firstIncomplete;
+  const openIdx = openStep ? steps.findIndex((s) => s.id === openStep.id) : -1;
+
+  const handleToggle = (step: Step, idx: number) => {
+    const willComplete = !step.completed;
+    onToggleStep(step.id);
+
+    if (!willComplete) {
+      setOpenStepId(step.id);
+      return;
+    }
+
+    const next =
+      steps.slice(idx + 1).find((s) => !s.completed) ??
+      steps.find((s) => s.id !== step.id && !s.completed);
+    setOpenStepId(next ? next.id : null);
+  };
 
   return (
     <div className="mt-4 pt-3 border-t border-border-subtle space-y-3">
@@ -25,7 +46,7 @@ export function StepsChecklist({
       <div className="space-y-1">
         {steps.map((st, idx) => {
           const isCompleted = st.completed;
-          const isCurrent = idx === activeIdx;
+          const isCurrent = idx === openIdx;
 
           return (
             <motion.div
@@ -34,19 +55,25 @@ export function StepsChecklist({
               initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.18 }}
+              onClick={() => {
+                if (!isCompleted) setOpenStepId(st.id);
+              }}
               className={
                 isCurrent
                   ? 'my-2 rounded-xl p-3.5 bg-surface border border-accent shadow-subtle ring-1 ring-accent/15 transition-all'
                   : `rounded-lg px-2.5 py-1.5 transition-all ${isCompleted
                     ? 'opacity-50 hover:opacity-80'
-                    : 'future-step-blur opacity-75'
+                    : 'future-step-blur opacity-75 cursor-pointer'
                   }`
               }
             >
               <div className="flex items-start gap-2.5">
                 {/* Checkbox Button */}
                 <button
-                  onClick={() => onToggleStep(st.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleToggle(st, idx);
+                  }}
                   aria-label={isCompleted ? 'Mark incomplete' : 'Mark complete'}
                   className={`mt-0.5 rounded-full flex items-center justify-center shrink-0 transition-all ${isCompleted
                       ? 'w-4 h-4 bg-accent border border-accent text-text-inverse'
@@ -62,12 +89,11 @@ export function StepsChecklist({
                 <div className="flex-1 min-w-0">
                   <div>
                     <span
-                      onClick={() => !isCurrent && onToggleStep(st.id)}
                       className={`leading-snug select-none block ${isCompleted
-                          ? 'text-xs line-through text-text-tertiary cursor-pointer'
+                          ? 'text-xs line-through text-text-tertiary'
                           : isCurrent
                             ? 'text-sm text-text-primary font-semibold'
-                            : 'text-xs text-text-secondary cursor-pointer'
+                            : 'text-xs text-text-secondary'
                         }`}
                     >
                       {st.text}
@@ -84,7 +110,10 @@ export function StepsChecklist({
                       <div className="flex items-center gap-1.5 ml-auto">
                         {st.canSplit && (
                           <button
-                            onClick={() => onShrinkStep(idx)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onShrinkStep(idx);
+                            }}
                             className="text-2xs px-2.5 py-1 rounded-md bg-surface-subtle hover:bg-surface-subtle/80 text-text-primary font-medium flex items-center gap-1.5 transition-all"
                           >
                             <Sparkle size={12} weight="duotone" className="text-accent" />
@@ -93,7 +122,10 @@ export function StepsChecklist({
                         )}
 
                         <button
-                          onClick={() => onToggleStep(st.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggle(st, idx);
+                          }}
                           className="text-2xs px-3 py-1 rounded-md bg-accent hover:bg-accent-hover text-text-inverse font-medium shadow-subtle transition-all active:scale-95 flex items-center gap-1"
                         >
                           <Check size={12} weight="bold" />
