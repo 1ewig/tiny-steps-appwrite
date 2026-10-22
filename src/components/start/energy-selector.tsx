@@ -1,5 +1,8 @@
 'use client';
 
+import type { ComponentType } from 'react';
+import type { IconProps } from '@phosphor-icons/react';
+import { Plant, Leaf, PottedPlant } from '@phosphor-icons/react';
 import type { GranularityLevel } from '@/types/task';
 
 interface EnergySelectorProps {
@@ -10,32 +13,28 @@ interface EnergySelectorProps {
 
 interface EnergyOption {
   level: GranularityLevel;
-  icon: string;
+  icon: ComponentType<IconProps>;
   label: string;
-  time: string;
   description: string;
 }
 
 const ENERGY_OPTIONS: EnergyOption[] = [
   {
     level: 1,
-    icon: '🌱',
+    icon: Plant,
     label: 'A little stuck',
-    time: '~2–5m',
     description: 'Clear, manageable ~2–5 min chunks for moderate energy.',
   },
   {
     level: 2,
-    icon: '🌿',
+    icon: Leaf,
     label: 'Overwhelmed',
-    time: '~1m',
     description: 'Gentle ~1 min pieces with calm reassurance. Zero pressure.',
   },
   {
     level: 3,
-    icon: '🪴',
+    icon: PottedPlant,
     label: 'Full paralysis',
-    time: '15–30s',
     description: 'Absurdly tiny 5–30 second micro-actions (e.g. "touch one item").',
   },
 ];
@@ -57,11 +56,12 @@ export function EnergySelector({
       {/* Pill options */}
       <div
         role="radiogroup"
-        aria-label="Overwhelm sensitivity level"
+        aria-label="Energy sensitivity level"
         className="flex flex-wrap items-center justify-center gap-2"
       >
         {ENERGY_OPTIONS.map((opt) => {
           const isSelected = opt.level === currentLevel;
+          const Icon = opt.icon;
 
           return (
             <button
@@ -71,25 +71,20 @@ export function EnergySelector({
               aria-checked={isSelected}
               disabled={disabled}
               onClick={() => onSelect(opt.level)}
-              className={`group flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium border transition-all duration-fast select-none active:scale-95 disabled:opacity-50 disabled:pointer-events-none ${
+              className={`group flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-medium border transition-all duration-fast select-none active:scale-95 disabled:opacity-50 disabled:pointer-events-none ${
                 isSelected
                   ? 'bg-accent-subtle text-accent-text border-accent/40 shadow-subtle ring-1 ring-accent/30 font-semibold'
                   : 'bg-surface hover:bg-surface-subtle text-text-secondary hover:text-text-primary border-border-subtle hover:border-border-muted shadow-2xs'
               }`}
             >
-              <span className="text-base group-hover:scale-110 transition-transform">
-                {opt.icon}
-              </span>
-              <span>{opt.label}</span>
-              <span
-                className={`text-2xs font-normal px-1.5 py-0.5 rounded-full transition-colors ${
-                  isSelected
-                    ? 'bg-accent/15 text-accent-text'
-                    : 'bg-surface-subtle text-text-tertiary group-hover:text-text-secondary'
+              <Icon
+                size={16}
+                weight={isSelected ? 'fill' : 'regular'}
+                className={`transition-colors shrink-0 ${
+                  isSelected ? 'text-accent' : 'text-text-tertiary group-hover:text-text-secondary'
                 }`}
-              >
-                {opt.time}
-              </span>
+              />
+              <span>{opt.label}</span>
             </button>
           );
         })}

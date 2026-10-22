@@ -1,6 +1,9 @@
 'use client';
 
+import type { ComponentType } from 'react';
 import { useState, useRef, useEffect } from 'react';
+import type { IconProps } from '@phosphor-icons/react';
+import { Plant, Leaf, PottedPlant } from '@phosphor-icons/react';
 import type { GranularityLevel } from '@/types/task';
 
 interface AppHeaderProps {
@@ -14,10 +17,16 @@ interface AppHeaderProps {
   onNewTask?: () => void;
 }
 
-const GRANULARITY_CONFIG = {
-  1: { icon: '🌱', label: 'A little stuck', desc: 'Clear, manageable ~2-5 min chunks' },
-  2: { icon: '🌿', label: 'Overwhelmed', desc: 'Small, gentle ~1 min pieces with calm tone' },
-  3: { icon: '🪴', label: 'Full paralysis', desc: 'Absurdly tiny 5-30 sec zero-guilt micro-actions' },
+interface GranularityItem {
+  icon: ComponentType<IconProps>;
+  label: string;
+  desc: string;
+}
+
+const GRANULARITY_CONFIG: Record<GranularityLevel, GranularityItem> = {
+  1: { icon: Plant, label: 'A little stuck', desc: 'Clear, manageable ~2-5 min chunks' },
+  2: { icon: Leaf, label: 'Overwhelmed', desc: 'Small, gentle ~1 min pieces with calm tone' },
+  3: { icon: PottedPlant, label: 'Full paralysis', desc: 'Absurdly tiny 5-30 sec zero-guilt micro-actions' },
 };
 
 export function AppHeader({
@@ -105,7 +114,10 @@ export function AppHeader({
               aria-expanded={dropdownOpen}
               title="Select overwhelm sensitivity level"
             >
-              <span>{currentGran.icon}</span>
+              {(() => {
+                const CurrentIcon = currentGran.icon;
+                return <CurrentIcon size={14} weight="fill" className="text-accent shrink-0" />;
+              })()}
               <span className="hidden sm:inline">{currentGran.label}</span>
               <svg
                 className={`w-3 h-3 text-text-tertiary transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
@@ -122,6 +134,7 @@ export function AppHeader({
               <div className="absolute right-0 mt-1.5 w-64 rounded-xl bg-surface-elevated border border-border-subtle shadow-modal p-1.5 z-modal text-xs chat-enter">
                 {([1, 2, 3] as GranularityLevel[]).map((lvl) => {
                   const conf = GRANULARITY_CONFIG[lvl];
+                  const ConfIcon = conf.icon;
                   const isSelected = lvl === granularity;
                   return (
                     <button
@@ -136,7 +149,11 @@ export function AppHeader({
                           : 'hover:bg-surface-subtle text-text-primary'
                       }`}
                     >
-                      <span className="text-base">{conf.icon}</span>
+                      <ConfIcon
+                        size={16}
+                        weight={isSelected ? 'fill' : 'regular'}
+                        className={`mt-0.5 shrink-0 ${isSelected ? 'text-accent' : 'text-text-tertiary'}`}
+                      />
                       <div>
                         <p className="font-semibold">{conf.label}</p>
                         <p className="text-2xs text-text-secondary leading-snug">{conf.desc}</p>
