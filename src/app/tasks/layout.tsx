@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { TasksLayoutClient } from '@/components/tasks-layout-client';
 
+export const instant = false;
+
 export const metadata: Metadata = {
   title: 'Tiny Steps — Low-Friction AI Task Companion',
   description: 'Empathetic, zero-pressure task breakdown for ADHD paralysis, burnout, and executive dysfunction.',
