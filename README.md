@@ -53,11 +53,13 @@ If any step triggers hesitation or fear, click **"Shrink this step"** to split i
 
 ### 5. ◎ Focus Tunnel (Monotasking Mode)
 * A full-screen, distraction-free view isolating the present task in large bold typography.
+* Newly created tasks open directly into the tunnel after a calm, text-only loading transition.
 * Controlled via keyboard shortcuts (`Space` or `Enter` to advance).
 * Gentle celebration screen upon completion (*"Take a breath and unclench your jaw. You turned something heavy into momentum"*).
 
 ### 6. 👁️ Progressive Disclosure (Anti-Scan Panic)
 * Future steps are softly blurred by default (`future-step-blur`) to prevent users from scanning ahead and quitting.
+* Hovering a blurred step reveals it after a short, intentional delay; the active step can show an optional hint when it needs a little more context.
 * Single-click header toggle to unblur future steps whenever you feel ready.
 
 ### 7. 🎨 Sensory-Friendly Design System
@@ -68,6 +70,26 @@ If any step triggers hesitation or fear, click **"Shrink this step"** to split i
 ### 8. 🔒 100% Offline & Private
 * Requires **no API keys** and sends **no personal data** to external servers.
 * All sessions and step progress are automatically saved to `localStorage`.
+
+### 9. 🌤️ Gentle Start Transition
+* Starting a task shows a minimal, opaque full-screen loader with calm rotating copy.
+* The loader holds for at least 1.2 seconds to keep the transition steady, with a 6-second cap and local fallback if generation stalls.
+* It crossfades into the Focus Tunnel already centered on the first step, so there is no flash of the full checklist.
+
+---
+
+## 🕘 Recent Updates
+
+| Commit | Change |
+| :--- | :--- |
+| `edd1e56` | Added the text-only start loader with a 1.2s minimum, 6s fallback, and automatic Focus Tunnel opening for new tasks. |
+| `b440789` | Eased the future-step blur transition and delayed hover reveal so scanning ahead feels intentional. |
+| `7fe77d1` | Added optional per-step hints on the active checklist row. |
+| `23ea09e` | Smoothed checklist expand/collapse using a Framer Motion height animation. |
+| `45d1802` | Converted checklist steps to an accordion-style interaction instead of click-to-complete. |
+| `cd34605` | Removed the redundant checklist progress bar. |
+| `ae76ec2` | Removed the skip action and Focus Tunnel skip button. |
+| `6473547` | Simplified checklist controls and streamlined the Focus Tunnel UI. |
 
 ---
 
@@ -121,19 +143,22 @@ src/
 │   └── shared/
 │       ├── app-icon.tsx               # Reusable cairn app icon with balancing teeter animation
 │       ├── chat-input.tsx             # Adaptive input (centered pill / collapsible bottom chip)
+│       ├── focus-loader.tsx           # Text-only full-screen start transition with rotating copy
 │       └── layout/
-│           ├── tasks-layout-client.tsx # Persistent layout shell (header, sidebar, progress, modal, splash)
+│           ├── tasks-layout-client.tsx # Persistent layout shell (header, sidebar, progress, loader, tunnel)
 │           ├── ambient-progress.tsx   # Top ambient progress bar
 │           ├── app-header.tsx         # Header with title, sensitivity & tunnel launcher
 │           └── sidebar.tsx            # Collapsible session drawer (history & theme)
 │
 ├── constants/
-│   └── presets.ts                     # Task decomposition templates (desk, email, laundry, braindump)
+│   └── presets.ts                     # Task decomposition templates with optional step hints
 │
 ├── lib/
-│   └── assistant-engine.ts            # Pure domain logic (decomposition, intent parsing, micro-steps)
+│   ├── assistant-engine.ts            # Pure domain logic (decomposition, intent parsing, micro-steps)
+│   └── task-generation.ts             # Async breakdown seam with loader timing constants
 │
 ├── hooks/
+│   ├── use-start-task.ts              # Start orchestration, minimum dwell, and fallback handling
 │   ├── use-offline-assistant.ts       # React hook adapter for assistant engine
 │   └── use-keyboard-shortcuts.ts      # Global Ctrl+K, Space, and Enter listeners
 │
