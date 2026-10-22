@@ -26,3 +26,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - **Thin Server Component Pages**: Next.js route entry pages (`src/app/**/page.tsx`) must remain thin Server Components dedicated to SEO metadata, layout structure, and server-side boundaries.
 - **Client Orchestrators (`*-client.tsx`)**: Client orchestrators act as the single source of coordination for a view—invoking hooks, connecting to stores, and passing data down as props.
 - **Pure & Reusable UI Blocks**: Presentational UI components must remain decoupled from direct domain logic and global store subscriptions wherever possible, receiving state and callbacks via props.
+
+## Fast Developer Experience (DX) & Tooling
+
+- **Code Searching (`rg` / ripgrep)**: Always prefer `rg` (e.g. `rg -n "pattern" src`) for all local text and regex searches across the project. It respects `.gitignore`, runs with native SIMD multi-threading, and avoids scanning build artifacts or `node_modules/`.
+- **Fast Linting (`oxlint`)**: Use `bun run lint` (or `bunx oxlint`) for sub-50ms static analysis across the codebase (do not invoke bare `oxlint` directly as it runs via Bun scripts).
+- **Fast Typechecking (`bun check`)**: Use `bun check` or `bun run check` for sub-second, multi-core TypeScript validation across all files.
+
