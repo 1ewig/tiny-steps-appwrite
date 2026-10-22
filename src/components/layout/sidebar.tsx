@@ -25,6 +25,9 @@ export function Sidebar({
   onDeleteSession,
   onToggleTheme,
 }: SidebarProps) {
+  const isNewTaskActive = !currentSessionId;
+  const validSessions = sessions.filter((s) => s.messages && s.messages.length > 0);
+
   return (
     <>
       {/* Mobile Backdrop */}
@@ -74,11 +77,15 @@ export function Sidebar({
               onNewSession();
               onClose();
             }}
-            className="w-full py-2.5 px-3.5 rounded-lg bg-surface hover:bg-surface-subtle text-text-primary text-xs font-semibold flex items-center justify-between border border-border-subtle shadow-subtle group transition-all"
+            className={`w-full py-2.5 px-3.5 rounded-lg text-xs font-semibold flex items-center justify-between border transition-all ${
+              isNewTaskActive
+                ? 'bg-accent-subtle text-accent-text border-accent/40 shadow-subtle'
+                : 'bg-surface hover:bg-surface-subtle text-text-primary border-border-subtle shadow-subtle group'
+            }`}
           >
             <span className="flex items-center gap-2">
               <svg
-                className="w-3.5 h-3.5 text-accent group-hover:rotate-90 transition-transform"
+                className={`w-3.5 h-3.5 ${isNewTaskActive ? 'text-accent-text' : 'text-accent group-hover:rotate-90'} transition-transform`}
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2.5"
@@ -88,7 +95,11 @@ export function Sidebar({
               </svg>
               <span>New gentle task</span>
             </span>
-            <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-2xs font-mono rounded bg-canvas-subtle text-text-tertiary border border-border-subtle">
+            <kbd className={`hidden sm:inline-block px-1.5 py-0.5 text-2xs font-mono rounded border ${
+              isNewTaskActive
+                ? 'bg-accent-subtle text-accent-text border-accent/30'
+                : 'bg-canvas-subtle text-text-tertiary border-border-subtle'
+            }`}>
               Ctrl+K
             </kbd>
           </button>
@@ -96,11 +107,11 @@ export function Sidebar({
 
         {/* Middle: Saved Sessions */}
         <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
-          {sessions.length === 0 ? (
-            <div className="p-4 text-center text-xs text-text-tertiary">No saved sessions yet.</div>
+          {validSessions.length === 0 ? (
+            <div className="p-4 text-center text-xs text-text-tertiary">No saved tasks yet.</div>
           ) : (
-            sessions.map((sess) => {
-              const isCurrent = sess.id === currentSessionId;
+            validSessions.map((sess) => {
+              const isCurrent = Boolean(currentSessionId && sess.id === currentSessionId);
               const hasSteps = sess.messages.some((m) => m.steps && m.steps.length > 0);
 
               return (

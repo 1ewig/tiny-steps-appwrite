@@ -164,11 +164,12 @@ export function TaskWorkspaceClient({ sessionId }: TaskWorkspaceClientProps) {
         <Sidebar
           isOpen={sidebarOpen}
           sessions={sessions}
-          currentSessionId={currentSessionId}
+          currentSessionId={null}
           theme={theme}
           onClose={() => setSidebarOpen(false)}
           onNewSession={() => {
             setSidebarOpen(false);
+            switchSession(null);
             router.push('/tasks');
           }}
           onSelectSession={(id) => {
@@ -187,7 +188,10 @@ export function TaskWorkspaceClient({ sessionId }: TaskWorkspaceClientProps) {
             peekFuture={false}
             onToggleSidebar={() => setSidebarOpen(true)}
             showNewTaskButton
-            onNewTask={() => router.push('/tasks')}
+            onNewTask={() => {
+              switchSession(null);
+              router.push('/tasks');
+            }}
           />
 
           <main className="flex-1 flex flex-col items-center justify-center px-4 text-center space-y-4">
@@ -226,6 +230,7 @@ export function TaskWorkspaceClient({ sessionId }: TaskWorkspaceClientProps) {
         onClose={() => setSidebarOpen(false)}
         onNewSession={() => {
           setSidebarOpen(false);
+          switchSession(null);
           router.push('/tasks');
         }}
         onSelectSession={(id) => {
@@ -253,7 +258,10 @@ export function TaskWorkspaceClient({ sessionId }: TaskWorkspaceClientProps) {
           onSelectGranularity={setGranularity}
           onTogglePeek={togglePeek}
           showNewTaskButton
-          onNewTask={() => router.push('/tasks')}
+          onNewTask={() => {
+            switchSession(null);
+            router.push('/tasks');
+          }}
         />
 
         {/* Scrollable Feed */}

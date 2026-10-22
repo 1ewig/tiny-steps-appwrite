@@ -3,20 +3,11 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import type { TaskState, ChatSession, GranularityLevel, Step } from '@/types/task';
 import { generateMicroSteps } from '@/lib/assistant-engine';
 
-const initialSessionId = 'session_' + Date.now();
-
 export const useTaskStore = create<TaskState>()(
   persist(
     (set) => ({
-      sessions: [
-        {
-          id: initialSessionId,
-          title: 'New gentle task',
-          createdAt: Date.now(),
-          messages: [],
-        },
-      ],
-      currentSessionId: initialSessionId,
+      sessions: [],
+      currentSessionId: null,
       granularity: 2,
       peekFuture: false,
       focusTunnelOpen: false,
@@ -39,32 +30,24 @@ export const useTaskStore = create<TaskState>()(
         return newId;
       },
 
-      switchSession: (sessionId: string) => {
+      switchSession: (sessionId: string | null) => {
         set({ currentSessionId: sessionId });
       },
 
       deleteSession: (sessionId: string) => {
         set((state) => {
           const filtered = state.sessions.filter((s) => s.id !== sessionId);
-          if (filtered.length === 0) {
-            const fallbackId = 'session_' + Date.now();
-            return {
-              sessions: [{ id: fallbackId, title: 'New gentle task', createdAt: Date.now(), messages: [] }],
-              currentSessionId: fallbackId,
-            };
-          }
           return {
             sessions: filtered,
-            currentSessionId: state.currentSessionId === sessionId ? filtered[0].id : state.currentSessionId,
+            currentSessionId: state.currentSessionId === sessionId ? null : state.currentSessionId,
           };
         });
       },
 
       clearAllSessions: () => {
-        const freshId = 'session_' + Date.now();
         set({
-          sessions: [{ id: freshId, title: 'New gentle task', createdAt: Date.now(), messages: [] }],
-          currentSessionId: freshId,
+          sessions: [],
+          currentSessionId: null,
         });
       },
 
@@ -199,6 +182,18 @@ export const useTaskStore = create<TaskState>()(
     {
       name: 'tinysteps_zustand_store',
       storage: createJSONStorage(() => (typeof window !== 'undefined' ? localStorage : dummyStorage)),
+      merge: (persistedState, currentState) => {
+        const state = persistedState as Partial<TaskState> | undefined;
+        if (!state) return currentState;
+        const validSessions = (state.sessions || []).filter(
+          (s) => s.messages && s.messages.length > 0
+        );
+        return {
+          ...currentState,
+          ...state,
+          sessions: validSessions,
+        };
+      },
     }
   )
 );

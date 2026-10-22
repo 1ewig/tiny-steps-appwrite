@@ -34,7 +34,7 @@ export interface TaskState {
 
   // Actions
   createNewSession: (switchImmediately?: boolean) => string;
-  switchSession: (sessionId: string) => void;
+  switchSession: (sessionId: string | null) => void;
   deleteSession: (sessionId: string) => void;
   clearAllSessions: () => void;
   setGranularity: (level: GranularityLevel) => void;

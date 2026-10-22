@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useSyncExternalStore } from 'react';
+import { useState, useEffect, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { decomposeTask } from '@/lib/assistant-engine';
@@ -23,50 +23,61 @@ export function TaskLauncherClient() {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [inputKey, setInputKey] = useState(0);
 
   const {
     sessions,
-    currentSessionId,
     granularity,
     theme,
     createNewSession,
+    switchSession,
     deleteSession,
     setGranularity,
     toggleTheme,
     addMessage,
   } = useTaskStore();
 
+  // On launcher mount, ensure active session is cleared
+  useEffect(() => {
+    switchSession(null);
+  }, [switchSession]);
+
   const handleStartTask = (text: string) => {
     if (!text.trim() || isSubmitting) return;
 
     setIsSubmitting(true);
 
-    // 1. Create a clean new session
-    const newSessionId = createNewSession(true);
+    try {
+      // 1. Create a clean new session
+      const newSessionId = createNewSession(true);
 
-    // 2. Add user message
-    addMessage(newSessionId, {
-      role: 'user',
-      text,
-    });
+      // 2. Add user message
+      addMessage(newSessionId, {
+        role: 'user',
+        text,
+      });
 
-    // 3. Decompose task into empathetic micro-steps
-    const breakdown = decomposeTask(text, granularity);
-    addMessage(newSessionId, {
-      role: 'assistant',
-      text: breakdown.dialogue,
-      steps: breakdown.steps,
-    });
+      // 3. Decompose task into empathetic micro-steps
+      const breakdown = decomposeTask(text, granularity);
+      addMessage(newSessionId, {
+        role: 'assistant',
+        text: breakdown.dialogue,
+        steps: breakdown.steps,
+      });
 
-    // 4. Smoothly navigate to the dedicated task workspace
-    router.push(`/tasks/${newSessionId}`);
+      // 4. Smoothly navigate to the dedicated task workspace
+      router.push(`/tasks/${newSessionId}`);
+    } catch (err) {
+      setIsSubmitting(false);
+      throw err;
+    }
   };
 
   useKeyboardShortcuts({
     onNewSession: () => {
-      // Already on new task launcher
-      const input = document.querySelector('textarea');
-      input?.focus();
+      // Clear input and focus
+      setIsSubmitting(false);
+      setInputKey((prev) => prev + 1);
     },
   });
 
@@ -86,14 +97,13 @@ export function TaskLauncherClient() {
       <Sidebar
         isOpen={sidebarOpen}
         sessions={sessions}
-        currentSessionId={currentSessionId}
+        currentSessionId={null}
         theme={theme}
         onClose={() => setSidebarOpen(false)}
         onNewSession={() => {
-          // Stay on launcher and focus input
           setSidebarOpen(false);
-          const input = document.querySelector('textarea');
-          input?.focus();
+          setIsSubmitting(false);
+          setInputKey((prev) => prev + 1);
         }}
         onSelectSession={(id) => {
           setSidebarOpen(false);
@@ -117,7 +127,7 @@ export function TaskLauncherClient() {
         <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 pb-12 overflow-y-auto">
           <div className="w-full max-w-2xl mx-auto space-y-6">
             <HeroWelcome />
-            <ChatInput disabled={isSubmitting} onSubmit={handleStartTask} isCentered />
+            <ChatInput key={inputKey} disabled={isSubmitting} onSubmit={handleStartTask} isCentered />
           </div>
         </main>
       </div>

@@ -57,16 +57,20 @@ export function ChatInput({
   };
 
   useEffect(() => {
-    if (isCentered) {
-      textareaRef.current?.focus();
+    if (isCentered && !disabled) {
+      const timer = setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 50);
+      return () => clearTimeout(timer);
     }
-  }, [isCentered]);
+  }, [isCentered, disabled]);
 
   const inputBlock = (
     <div className="max-w-2xl mx-auto pointer-events-auto w-full">
       {/* Dynamic input container: pill for single-line, rounded-2xl for multiline */}
       <div
-        className={`bg-surface/95 backdrop-blur-md border border-border-subtle shadow-capsule px-4 transition-all duration-200 focus-within:border-accent/40 focus-within:ring-2 focus-within:ring-accent/15 flex gap-2.5 ${
+        onClick={() => textareaRef.current?.focus()}
+        className={`bg-surface/95 backdrop-blur-md border border-border-subtle shadow-capsule px-4 transition-all duration-200 focus-within:border-accent/40 focus-within:ring-2 focus-within:ring-accent/15 flex gap-2.5 cursor-text ${
           isMultiline
             ? 'rounded-2xl py-3 items-end'
             : 'rounded-full py-2 sm:py-2.5 items-center'
@@ -77,10 +81,11 @@ export function ChatInput({
           rows={1}
           value={text}
           disabled={disabled}
+          autoFocus={isCentered}
           onChange={handleInput}
           onKeyDown={handleKeyDown}
           placeholder="What feels heavy? Type anything or brain-dump..."
-          className="w-full bg-transparent text-text-primary placeholder-text-tertiary text-sm sm:text-base resize-none focus:outline-none py-1 leading-normal max-h-36"
+          className="w-full bg-transparent text-text-primary placeholder-text-tertiary text-sm sm:text-base resize-none focus:outline-none py-1 leading-normal max-h-36 disabled:opacity-50"
         />
 
         <button
