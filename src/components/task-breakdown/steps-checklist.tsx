@@ -117,35 +117,43 @@ export function StepsChecklist({
                         transition={expandTransition}
                         className="overflow-hidden"
                       >
-                        <div className="pt-3 flex items-center justify-between gap-2">
-                          <span className="shrink-0 text-2xs text-text-tertiary font-medium">
-                            {st.effort || '~1 min'}
-                          </span>
+                        <div className="pt-3 space-y-2">
+                          {st.hint && (
+                            <p className="text-2xs text-text-tertiary leading-relaxed">
+                              {st.hint}
+                            </p>
+                          )}
 
-                          <div className="flex items-center gap-1.5 ml-auto">
-                            {st.canSplit && (
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="shrink-0 text-2xs text-text-tertiary font-medium">
+                              {st.effort || '~1 min'}
+                            </span>
+
+                            <div className="flex items-center gap-1.5 ml-auto">
+                              {st.canSplit && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onShrinkStep(idx);
+                                  }}
+                                  className="text-2xs px-2.5 py-1 rounded-md bg-surface-subtle hover:bg-surface-subtle/80 text-text-primary font-medium flex items-center gap-1.5 transition-all"
+                                >
+                                  <Sparkle size={12} weight="duotone" className="text-accent" />
+                                  <span>Break down</span>
+                                </button>
+                              )}
+
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  onShrinkStep(idx);
+                                  handleToggle(st, idx);
                                 }}
-                                className="text-2xs px-2.5 py-1 rounded-md bg-surface-subtle hover:bg-surface-subtle/80 text-text-primary font-medium flex items-center gap-1.5 transition-all"
+                                className="text-2xs px-3 py-1 rounded-md bg-accent hover:bg-accent-hover text-text-inverse font-medium shadow-subtle transition-all active:scale-95 flex items-center gap-1"
                               >
-                                <Sparkle size={12} weight="duotone" className="text-accent" />
-                                <span>Break down</span>
+                                <Check size={12} weight="bold" />
+                                <span>Done</span>
                               </button>
-                            )}
-
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleToggle(st, idx);
-                              }}
-                              className="text-2xs px-3 py-1 rounded-md bg-accent hover:bg-accent-hover text-text-inverse font-medium shadow-subtle transition-all active:scale-95 flex items-center gap-1"
-                            >
-                              <Check size={12} weight="bold" />
-                              <span>Done</span>
-                            </button>
+                            </div>
                           </div>
                         </div>
                       </motion.div>

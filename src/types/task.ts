@@ -4,6 +4,7 @@ export interface Step {
   id: number;
   text: string;
   effort?: string;
+  hint?: string;
   completed: boolean;
   canSplit: boolean;
 }
