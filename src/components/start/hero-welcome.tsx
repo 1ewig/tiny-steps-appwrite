@@ -14,7 +14,7 @@ export function HeroWelcome() {
       </h1>
 
       <p className="text-text-secondary text-sm sm:text-base leading-relaxed max-w-md mx-auto">
-        Tell me what you are avoiding, or vent your raw thoughts. I will shrink it down into microscopic, zero-guilt actions.
+        Brain-dump your thoughts. We&apos;ll make it tiny.
       </p>
     </div>
   );

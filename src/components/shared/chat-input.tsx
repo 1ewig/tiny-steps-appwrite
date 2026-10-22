@@ -85,7 +85,7 @@ export function ChatInput({
           autoFocus={isCentered}
           onChange={handleInput}
           onKeyDown={handleKeyDown}
-          placeholder="What feels heavy? Type anything or brain-dump..."
+          placeholder="Type or vent anything..."
           className="w-full bg-transparent text-text-primary placeholder-text-tertiary text-sm sm:text-base resize-none focus:outline-none py-1 leading-normal max-h-36 disabled:opacity-50"
         />
 
@@ -101,10 +101,6 @@ export function ChatInput({
           </svg>
         </button>
       </div>
-
-      <p className="text-center text-2xs text-text-tertiary pt-2 tracking-wide">
-        Doing just one tiny step and stopping is still a complete victory.
-      </p>
     </div>
   );
 
