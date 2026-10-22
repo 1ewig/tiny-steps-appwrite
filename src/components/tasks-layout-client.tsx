@@ -1,0 +1,161 @@
+'use client';
+
+import { useState, useSyncExternalStore } from 'react';
+import { useRouter } from 'next/navigation';
+import { useTaskStore } from '@/store/task-store';
+import { generateMicroSteps } from '@/lib/assistant-engine';
+import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
+import { AmbientProgress } from '@/components/layout/ambient-progress';
+import { AppHeader } from '@/components/layout/app-header';
+import { Sidebar } from '@/components/layout/sidebar';
+import { FocusTunnelModal } from '@/components/focus/focus-tunnel-modal';
+
+const emptySubscribe = () => () => {};
+
+export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
+
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const {
+    sessions,
+    currentSessionId,
+    granularity,
+    peekFuture,
+    focusTunnelOpen,
+    theme,
+    switchSession,
+    deleteSession,
+    setGranularity,
+    togglePeek,
+    setFocusTunnel,
+    toggleTheme,
+    toggleStepCompletion,
+    shrinkStep,
+    skipStep,
+  } = useTaskStore();
+
+  const activeSession = sessions.find((s) => s.id === currentSessionId);
+
+  const latestMessageWithSteps = activeSession?.messages
+    ? [...activeSession.messages].reverse().find((m) => m.steps && m.steps.length > 0)
+    : undefined;
+
+  const steps = latestMessageWithSteps?.steps || [];
+  const activeStep = steps.find((s) => !s.completed) || null;
+  const activeStepIndex = activeStep ? steps.findIndex((s) => s.id === activeStep.id) : -1;
+
+  const totalSteps = steps.length;
+  const completedSteps = steps.filter((s) => s.completed).length;
+  const progressPct = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
+
+  // Global Keyboard Shortcuts
+  useKeyboardShortcuts({
+    onNewSession: () => {
+      switchSession(null);
+      router.push('/tasks');
+    },
+    onCompleteFocusStep: () => {
+      if (activeStep && latestMessageWithSteps && activeSession) {
+        toggleStepCompletion(activeSession.id, latestMessageWithSteps.id, activeStep.id);
+      }
+    },
+    isFocusTunnelActive: focusTunnelOpen,
+  });
+
+  if (!mounted) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-canvas text-text-tertiary">
+        <span className="w-6 h-6 rounded-full bg-accent/20 orb-pulse flex items-center justify-center text-xs">
+          🌱
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`h-screen flex overflow-hidden font-sans ${peekFuture ? 'peek-enabled' : ''}`}>
+      {/* Ambient Top Progress Bar - Persistent & Static */}
+      <AmbientProgress progressPercentage={currentSessionId ? progressPct : 0} />
+
+      {/* Collapsible Sidebar - Persistent & Static */}
+      <Sidebar
+        isOpen={sidebarOpen}
+        sessions={sessions}
+        currentSessionId={currentSessionId}
+        theme={theme}
+        onClose={() => setSidebarOpen(false)}
+        onNewSession={() => {
+          setSidebarOpen(false);
+          switchSession(null);
+          router.push('/tasks');
+        }}
+        onSelectSession={(id) => {
+          setSidebarOpen(false);
+          switchSession(id);
+          router.push(`/tasks/${id}`);
+        }}
+        onDeleteSession={(id) => {
+          deleteSession(id);
+          if (id === currentSessionId) {
+            router.push('/tasks');
+          }
+        }}
+        onToggleTheme={toggleTheme}
+      />
+
+      {/* Main Column */}
+      <div className="flex-1 flex flex-col h-full overflow-hidden relative">
+        {/* AppHeader - Fixed, Static & Never Unmounted */}
+        <AppHeader
+          sessionTitle={activeSession ? activeSession.title : 'New gentle task'}
+          hasActiveSteps={Boolean(activeSession && steps.length > 0)}
+          granularity={granularity}
+          peekFuture={peekFuture}
+          onToggleSidebar={() => setSidebarOpen(true)}
+          onOpenFocusTunnel={activeSession && steps.length > 0 ? () => setFocusTunnel(true) : undefined}
+          onSelectGranularity={setGranularity}
+          onTogglePeek={activeSession ? togglePeek : undefined}
+          showNewTaskButton={Boolean(currentSessionId)}
+          onNewTask={() => {
+            switchSession(null);
+            router.push('/tasks');
+          }}
+        />
+
+        {/* Dynamic Page Content */}
+        {children}
+      </div>
+
+      {/* Focus Tunnel Modal - Persistent */}
+      <FocusTunnelModal
+        isOpen={focusTunnelOpen}
+        activeStep={activeStep}
+        sessionTitle={activeSession?.title || 'Focus Tunnel'}
+        onClose={() => setFocusTunnel(false)}
+        onComplete={() => {
+          if (activeStep && latestMessageWithSteps && activeSession) {
+            toggleStepCompletion(activeSession.id, latestMessageWithSteps.id, activeStep.id);
+          }
+        }}
+        onShrink={() => {
+          if (activeStepIndex !== -1 && latestMessageWithSteps && activeStep && activeSession) {
+            const subSteps = generateMicroSteps(activeStep.text);
+            shrinkStep(activeSession.id, latestMessageWithSteps.id, activeStepIndex, subSteps);
+          }
+        }}
+        onSkip={() => {
+          if (activeStepIndex !== -1 && latestMessageWithSteps && activeSession) {
+            skipStep(activeSession.id, latestMessageWithSteps.id, activeStepIndex);
+          }
+        }}
+      />
+    </div>
+  );
+}

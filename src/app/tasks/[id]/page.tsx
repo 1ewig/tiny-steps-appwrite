@@ -24,7 +24,7 @@ export default function TaskDetailPage({
   return (
     <Suspense
       fallback={
-        <div className="h-screen w-full flex items-center justify-center bg-canvas text-text-tertiary">
+        <div className="flex-1 flex items-center justify-center text-text-tertiary">
           <span className="w-6 h-6 rounded-full bg-accent/20 orb-pulse flex items-center justify-center text-xs">
             🌱
           </span>
