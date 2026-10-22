@@ -9,6 +9,7 @@
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.0-38bdf8?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
 [![Zustand](https://img.shields.io/badge/State-Zustand_5-brown?style=flat-square)](https://github.com/pmndrs/zustand)
 [![Framer Motion](https://img.shields.io/badge/Motion-Framer_14-black?style=flat-square&logo=framer)](https://www.framer.com/motion/)
+[![Phosphor Icons](https://img.shields.io/badge/Icons-Phosphor_2-blueviolet?style=flat-square)](https://phosphoricons.com/)
 [![Oxlint](https://img.shields.io/badge/Linter-Oxlint_1.89-orange?style=flat-square)](https://oxc.rs/)
 
 ---
@@ -36,16 +37,16 @@ Action does not follow motivation; **motivation follows microscopic physical mom
 
 ### 2. 🎯 Centered Hero & Collapsible Tweak Chip
 * **Empty State**: The prompt input is centered directly under the gentle greeting, inviting step #1 with zero visual noise.
-* **Active Working Mode**: Once steps are generated, the input collapses into a quiet bottom chip (`💬 Need to tweak or vent?`), keeping 98% of the screen clear for execution. Click anytime to expand and adjust.
+* **Active Working Mode**: Once steps are generated, the input collapses into a quiet bottom chip (`Need to tweak or vent?`), keeping 98% of the screen clear for execution. Click anytime to expand and adjust.
 
 ### 3. 🎚️ Elastic Sensitivity Modes
 Users experience task resistance differently depending on their daily energy:
-* **🌱 A little stuck**: Clear, manageable 2–5 minute chunks.
-* **🌿 Overwhelmed (Default)**: Small, gentle 1-minute steps with warm reassuring tone.
-* **🪴 Full paralysis**: Absurdly tiny 5–30 second micro-actions (*"Exhale slowly. You only have to do 10 seconds of motion right now"*).
+* **A little stuck**: Clear, manageable 2–5 minute chunks (`Plant` icon).
+* **Overwhelmed (Default)**: Small, gentle 1-minute steps with warm reassuring tone (`Leaf` icon).
+* **Full paralysis**: Absurdly tiny 5–30 second micro-actions (*"Exhale slowly. You only have to do 10 seconds of motion right now"*, `PottedPlant` icon).
 
 ### 4. ✨ On-Demand Step Shrinking ("Still too big?")
-If any step triggers hesitation or fear, click **"✨ Shrink this step"** to split it dynamically into 3 bite-sized pieces:
+If any step triggers hesitation or fear, click **"Shrink this step"** to split it dynamically into 3 bite-sized pieces:
 1. **Prep**: Glance at or reach for what you need (zero pressure to work).
 2. **Touch**: Do just the first 15–20 seconds.
 3. **Finish**: Complete just that piece cleanly.
@@ -83,6 +84,7 @@ Built with a high-performance modern web stack:
 | **Tailwind CSS v4** | 100% tokenized CSS variable architecture (`globals.css`) with zero hardcoded values |
 | **Zustand 5.0** | Centralized, hydration-safe reactive state with local persistence |
 | **Framer Motion 14** | Physics-based spring animations, checkmark animations, and modal transitions |
+| **Phosphor Icons 2.1** | Sensory-friendly, modern, and minimal icons across all controls |
 | **Oxlint 1.89** | Rust-based linter that scans the entire codebase in ~15ms |
 
 ---
@@ -92,33 +94,35 @@ Built with a high-performance modern web stack:
 ```text
 src/
 ├── app/
-│   ├── layout.tsx                     # Root layout (Plus Jakarta Sans, globals.css tokens)
+│   ├── layout.tsx                     # Root layout (Plus Jakarta Sans, globals.css tokens, theme hydration)
+│   ├── icon.svg                       # Dynamic SVG tab favicon (stepping stones cairn)
 │   ├── page.tsx                       # Root redirect -> /tasks (reserved for future landing page)
 │   ├── tasks/
-│   │   ├── page.tsx                   # Task launcher / new task creator (/tasks)
+│   │   ├── page.tsx                   # Task start / new task creator (/tasks)
 │   │   └── [id]/
-│   │       └── page.tsx               # Dedicated task workspace with partial prerendering (/tasks/[id])
+│   │       └── page.tsx               # Dedicated task breakdown with partial prerendering (/tasks/[id])
 │   └── globals.css                    # Complete design tokens (colors, radii, shadows, typography)
 │
 ├── components/
 │   ├── start/
-│   │   ├── hero-welcome.tsx           # Centered empty state greeting
-│   │   ├── energy-selector.tsx        # Tactile energy sensitivity pills (paralysis / overwhelmed / stuck)
+│   │   ├── hero-welcome.tsx           # Centered empty state greeting with cairn icon
+│   │   ├── energy-selector.tsx        # Tactile energy sensitivity pills (A little stuck / Overwhelmed / Full paralysis)
 │   │   └── start-client.tsx           # Start orchestrator for /tasks
 │   │
 │   ├── task-breakdown/
 │   │   ├── task-breakdown-client.tsx  # Dynamic task breakdown orchestrator for /tasks/[id]
 │   │   ├── assistant-bubble.tsx       # Assistant guidance & living task card
-│   │   ├── message-feed.tsx           # Auto-scrolling task feed
+│   │   ├── message-feed.tsx           # Auto-scrolling task feed (stable scroll on step toggles)
 │   │   ├── steps-checklist.tsx        # Framer Motion animated checklist (Shrink / Skip / Done)
 │   │   ├── focus-tunnel-modal.tsx     # Distraction-free single-task execution modal
 │   │   ├── peek-toggle.tsx            # Floating round future-step blur/unblur toggle
-│   │   └── typing-indicator.tsx       # Calm shimmer dots
+│   │   └── typing-indicator.tsx       # Calm shimmer dots with cairn avatar
 │   │
 │   └── shared/
+│       ├── app-icon.tsx               # Reusable cairn app icon with balancing teeter animation
 │       ├── chat-input.tsx             # Adaptive input (centered pill / collapsible bottom chip)
 │       └── layout/
-│           ├── tasks-layout-client.tsx # Persistent layout shell (header, sidebar, progress, modal)
+│           ├── tasks-layout-client.tsx # Persistent layout shell (header, sidebar, progress, modal, splash)
 │           ├── ambient-progress.tsx   # Top ambient progress bar
 │           ├── app-header.tsx         # Header with title, sensitivity & tunnel launcher
 │           └── sidebar.tsx            # Collapsible session drawer (history & theme)
