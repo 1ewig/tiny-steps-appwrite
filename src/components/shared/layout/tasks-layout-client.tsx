@@ -36,7 +36,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     theme,
     switchSession,
     deleteSession,
-    clearAllSessions,
     setGranularity,
     openFocusTunnel,
     closeFocusTunnel,
@@ -170,12 +169,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
         sessions={sessions}
         currentSessionId={activeSessionId}
         onClose={closeHistory}
-        onNewSession={() => {
-          closeHistory();
-          closeFocusTunnel();
-          switchSession(null);
-          router.push('/tasks');
-        }}
         onSelectSession={(id) => {
           closeHistory();
           closeFocusTunnel();
@@ -190,10 +183,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
           if (id === activeSessionId) {
             router.push('/tasks');
           }
-        }}
-        onClearAllSessions={() => {
-          clearAllSessions();
-          router.push('/tasks');
         }}
       />
 

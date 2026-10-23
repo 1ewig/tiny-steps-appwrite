@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import type { ChatSession } from '@/types/task';
 import { AppIcon } from '@/components/shared/app-icon';
@@ -9,7 +9,6 @@ import {
   CheckCircle,
   ChatText,
   X,
-  Plus,
   Trash,
 } from '@phosphor-icons/react';
 import {
@@ -24,9 +23,9 @@ interface HistoryDrawerProps {
   sessions: ChatSession[];
   currentSessionId: string | null;
   onClose: () => void;
-  onNewSession: () => void;
   onSelectSession: (sessionId: string) => void;
   onDeleteSession: (sessionId: string) => void;
+  onNewSession?: () => void;
   onClearAllSessions?: () => void;
 }
 
@@ -35,17 +34,64 @@ export function HistoryDrawer({
   sessions,
   currentSessionId,
   onClose,
-  onNewSession,
   onSelectSession,
   onDeleteSession,
-  onClearAllSessions,
 }: HistoryDrawerProps) {
   const reduceMotion = useReducedMotion();
-  const [confirmClear, setConfirmClear] = useState(false);
+  const panelRef = useRef<HTMLElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   const validSessions = sessions.filter(
     (s) => s.messages && s.messages.length > 0
   );
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const active = document.activeElement;
+    previousFocusRef.current =
+      active instanceof HTMLElement
+        ? active
+        : document.querySelector<HTMLElement>('[aria-label="Open task history"]');
+
+    const frame = requestAnimationFrame(() => closeButtonRef.current?.focus());
+
+    return () => {
+      cancelAnimationFrame(frame);
+      const target =
+        previousFocusRef.current ??
+        document.querySelector<HTMLElement>('[aria-label="Open task history"]');
+      target?.focus();
+      previousFocusRef.current = null;
+    };
+  }, [isOpen]);
+
+  const handlePanelKeyDown = (event: ReactKeyboardEvent<HTMLElement>) => {
+    if (event.key !== 'Tab') return;
+
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    const focusables = Array.from(
+      panel.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )
+    ).filter((element) => element.offsetParent !== null);
+
+    if (focusables.length === 0) return;
+
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -59,91 +105,66 @@ export function HistoryDrawer({
             animate="animate"
             exit="exit"
             onClick={onClose}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-backdrop cursor-pointer"
+            className="fixed inset-0 bg-scrim/50 backdrop-blur-sm z-backdrop cursor-pointer"
             aria-hidden="true"
           />
 
           {/* Right Slide Drawer */}
           <motion.aside
+            ref={panelRef}
             key="drawer-panel"
             variants={reduceMotion ? undefined : drawerSlideVariants}
             initial="initial"
             animate="animate"
             exit="exit"
-            className="fixed inset-y-0 right-0 z-drawer w-80 sm:w-96 max-w-[calc(100vw-1.5rem)] bg-canvas-subtle border-l border-border-subtle flex flex-col justify-between shadow-modal font-sans"
+            tabIndex={-1}
+            onKeyDown={handlePanelKeyDown}
+            className="fixed inset-y-0 right-0 z-drawer w-80 sm:w-96 max-w-[calc(100vw-1.5rem)] bg-canvas-subtle border-l border-border-subtle flex flex-col justify-between shadow-modal font-sans focus:outline-none"
             role="dialog"
             aria-modal="true"
             aria-label="Task history"
           >
             {/* Top Bar: Title, Count Badge, Close */}
-            <div className="p-4 sm:p-5 border-b border-border-subtle space-y-3.5 bg-canvas/60">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 flex items-center justify-center shrink-0">
-                    <AppIcon size={26} className="rounded-lg shadow-subtle" />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-sm tracking-tight text-text-primary">
-                      Task history
-                    </span>
-                    {validSessions.length > 0 && (
-                      <span className="px-2 py-0.5 rounded-full text-2xs font-semibold bg-surface border border-border-subtle text-text-secondary">
-                        {validSessions.length}
-                      </span>
-                    )}
-                  </div>
+            <div className="p-4 sm:p-5 border-b border-border-subtle bg-canvas/60 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 flex items-center justify-center shrink-0">
+                  <AppIcon size={26} className="rounded-lg shadow-subtle" />
                 </div>
-
-                <motion.button
-                  onClick={onClose}
-                  variants={reduceMotion ? undefined : tactileButtonVariants}
-                  initial="rest"
-                  animate="rest"
-                  whileHover={reduceMotion ? undefined : 'hover'}
-                  whileTap={reduceMotion ? undefined : 'tap'}
-                  className="p-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors duration-fast cursor-pointer"
-                  aria-label="Close task history"
-                  title="Close (Esc)"
-                >
-                  <motion.span
-                    variants={reduceMotion ? undefined : tactileIconVariants}
-                    className="flex items-center"
-                  >
-                    <X size={18} weight="bold" />
-                  </motion.span>
-                </motion.button>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-sm tracking-tight text-text-primary">
+                    Task history
+                  </span>
+                  {validSessions.length > 0 && (
+                    <span className="px-2 py-0.5 rounded-full text-2xs font-semibold bg-surface border border-border-subtle text-text-secondary">
+                      {validSessions.length}
+                    </span>
+                  )}
+                </div>
               </div>
 
-              {/* New Task Button */}
               <motion.button
-                onClick={() => {
-                  onNewSession();
-                  onClose();
-                }}
+                ref={closeButtonRef}
+                onClick={onClose}
                 variants={reduceMotion ? undefined : tactileButtonVariants}
                 initial="rest"
                 animate="rest"
                 whileHover={reduceMotion ? undefined : 'hover'}
                 whileTap={reduceMotion ? undefined : 'tap'}
-                className="w-full py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center justify-between border bg-surface hover:bg-surface-subtle text-text-primary border-border-subtle shadow-subtle transition-colors duration-fast group cursor-pointer"
+                className="p-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors duration-fast cursor-pointer"
+                aria-label="Close task history"
+                title="Close (Esc)"
               >
-                <span className="flex items-center gap-2">
-                  <motion.span
-                    variants={reduceMotion ? undefined : tactileIconVariants}
-                    className="flex items-center text-accent"
-                  >
-                    <Plus size={15} weight="bold" />
-                  </motion.span>
-                  <span>New gentle task</span>
-                </span>
-                <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-2xs font-mono rounded border bg-canvas-subtle text-text-tertiary border-border-subtle">
-                  Ctrl+K
-                </kbd>
+                <motion.span
+                  variants={reduceMotion ? undefined : tactileIconVariants}
+                  className="flex items-center"
+                >
+                  <X size={18} weight="bold" />
+                </motion.span>
               </motion.button>
             </div>
 
             {/* Middle: Saved Sessions List */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-2">
+            <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-5 space-y-2">
               {validSessions.length === 0 ? (
                 <div className="py-12 px-4 text-center space-y-3">
                   <div className="w-12 h-12 mx-auto rounded-2xl bg-surface border border-border-subtle text-text-tertiary flex items-center justify-center shadow-subtle">
@@ -171,28 +192,20 @@ export function HistoryDrawer({
                   const completedSteps = steps.filter((s) => s.completed).length;
 
                   return (
-                    <div
-                      key={sess.id}
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => {
-                        onSelectSession(sess.id);
-                        onClose();
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
+                    <div key={sess.id} className="group relative">
+                      <button
+                        type="button"
+                        onClick={() => {
                           onSelectSession(sess.id);
                           onClose();
-                        }
-                      }}
-                      className={`group p-3 rounded-xl border flex items-start justify-between gap-2.5 transition-all cursor-pointer select-none ${
-                        isCurrent
-                          ? 'bg-accent-subtle/80 text-accent-text border-accent/40 font-semibold shadow-2xs'
-                          : 'bg-surface hover:bg-surface-subtle text-text-primary border-border-subtle hover:border-border-muted shadow-2xs'
-                      }`}
-                    >
-                      <div className="flex items-start gap-2.5 min-w-0 flex-1">
+                        }}
+                        aria-current={isCurrent ? 'true' : undefined}
+                        className={`w-full text-left p-3 pr-10 rounded-xl border flex items-start gap-2.5 transition-all cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                          isCurrent
+                            ? 'bg-accent-subtle/80 text-accent-text border-accent/40 font-semibold shadow-2xs'
+                            : 'bg-surface hover:bg-surface-subtle text-text-primary border-border-subtle hover:border-border-muted shadow-2xs'
+                        }`}
+                      >
                         <div className="mt-0.5 shrink-0">
                           {totalSteps > 0 ? (
                             <CheckCircle
@@ -225,60 +238,20 @@ export function HistoryDrawer({
                                 }`}
                           </p>
                         </div>
-                      </div>
+                      </button>
 
                       <button
                         type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDeleteSession(sess.id);
-                        }}
-                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md hover:bg-danger-subtle text-text-tertiary hover:text-danger-text transition-opacity cursor-pointer shrink-0"
+                        onClick={() => onDeleteSession(sess.id)}
+                        className="absolute top-2 right-2 p-1.5 rounded-md opacity-100 sm:opacity-0 sm:group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent hover:bg-danger-subtle text-text-tertiary hover:text-danger-text transition-opacity cursor-pointer"
                         title="Delete task"
-                        aria-label="Delete task"
+                        aria-label={`Delete ${sess.title || 'task'}`}
                       >
                         <Trash size={14} weight="regular" />
                       </button>
                     </div>
                   );
                 })
-              )}
-            </div>
-
-            {/* Bottom Footer: Privacy reassurance & Clear All */}
-            <div className="p-3.5 sm:p-4 border-t border-border-subtle bg-canvas/40 flex items-center justify-between text-2xs text-text-tertiary">
-              <span>Saved locally on your device</span>
-
-              {validSessions.length > 0 && onClearAllSessions && (
-                confirmClear ? (
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onClearAllSessions();
-                        setConfirmClear(false);
-                      }}
-                      className="px-2 py-0.5 rounded text-danger-text font-semibold hover:bg-danger-subtle transition-colors"
-                    >
-                      Confirm clear
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setConfirmClear(false)}
-                      className="px-1.5 py-0.5 rounded hover:bg-surface-subtle text-text-tertiary"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setConfirmClear(true)}
-                    className="hover:text-danger-text transition-colors cursor-pointer"
-                  >
-                    Clear all
-                  </button>
-                )
               )}
             </div>
           </motion.aside>
