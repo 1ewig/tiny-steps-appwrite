@@ -84,7 +84,7 @@ export function ChatInput({
       {/* Dynamic input container: pill for single-line, rounded-2xl for multiline */}
       <div
         onClick={() => textareaRef.current?.focus()}
-        className={`bg-surface/95 backdrop-blur-md border border-border-subtle shadow-capsule px-4 transition-all duration-200 focus-within:border-accent/40 focus-within:ring-2 focus-within:ring-accent/15 flex gap-2.5 cursor-text ${
+        className={`bg-surface/95 backdrop-blur-md shadow-capsule px-4 transition-shadow duration-200 flex gap-2.5 cursor-text ${
           isMultiline
             ? 'rounded-2xl py-3 items-end'
             : 'rounded-full py-2 sm:py-2.5 items-center'
@@ -156,7 +156,7 @@ export function ChatInput({
               animate="rest"
               whileHover={reduceMotion ? undefined : 'hover'}
               whileTap={reduceMotion ? undefined : 'tap'}
-              className="pointer-events-auto px-4 py-2 rounded-full bg-surface/95 hover:bg-surface border border-border-subtle shadow-card text-xs font-medium text-text-secondary hover:text-text-primary flex items-center gap-2 transition-colors duration-fast backdrop-blur-md group"
+              className="pointer-events-auto px-4 py-2 rounded-full bg-surface/95 hover:bg-surface shadow-card text-xs font-medium text-text-secondary hover:text-text-primary flex items-center gap-2 transition-colors duration-fast backdrop-blur-md group"
             >
               <motion.span variants={reduceMotion ? undefined : tactileIconVariants} className="shrink-0 flex items-center">
                 <ChatCircleDots size={16} weight="regular" className="text-accent" />

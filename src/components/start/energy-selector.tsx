@@ -83,10 +83,10 @@ export function EnergySelector({
               animate="rest"
               whileHover={disabled || reduceMotion ? undefined : 'hover'}
               whileTap={disabled || reduceMotion ? undefined : 'tap'}
-              className={`group flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-medium border select-none disabled:opacity-50 disabled:pointer-events-none transition-colors duration-fast ${
+              className={`group flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-medium select-none disabled:opacity-50 disabled:pointer-events-none transition-colors duration-fast ${
                 isSelected
-                  ? 'bg-accent-subtle text-accent-text border-accent/40 shadow-subtle ring-1 ring-accent/30 font-semibold'
-                  : 'bg-surface hover:bg-surface-subtle text-text-secondary hover:text-text-primary border-border-subtle hover:border-border-muted shadow-2xs'
+                  ? 'bg-accent-subtle text-accent-text shadow-subtle font-semibold'
+                  : 'bg-surface hover:bg-surface-subtle text-text-secondary hover:text-text-primary shadow-subtle'
               }`}
             >
               <motion.span
