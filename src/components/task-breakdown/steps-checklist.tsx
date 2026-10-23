@@ -4,6 +4,11 @@ import { useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Sparkle, Check } from '@phosphor-icons/react';
 import type { Step } from '@/types/task';
+import {
+  tactileButtonVariants,
+  tactileIconVariants,
+  tactileCheckboxVariants,
+} from '@/constants/animation';
 
 const EASE_CALM = [0.2, 0.9, 0.3, 1] as const;
 
@@ -75,21 +80,34 @@ export function StepsChecklist({
             >
               <div className="flex items-start gap-2.5">
                 {/* Checkbox Button */}
-                <button
+                <motion.button
                   onClick={(e) => {
                     e.stopPropagation();
                     handleToggle(st, idx);
                   }}
+                  variants={reduceMotion ? undefined : tactileCheckboxVariants}
+                  initial="rest"
+                  animate="rest"
+                  whileHover={reduceMotion ? undefined : 'hover'}
+                  whileTap={reduceMotion ? undefined : 'tap'}
                   aria-label={isCompleted ? 'Mark incomplete' : 'Mark complete'}
-                  className={`mt-0.5 rounded-full flex items-center justify-center shrink-0 transition-all ${isCompleted
+                  className={`mt-0.5 rounded-full flex items-center justify-center shrink-0 transition-colors duration-fast ${isCompleted
                       ? 'w-4 h-4 bg-accent border border-accent text-text-inverse'
                       : isCurrent
                         ? 'w-5 h-5 border-2 border-accent hover:bg-accent-subtle'
                         : 'w-4 h-4 border border-border-muted hover:border-text-tertiary'
                     }`}
                 >
-                  {isCompleted && <Check size={10} weight="bold" />}
-                </button>
+                  {isCompleted && (
+                    <motion.span
+                      initial={{ scale: 0.5, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      <Check size={10} weight="bold" />
+                    </motion.span>
+                  )}
+                </motion.button>
 
                 {/* Step Content */}
                 <div className="flex-1 min-w-0">
@@ -131,28 +149,42 @@ export function StepsChecklist({
 
                             <div className="flex items-center gap-1.5 ml-auto">
                               {st.canSplit && (
-                                <button
+                                <motion.button
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     onShrinkStep(idx);
                                   }}
-                                  className="text-2xs px-2.5 py-1 rounded-md bg-surface-subtle hover:bg-surface-subtle/80 text-text-primary font-medium flex items-center gap-1.5 transition-all"
+                                  variants={reduceMotion ? undefined : tactileButtonVariants}
+                                  initial="rest"
+                                  animate="rest"
+                                  whileHover={reduceMotion ? undefined : 'hover'}
+                                  whileTap={reduceMotion ? undefined : 'tap'}
+                                  className="text-2xs px-2.5 py-1 rounded-md bg-surface-subtle hover:bg-surface-subtle/80 text-text-primary font-medium flex items-center gap-1.5 transition-colors duration-fast"
                                 >
-                                  <Sparkle size={12} weight="duotone" className="text-accent" />
+                                  <motion.span variants={reduceMotion ? undefined : tactileIconVariants} className="shrink-0 flex items-center">
+                                    <Sparkle size={12} weight="duotone" className="text-accent" />
+                                  </motion.span>
                                   <span>Break down</span>
-                                </button>
+                                </motion.button>
                               )}
 
-                              <button
+                              <motion.button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleToggle(st, idx);
                                 }}
-                                className="text-2xs px-3 py-1 rounded-md bg-accent hover:bg-accent-hover text-text-inverse font-medium shadow-subtle transition-all active:scale-95 flex items-center gap-1"
+                                variants={reduceMotion ? undefined : tactileButtonVariants}
+                                initial="rest"
+                                animate="rest"
+                                whileHover={reduceMotion ? undefined : 'hover'}
+                                whileTap={reduceMotion ? undefined : 'tap'}
+                                className="text-2xs px-3 py-1 rounded-md bg-accent hover:bg-accent-hover text-text-inverse font-medium shadow-subtle transition-colors duration-fast flex items-center gap-1"
                               >
-                                <Check size={12} weight="bold" />
+                                <motion.span variants={reduceMotion ? undefined : tactileIconVariants} className="shrink-0 flex items-center">
+                                  <Check size={12} weight="bold" />
+                                </motion.span>
                                 <span>Done</span>
-                              </button>
+                              </motion.button>
                             </div>
                           </div>
                         </div>

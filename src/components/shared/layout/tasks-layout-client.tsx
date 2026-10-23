@@ -169,7 +169,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
         {/* AppHeader - Fixed, Static & Never Unmounted */}
         <AppHeader
-          sessionTitle={activeSession ? activeSession.title : 'New gentle task'}
           hasActiveSteps={Boolean(activeSession && steps.length > 0)}
           granularity={granularity}
           onToggleSidebar={() => setSidebarOpen(true)}
@@ -179,8 +178,8 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
               : undefined
           }
           onSelectGranularity={activeSessionId ? setGranularity : undefined}
-          showNewTaskButton={Boolean(activeSessionId)}
-          onNewTask={() => {
+          showHomeButton={Boolean(activeSessionId)}
+          onHome={() => {
             closeFocusTunnel();
             switchSession(null);
             router.push('/tasks');

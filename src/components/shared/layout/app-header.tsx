@@ -4,7 +4,7 @@ import type { ComponentType } from 'react';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import type { IconProps } from '@phosphor-icons/react';
-import { Plant, Leaf, PottedPlant } from '@phosphor-icons/react';
+import { Plant, Leaf, PottedPlant, House } from '@phosphor-icons/react';
 import type { GranularityLevel } from '@/types/task';
 import {
   tactileButtonVariants,
@@ -13,12 +13,15 @@ import {
 } from '@/constants/animation';
 
 interface AppHeaderProps {
-  sessionTitle: string;
   hasActiveSteps: boolean;
   granularity: GranularityLevel;
   onOpenFocusTunnel?: () => void;
   onSelectGranularity?: (level: GranularityLevel) => void;
   onToggleSidebar?: () => void;
+  showHomeButton?: boolean;
+  onHome?: () => void;
+  // Optional backwards-compatibility
+  sessionTitle?: string;
   showNewTaskButton?: boolean;
   onNewTask?: () => void;
 }
@@ -36,18 +39,22 @@ const GRANULARITY_CONFIG: Record<GranularityLevel, GranularityItem> = {
 };
 
 export function AppHeader({
-  sessionTitle,
   hasActiveSteps,
   granularity,
   onOpenFocusTunnel,
   onSelectGranularity,
   onToggleSidebar,
-  showNewTaskButton = false,
+  showHomeButton,
+  onHome,
+  showNewTaskButton,
   onNewTask,
 }: AppHeaderProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
+
+  const isHomeVisible = showHomeButton ?? showNewTaskButton ?? false;
+  const handleHome = onHome ?? onNewTask;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -83,37 +90,30 @@ export function AppHeader({
           </motion.button>
         )}
 
-        {/* Current Title */}
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="text-xs sm:text-sm font-semibold text-text-primary max-w-[150px] sm:max-w-xs md:max-w-md truncate">
-            {sessionTitle || 'New gentle task'}
-          </span>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-1.5 sm:gap-2">
-        {/* Optional New Task Button */}
-        {showNewTaskButton && onNewTask && (
+        {/* Home Button (Far Left) */}
+        {isHomeVisible && handleHome && (
           <motion.button
-            onClick={onNewTask}
+            onClick={handleHome}
             variants={reduceMotion ? undefined : tactileButtonVariants}
             initial="rest"
             animate="rest"
             whileHover={reduceMotion ? undefined : 'hover'}
             whileTap={reduceMotion ? undefined : 'tap'}
-            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors duration-fast"
-            title="Start another gentle task"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle border border-border-subtle transition-colors duration-fast shadow-2xs"
+            title="Return home"
           >
             <motion.span
               variants={reduceMotion ? undefined : tactileIconVariants}
-              className="text-accent font-bold"
+              className="shrink-0 flex items-center"
             >
-              +
+              <House size={15} weight="regular" className="text-accent" />
             </motion.span>
-            <span>New task</span>
+            <span className="hidden sm:inline">Home</span>
           </motion.button>
         )}
+      </div>
 
+      <div className="flex items-center gap-1.5 sm:gap-2">
         {/* Focus Tunnel Launcher Button */}
         {hasActiveSteps && onOpenFocusTunnel && (
           <motion.button

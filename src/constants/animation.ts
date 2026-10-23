@@ -83,6 +83,31 @@ export const tactileIconVariants: Variants = {
   },
 };
 
+/**
+ * Tactile Checkbox Variants
+ * Optimized for step checklist checkboxes (16-20px)
+ */
+export const tactileCheckboxVariants: Variants = {
+  rest: {
+    scale: 1,
+    y: 0,
+    transition: {
+      duration: 0.2,
+      ease: CALM_EASE,
+    },
+  },
+  hover: {
+    scale: 1.08,
+    y: -0.5,
+    transition: CALM_SPRING,
+  },
+  tap: {
+    scale: 0.88,
+    y: 0,
+    transition: CUSHION_TAP_SPRING,
+  },
+};
+
 // Semantic backwards-compatible aliases
 export const energyPillVariants = tactileButtonVariants;
 export const energyIconVariants = tactileIconVariants;

@@ -176,17 +176,24 @@ export function ChatInput({
             <div className="max-w-2xl mx-auto pointer-events-auto w-full space-y-1.5">
               <div className="flex items-center justify-between px-2 text-2xs text-text-tertiary">
                 <span>Adjust your task or vent freely</span>
-                <button
+                <motion.button
                   type="button"
                   onClick={() => {
                     setIsExpanded(false);
                     setText('');
                   }}
+                  variants={reduceMotion ? undefined : tactileButtonVariants}
+                  initial="rest"
+                  animate="rest"
+                  whileHover={reduceMotion ? undefined : 'hover'}
+                  whileTap={reduceMotion ? undefined : 'tap'}
                   className="hover:text-text-primary px-2 py-0.5 rounded hover:bg-surface-subtle transition-colors flex items-center gap-1 font-medium"
                 >
-                  <X size={12} weight="bold" />
+                  <motion.span variants={reduceMotion ? undefined : tactileIconVariants} className="shrink-0 flex items-center">
+                    <X size={12} weight="bold" />
+                  </motion.span>
                   <span>Close</span>
-                </button>
+                </motion.button>
               </div>
               {inputBlock}
             </div>
