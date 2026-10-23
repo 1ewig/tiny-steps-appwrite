@@ -4,7 +4,7 @@ import type { ComponentType } from 'react';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import type { IconProps } from '@phosphor-icons/react';
-import { Plant, Leaf, PottedPlant, House } from '@phosphor-icons/react';
+import { Plant, Leaf, PottedPlant, House, ClockCounterClockwise } from '@phosphor-icons/react';
 import type { GranularityLevel } from '@/types/task';
 import {
   tactileButtonVariants,
@@ -17,6 +17,7 @@ interface AppHeaderProps {
   granularity: GranularityLevel;
   onOpenFocusTunnel?: () => void;
   onSelectGranularity?: (level: GranularityLevel) => void;
+  onToggleHistory?: () => void;
   onToggleSidebar?: () => void;
   showHomeButton?: boolean;
   onHome?: () => void;
@@ -43,6 +44,7 @@ export function AppHeader({
   granularity,
   onOpenFocusTunnel,
   onSelectGranularity,
+  onToggleHistory,
   onToggleSidebar,
   showHomeButton,
   onHome,
@@ -55,6 +57,7 @@ export function AppHeader({
 
   const isHomeVisible = showHomeButton ?? showNewTaskButton ?? false;
   const handleHome = onHome ?? onNewTask;
+  const handleToggleHistory = onToggleHistory ?? onToggleSidebar;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -71,25 +74,6 @@ export function AppHeader({
   return (
     <header className="h-14 border-b border-border-subtle px-4 sm:px-6 flex items-center justify-between shrink-0 bg-canvas/80 backdrop-blur-md z-header">
       <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-        {/* Mobile Sidebar Hamburger Toggle */}
-        {onToggleSidebar && (
-          <motion.button
-            onClick={onToggleSidebar}
-            variants={reduceMotion ? undefined : tactileButtonVariants}
-            initial="rest"
-            animate="rest"
-            whileHover={reduceMotion ? undefined : 'hover'}
-            whileTap={reduceMotion ? undefined : 'tap'}
-            className="lg:hidden p-1.5 -ml-1 rounded-md text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors duration-fast"
-            aria-label="Open task history sidebar"
-            title="Open task history"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-            </svg>
-          </motion.button>
-        )}
-
         {/* Home Button (Far Left) */}
         {isHomeVisible && handleHome && (
           <motion.button
@@ -99,7 +83,7 @@ export function AppHeader({
             animate="rest"
             whileHover={reduceMotion ? undefined : 'hover'}
             whileTap={reduceMotion ? undefined : 'tap'}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer"
             title="Return home"
           >
             <motion.span
@@ -114,6 +98,28 @@ export function AppHeader({
       </div>
 
       <div className="flex items-center gap-1.5 sm:gap-2">
+        {/* History Drawer Trigger Button */}
+        {handleToggleHistory && (
+          <motion.button
+            onClick={handleToggleHistory}
+            variants={reduceMotion ? undefined : tactileButtonVariants}
+            initial="rest"
+            animate="rest"
+            whileHover={reduceMotion ? undefined : 'hover'}
+            whileTap={reduceMotion ? undefined : 'tap'}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle border border-border-subtle transition-colors duration-fast cursor-pointer"
+            title="Task history (Ctrl+H)"
+            aria-label="Open task history"
+          >
+            <motion.span
+              variants={reduceMotion ? undefined : tactileIconVariants}
+              className="shrink-0 flex items-center"
+            >
+              <ClockCounterClockwise size={15} weight="regular" className="text-accent" />
+            </motion.span>
+            <span className="hidden sm:inline">History</span>
+          </motion.button>
+        )}
         {/* Focus Tunnel Launcher Button */}
         {hasActiveSteps && onOpenFocusTunnel && (
           <motion.button

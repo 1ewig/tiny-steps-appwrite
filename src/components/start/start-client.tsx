@@ -1,14 +1,22 @@
 'use client';
 
+import { motion, useReducedMotion } from 'framer-motion';
+import { ClockCounterClockwise } from '@phosphor-icons/react';
 import { useTaskStore } from '@/store/task-store';
 import { useStartTask } from '@/hooks/use-start-task';
 import { HeroWelcome } from '@/components/start/hero-welcome';
 import { EnergySelector } from '@/components/start/energy-selector';
 import { ChatInput } from '@/components/shared/chat-input';
+import { tactileButtonVariants } from '@/constants/animation';
 
 export function StartClient() {
-  const { granularity, setGranularity } = useTaskStore();
+  const { granularity, setGranularity, sessions, openHistory } = useTaskStore();
   const { startTask, isGeneratingTask, error, restoreText } = useStartTask();
+  const reduceMotion = useReducedMotion();
+
+  const hasSavedTasks = sessions.some(
+    (s) => s.messages && s.messages.length > 0
+  );
 
   return (
     <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 pb-12 overflow-y-auto">
@@ -35,6 +43,25 @@ export function StartClient() {
             onSelect={setGranularity}
             disabled={isGeneratingTask}
           />
+
+          {hasSavedTasks && !isGeneratingTask && (
+            <div className="pt-1 text-center">
+              <motion.button
+                type="button"
+                onClick={openHistory}
+                variants={reduceMotion ? undefined : tactileButtonVariants}
+                initial="rest"
+                animate="rest"
+                whileHover={reduceMotion ? undefined : 'hover'}
+                whileTap={reduceMotion ? undefined : 'tap'}
+                className="inline-flex items-center gap-1.5 text-xs text-text-tertiary hover:text-text-secondary transition-colors duration-fast cursor-pointer py-1.5 px-3 rounded-full hover:bg-surface-subtle"
+              >
+                <ClockCounterClockwise size={14} className="text-accent" />
+                <span>Looking for an earlier task? View history</span>
+                <span aria-hidden="true">→</span>
+              </motion.button>
+            </div>
+          )}
         </div>
       </div>
     </main>

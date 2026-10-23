@@ -198,3 +198,49 @@ export const staggerContainerVariants: Variants = {
     },
   },
 };
+
+/**
+ * Slide-over Drawer Variants (Right Side)
+ */
+export const drawerSlideVariants: Variants = {
+  initial: {
+    x: '100%',
+    opacity: 0.8,
+  },
+  animate: {
+    x: 0,
+    opacity: 1,
+    transition: GENTLE_SLIDE_SPRING,
+  },
+  exit: {
+    x: '100%',
+    opacity: 0.8,
+    transition: {
+      duration: 0.22,
+      ease: CALM_EASE,
+    },
+  },
+};
+
+/**
+ * Soft Backdrop Overlay Variants
+ */
+export const backdropVariants: Variants = {
+  initial: {
+    opacity: 0,
+  },
+  animate: {
+    opacity: 1,
+    transition: {
+      duration: 0.2,
+      ease: CALM_EASE,
+    },
+  },
+  exit: {
+    opacity: 0,
+    transition: {
+      duration: 0.16,
+      ease: CALM_EASE,
+    },
+  },
+};

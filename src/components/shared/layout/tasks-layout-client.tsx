@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useEffect, useSyncExternalStore } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { generateMicroSteps } from '@/lib/assistant-engine';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { AmbientProgress } from '@/components/shared/layout/ambient-progress';
 import { AppHeader } from '@/components/shared/layout/app-header';
-import { Sidebar } from '@/components/shared/layout/sidebar';
+import { HistoryDrawer } from '@/components/shared/layout/history-drawer';
+import { ThemeToggleFab } from '@/components/shared/theme-toggle-fab';
 import { FocusTunnelModal } from '@/components/task-breakdown/focus-tunnel-modal';
 import { FocusLoader } from '@/components/shared/focus-loader';
 import { AppIcon } from '@/components/shared/app-icon';
@@ -25,8 +26,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     () => false
   );
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   const {
     sessions,
     currentSessionId,
@@ -34,14 +33,18 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     peekFuture,
     focusTunnelSessionId,
     isGeneratingTask,
+    isHistoryOpen,
     theme,
     switchSession,
     deleteSession,
+    clearAllSessions,
     setGranularity,
     openFocusTunnel,
     closeFocusTunnel,
     setGeneratingTask,
     toggleTheme,
+    closeHistory,
+    toggleHistory,
     toggleStepCompletion,
     shrinkStep,
   } = useTaskStore();
@@ -110,6 +113,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     onNewSession: () => {
       if (isGeneratingTask) return;
       closeFocusTunnel();
+      closeHistory();
       switchSession(null);
       router.push('/tasks');
     },
@@ -119,6 +123,9 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
       }
     },
     isFocusTunnelActive: focusTunnelOpen && !isGeneratingTask,
+    onToggleHistory: toggleHistory,
+    onCloseHistory: closeHistory,
+    isHistoryOpen,
   });
 
   if (!mounted) {
@@ -134,21 +141,20 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
       {/* Ambient Top Progress Bar - Persistent & Static */}
       <AmbientProgress progressPercentage={activeSessionId ? progressPct : 0} />
 
-      {/* Collapsible Sidebar - Persistent & Static */}
-      <Sidebar
-        isOpen={sidebarOpen}
+      {/* Slide-over History Drawer (Opens to Right) */}
+      <HistoryDrawer
+        isOpen={isHistoryOpen}
         sessions={sessions}
         currentSessionId={activeSessionId}
-        theme={theme}
-        onClose={() => setSidebarOpen(false)}
+        onClose={closeHistory}
         onNewSession={() => {
-          setSidebarOpen(false);
+          closeHistory();
           closeFocusTunnel();
           switchSession(null);
           router.push('/tasks');
         }}
         onSelectSession={(id) => {
-          setSidebarOpen(false);
+          closeHistory();
           closeFocusTunnel();
           switchSession(id);
           router.push(`/tasks/${id}`);
@@ -162,16 +168,19 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
             router.push('/tasks');
           }
         }}
-        onToggleTheme={toggleTheme}
+        onClearAllSessions={() => {
+          clearAllSessions();
+          router.push('/tasks');
+        }}
       />
 
-      {/* Main Column */}
+      {/* Main Full-Width Column (Distraction-Free Workspace) */}
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
         {/* AppHeader - Fixed, Static & Never Unmounted */}
         <AppHeader
           hasActiveSteps={Boolean(activeSession && steps.length > 0)}
           granularity={granularity}
-          onToggleSidebar={() => setSidebarOpen(true)}
+          onToggleHistory={toggleHistory}
           onOpenFocusTunnel={
             activeSession && activeSessionId && steps.length > 0
               ? () => openFocusTunnel(activeSessionId)
@@ -181,6 +190,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
           showHomeButton={Boolean(activeSessionId)}
           onHome={() => {
             closeFocusTunnel();
+            closeHistory();
             switchSession(null);
             router.push('/tasks');
           }}
@@ -189,6 +199,11 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
         {/* Dynamic Page Content */}
         {children}
       </div>
+
+      {/* Floating Theme Toggle (Bottom-Left FAB) */}
+      {!focusTunnelOpen && !isGeneratingTask && (
+        <ThemeToggleFab theme={theme} onToggle={toggleTheme} />
+      )}
 
       {/* Focus Tunnel Modal - Persistent */}
       <FocusTunnelModal

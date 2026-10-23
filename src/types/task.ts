@@ -32,6 +32,7 @@ export interface TaskState {
   peekFuture: boolean;
   focusTunnelSessionId: string | null;
   isGeneratingTask: boolean;
+  isHistoryOpen: boolean;
   theme: 'light' | 'dark';
 
   // Actions
@@ -44,6 +45,9 @@ export interface TaskState {
   openFocusTunnel: (sessionId: string) => void;
   closeFocusTunnel: () => void;
   setGeneratingTask: (isGenerating: boolean) => void;
+  openHistory: () => void;
+  closeHistory: () => void;
+  toggleHistory: () => void;
   toggleTheme: () => void;
 
   // Chat & Step Actions

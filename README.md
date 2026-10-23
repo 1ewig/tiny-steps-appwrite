@@ -144,11 +144,12 @@ src/
 │       ├── app-icon.tsx               # Reusable cairn app icon with balancing teeter animation
 │       ├── chat-input.tsx             # Adaptive input (centered pill / collapsible bottom chip)
 │       ├── focus-loader.tsx           # Text-only full-screen start transition with rotating copy
+│       ├── theme-toggle-fab.tsx       # Bottom-left floating action button for sensory light/dim mode
 │       └── layout/
-│           ├── tasks-layout-client.tsx # Persistent layout shell (header, sidebar, progress, loader, tunnel)
+│           ├── tasks-layout-client.tsx # Persistent layout shell (header, drawer, progress, loader, tunnel)
 │           ├── ambient-progress.tsx   # Top ambient progress bar
-│           ├── app-header.tsx         # Header with title, sensitivity & tunnel launcher
-│           └── sidebar.tsx            # Collapsible session drawer (history & theme)
+│           ├── app-header.tsx         # Header with home, history trigger, sensitivity & tunnel launcher
+│           └── history-drawer.tsx     # Slide-over task history drawer (right-side)
 │
 ├── constants/
 │   └── presets.ts                     # Task decomposition templates with optional step hints
@@ -215,6 +216,8 @@ bun run build
 | Shortcut | Action |
 | :--- | :--- |
 | `Ctrl + K` / `Cmd + K` | Start a new gentle task session |
+| `Ctrl + H` / `Cmd + H` | Toggle task history drawer |
+| `Escape` | Close task history drawer / modals |
 | `Enter` (in input) | Send message / decompose task |
 | `Shift + Enter` (in input) | Insert a newline |
 | `Space` / `Enter` (in Focus Tunnel) | Mark current micro-step done and advance |

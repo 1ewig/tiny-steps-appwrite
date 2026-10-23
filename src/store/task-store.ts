@@ -12,6 +12,7 @@ export const useTaskStore = create<TaskState>()(
       peekFuture: false,
       focusTunnelSessionId: null,
       isGeneratingTask: false,
+      isHistoryOpen: false,
       theme: 'light',
 
       createNewSession: (switchImmediately = true) => {
@@ -73,6 +74,18 @@ export const useTaskStore = create<TaskState>()(
 
       setGeneratingTask: (isGenerating: boolean) => {
         set({ isGeneratingTask: isGenerating });
+      },
+
+      openHistory: () => {
+        set({ isHistoryOpen: true });
+      },
+
+      closeHistory: () => {
+        set({ isHistoryOpen: false });
+      },
+
+      toggleHistory: () => {
+        set((state) => ({ isHistoryOpen: !state.isHistoryOpen }));
       },
 
       toggleTheme: () => {
