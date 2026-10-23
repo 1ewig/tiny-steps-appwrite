@@ -27,7 +27,6 @@ export interface ChatSession {
 export interface TaskState {
   // State
   sessions: ChatSession[];
-  currentSessionId: string | null;
   granularity: GranularityLevel;
   peekFuture: boolean;
   focusTunnelSessionId: string | null;
@@ -36,8 +35,8 @@ export interface TaskState {
   theme: 'light' | 'dark';
 
   // Actions
-  createNewSession: (switchImmediately?: boolean) => string;
-  switchSession: (sessionId: string | null) => void;
+  createNewSession: (title?: string) => string;
+  setSessionTitle: (sessionId: string, title: string) => void;
   deleteSession: (sessionId: string) => void;
   setGranularity: (level: GranularityLevel) => void;
   togglePeek: () => void;

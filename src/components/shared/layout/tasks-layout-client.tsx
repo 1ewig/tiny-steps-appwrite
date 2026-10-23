@@ -3,7 +3,9 @@
 import { useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
+import { useHydrated } from '@/hooks/use-hydrated';
 import { generateMicroSteps } from '@/lib/assistant-engine';
+import { MAX_BREAKDOWN_WAIT_MS } from '@/lib/task-generation';
 import {
   getLatestMessageWithSteps,
   getSessionSteps,
@@ -21,6 +23,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const params = useParams();
   const routeSessionId = typeof params?.id === 'string' ? params.id : null;
+  const hasHydrated = useHydrated();
 
   const {
     sessions,
@@ -30,7 +33,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     isGeneratingTask,
     isHistoryOpen,
     theme,
-    switchSession,
     deleteSession,
     setGranularity,
     openFocusTunnel,
@@ -45,11 +47,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
 
   const activeSessionId = routeSessionId;
 
-  // Sync route session with Zustand store
-  useEffect(() => {
-    switchSession(routeSessionId);
-  }, [routeSessionId, switchSession]);
-
   // Ensure DOM matches store theme on mount and changes
   useEffect(() => {
     if (theme === 'dark') {
@@ -59,9 +56,10 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     }
   }, [theme]);
 
-  const activeSession = routeSessionId
-    ? sessions.find((s) => s.id === routeSessionId)
-    : undefined;
+  const activeSession =
+    hasHydrated && routeSessionId
+      ? sessions.find((s) => s.id === routeSessionId)
+      : undefined;
   const focusTunnelOpen = Boolean(
     activeSessionId && focusTunnelSessionId === activeSessionId
   );
@@ -92,13 +90,23 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     setGeneratingTask,
   ]);
 
+  // Watchdog: never leave the loader covering the app if navigation is interrupted
+  useEffect(() => {
+    if (!isGeneratingTask) return;
+    const timer = setTimeout(() => setGeneratingTask(false), MAX_BREAKDOWN_WAIT_MS);
+    return () => clearTimeout(timer);
+  }, [isGeneratingTask, setGeneratingTask]);
+
+  const displayedGranularity = hasHydrated ? granularity : 2;
+  const displayedTheme = hasHydrated ? theme : 'light';
+  const peekEnabled = hasHydrated && peekFuture;
+
   // Global Keyboard Shortcuts
   useKeyboardShortcuts({
     onNewSession: () => {
       if (isGeneratingTask) return;
       closeFocusTunnel();
       closeHistory();
-      switchSession(null);
       router.push('/tasks');
     },
     onCompleteFocusStep: () => {
@@ -113,13 +121,13 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
   });
 
   return (
-    <div className={`h-screen flex overflow-hidden font-sans ${peekFuture ? 'peek-enabled' : ''}`}>
+    <div className={`h-screen flex overflow-hidden font-sans ${peekEnabled ? 'peek-enabled' : ''}`}>
       {/* Main Full-Width Column (Distraction-Free Workspace) */}
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
         {/* AppHeader - Fixed, Static & Never Unmounted */}
         <AppHeader
           hasActiveSteps={Boolean(activeSession && steps.length > 0)}
-          granularity={granularity}
+          granularity={displayedGranularity}
           onToggleHistory={toggleHistory}
           onOpenFocusTunnel={
             activeSession && activeSessionId && steps.length > 0
@@ -131,7 +139,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
           onHome={() => {
             closeFocusTunnel();
             closeHistory();
-            switchSession(null);
             router.push('/tasks');
           }}
         />
@@ -142,7 +149,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
 
       {/* Floating Theme Toggle (Bottom-Left FAB) */}
       {!focusTunnelOpen && !isGeneratingTask && (
-        <ThemeToggleFab theme={theme} onToggle={toggleTheme} />
+        <ThemeToggleFab theme={displayedTheme} onToggle={toggleTheme} />
       )}
 
       {/* Slide-over History Drawer (Opens to Right, Above Header & Workspace) */}
@@ -154,7 +161,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
         onSelectSession={(id) => {
           closeHistory();
           closeFocusTunnel();
-          switchSession(id);
           router.push(`/tasks/${id}`);
         }}
         onDeleteSession={(id) => {

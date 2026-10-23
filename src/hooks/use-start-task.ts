@@ -71,7 +71,7 @@ export function useStartTask() {
         await sleep(MIN_BREAKDOWN_LOADER_MS - elapsed);
       }
 
-      const newSessionId = createNewSession(false);
+      const newSessionId = createNewSession(breakdown.title);
 
       addMessage(newSessionId, {
         role: 'user',
@@ -86,11 +86,6 @@ export function useStartTask() {
 
       openFocusTunnel(newSessionId);
       router.push(`/tasks/${newSessionId}`);
-
-      // Safety fallback: guarantee loader dismiss even if navigation/route transition stalls
-      setTimeout(() => {
-        useTaskStore.getState().setGeneratingTask(false);
-      }, MAX_BREAKDOWN_WAIT_MS);
     } catch (err) {
       console.error(err);
       setGeneratingTask(false);

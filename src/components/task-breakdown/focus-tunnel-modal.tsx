@@ -27,22 +27,31 @@ export function FocusTunnelModal({
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElementRef = useRef<HTMLElement | null>(null);
 
-  // Focus preservation and initial focus
+  // Preserve the previously focused element while the dialog is open
   useEffect(() => {
-    if (isOpen) {
-      previousActiveElementRef.current = document.activeElement as HTMLElement | null;
-      const timer = setTimeout(() => {
-        const firstFocusable = modalRef.current?.querySelector<HTMLElement>(
-          'button:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        );
-        firstFocusable?.focus();
-      }, 50);
-      return () => {
-        clearTimeout(timer);
-        previousActiveElementRef.current?.focus();
-      };
-    }
+    if (!isOpen) return;
+
+    previousActiveElementRef.current = document.activeElement as HTMLElement | null;
+    return () => {
+      previousActiveElementRef.current?.focus();
+      previousActiveElementRef.current = null;
+    };
   }, [isOpen]);
+
+  // Move focus into the dialog once it is ready for interaction
+  useEffect(() => {
+    if (!isOpen || isBusy) return;
+
+    const timer = setTimeout(() => {
+      const autofocus = modalRef.current?.querySelector<HTMLElement>('[data-autofocus]');
+      const firstFocusable = modalRef.current?.querySelector<HTMLElement>(
+        'button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      (autofocus ?? firstFocusable)?.focus();
+    }, 50);
+
+    return () => clearTimeout(timer);
+  }, [isOpen, isBusy, activeStep?.id]);
 
   // Key handling: Escape and Tab trapping
   useEffect(() => {
@@ -97,9 +106,10 @@ export function FocusTunnelModal({
 
             <button
               onClick={onClose}
-              className="p-2 rounded-full text-text-tertiary hover:text-text-primary hover:bg-surface-subtle transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent"
+              disabled={isBusy}
+              className="p-2 rounded-full text-text-tertiary hover:text-text-primary hover:bg-surface-subtle transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-40 disabled:cursor-not-allowed"
               aria-label="Close Focus Tunnel"
-              title="Exit (Esc)"
+              title={isBusy ? 'Preparing your steps' : 'Exit (Esc)'}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -149,8 +159,10 @@ export function FocusTunnelModal({
                 <div className="flex items-center justify-center gap-2">
                   {/* Primary: Done */}
                   <button
+                    data-autofocus
                     onClick={onComplete}
-                    className="h-9 sm:h-10 px-4 sm:px-5 rounded-full bg-accent hover:bg-accent-hover active:scale-95 text-text-inverse font-medium text-xs sm:text-sm shadow-subtle flex items-center gap-1.5 transition-all"
+                    disabled={isBusy}
+                    className="h-9 sm:h-10 px-4 sm:px-5 rounded-full bg-accent hover:bg-accent-hover active:scale-95 text-text-inverse font-medium text-xs sm:text-sm shadow-subtle flex items-center gap-1.5 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <Check size={14} weight="bold" />
                     <span>Done</span>
@@ -160,7 +172,8 @@ export function FocusTunnelModal({
                   {activeStep.canSplit && (
                     <button
                       onClick={onShrink}
-                      className="h-9 sm:h-10 px-3.5 rounded-full bg-surface-subtle/80 hover:bg-surface-subtle text-text-secondary hover:text-text-primary text-xs sm:text-sm font-medium transition-all active:scale-95 flex items-center gap-1.5"
+                      disabled={isBusy}
+                      className="h-9 sm:h-10 px-3.5 rounded-full bg-surface-subtle/80 hover:bg-surface-subtle text-text-secondary hover:text-text-primary text-xs sm:text-sm font-medium transition-all active:scale-95 flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       <Sparkle size={13} weight="duotone" className="text-accent" />
                       <span>Shrink</span>

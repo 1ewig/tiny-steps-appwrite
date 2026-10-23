@@ -7,7 +7,6 @@ export const useTaskStore = create<TaskState>()(
   persist(
     (set) => ({
       sessions: [],
-      currentSessionId: null,
       granularity: 2,
       peekFuture: false,
       focusTunnelSessionId: null,
@@ -15,25 +14,28 @@ export const useTaskStore = create<TaskState>()(
       isHistoryOpen: false,
       theme: 'light',
 
-      createNewSession: (switchImmediately = true) => {
+      createNewSession: (title = 'New gentle task') => {
         const newId = 'session_' + Date.now();
         const newSession: ChatSession = {
           id: newId,
-          title: 'New gentle task',
+          title,
           createdAt: Date.now(),
           messages: [],
         };
 
         set((state) => ({
           sessions: [newSession, ...state.sessions],
-          currentSessionId: switchImmediately ? newId : state.currentSessionId,
         }));
 
         return newId;
       },
 
-      switchSession: (sessionId: string | null) => {
-        set({ currentSessionId: sessionId });
+      setSessionTitle: (sessionId: string, title: string) => {
+        set((state) => ({
+          sessions: state.sessions.map((sess) =>
+            sess.id === sessionId ? { ...sess, title } : sess
+          ),
+        }));
       },
 
       deleteSession: (sessionId: string) => {
@@ -41,7 +43,6 @@ export const useTaskStore = create<TaskState>()(
           const filtered = state.sessions.filter((s) => s.id !== sessionId);
           return {
             sessions: filtered,
-            currentSessionId: state.currentSessionId === sessionId ? null : state.currentSessionId,
             focusTunnelSessionId:
               state.focusTunnelSessionId === sessionId ? null : state.focusTunnelSessionId,
           };
@@ -100,7 +101,11 @@ export const useTaskStore = create<TaskState>()(
             const updatedMessages = [...sess.messages, fullMessage];
             // Auto update session title from first user prompt
             let updatedTitle = sess.title;
-            if (sess.messages.length === 0 && message.role === 'user') {
+            if (
+              sess.messages.length === 0 &&
+              message.role === 'user' &&
+              sess.title === 'New gentle task'
+            ) {
               updatedTitle = message.text.length > 28 ? message.text.substring(0, 25) + '...' : message.text;
             }
 

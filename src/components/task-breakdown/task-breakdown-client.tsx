@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useRef, useEffect, useSyncExternalStore } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
+import { useHydrated } from '@/hooks/use-hydrated';
 import { useOfflineAssistant } from '@/hooks/use-offline-assistant';
 import {
   getLatestMessageWithSteps,
@@ -23,11 +24,7 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
   const [isTyping, setIsTyping] = useState(false);
   const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const hasHydrated = useSyncExternalStore(
-    (callback) => useTaskStore.persist.onFinishHydration(callback),
-    () => useTaskStore.persist.hasHydrated(),
-    () => false
-  );
+  const hasHydrated = useHydrated();
 
   const {
     sessions,
@@ -37,6 +34,7 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
     focusTunnelSessionId,
     addMessage,
     updateAssistantMessage,
+    setSessionTitle,
     toggleStepCompletion,
     shrinkStep,
   } = useTaskStore();
@@ -104,16 +102,26 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
             ...existingCompleted,
             ...intent.steps.map((st, i) => ({ ...st, id: Date.now() + i, completed: false })),
           ];
-          const updatedDialogue =
+          const dialogue =
             existingCompleted.length > 0
-              ? `Plan updated! Kept your ${existingCompleted.length} completed step${
+              ? `${intent.dialogue}\n\nI kept your ${existingCompleted.length} completed step${
                   existingCompleted.length > 1 ? 's' : ''
-                } and adjusted the rest:`
+                } and adjusted the rest.`
               : intent.dialogue;
 
+          if (intent.title) {
+            setSessionTitle(currentSession.id, intent.title);
+          }
+
+          // Keep the living plan message text, update only its steps (Single Living Task Card rule)
           updateAssistantMessage(currentSession.id, latestMessageWithSteps.id, {
-            text: updatedDialogue,
             steps: combinedSteps,
+          });
+
+          // Append a separate "Plan updated" message without steps
+          addMessage(currentSession.id, {
+            role: 'assistant',
+            text: dialogue,
           });
         }
       } else {

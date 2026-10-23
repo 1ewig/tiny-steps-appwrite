@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { ClockCounterClockwise } from '@phosphor-icons/react';
 import { useTaskStore } from '@/store/task-store';
+import { useHydrated } from '@/hooks/use-hydrated';
 import { useStartTask } from '@/hooks/use-start-task';
 import { HeroWelcome } from '@/components/start/hero-welcome';
 import { EnergySelector } from '@/components/start/energy-selector';
@@ -10,13 +11,14 @@ import { ChatInput } from '@/components/shared/chat-input';
 import { tactileButtonVariants } from '@/constants/animation';
 
 export function StartClient() {
+  const hasHydrated = useHydrated();
   const { granularity, setGranularity, sessions, openHistory } = useTaskStore();
   const { startTask, isGeneratingTask, error, restoreText } = useStartTask();
   const reduceMotion = useReducedMotion();
 
-  const hasSavedTasks = sessions.some(
-    (s) => s.messages && s.messages.length > 0
-  );
+  const displayedGranularity = hasHydrated ? granularity : 2;
+  const hasSavedTasks =
+    hasHydrated && sessions.some((s) => s.messages && s.messages.length > 0);
 
   return (
     <main className="flex-1 flex flex-col items-center justify-between px-4 sm:px-6 py-6 sm:py-8 overflow-y-auto">
@@ -39,7 +41,7 @@ export function StartClient() {
             </p>
           )}
           <EnergySelector
-            currentLevel={granularity}
+            currentLevel={displayedGranularity}
             onSelect={setGranularity}
             disabled={isGeneratingTask}
           />
