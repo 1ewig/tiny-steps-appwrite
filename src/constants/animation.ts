@@ -29,7 +29,6 @@ export const GENTLE_SLIDE_SPRING: Transition = {
  * Designed for ADHD/sensory calm:
  * - Subtle micro-lift on hover (y: -1.5px, scale: 1.015)
  * - Soft tactile cushion press on tap (scale: 0.97)
- * - Fluid gliding active indicator via layoutId
  * - Delicate micro-tilt on the leaf/plant icon
  * - Gentle crossfade for the empathetic subtitle
  */
@@ -98,6 +97,52 @@ export const energyDescriptionVariants: Variants = {
       duration: 0.16,
       ease: CALM_EASE,
     },
+  },
+};
+
+/**
+ * Chat Input Send Button Animations
+ * Same subtle micro-lift and cushion press for tactile feel
+ */
+export const sendButtonVariants: Variants = {
+  rest: {
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.2,
+      ease: CALM_EASE,
+    },
+  },
+  hover: {
+    y: -1.5,
+    scale: 1.03,
+    transition: CALM_SPRING,
+  },
+  tap: {
+    scale: 0.95,
+    y: 0,
+    transition: CUSHION_TAP_SPRING,
+  },
+};
+
+export const sendIconVariants: Variants = {
+  rest: {
+    y: 0,
+    transition: {
+      duration: 0.2,
+      ease: CALM_EASE,
+    },
+  },
+  hover: {
+    y: -1,
+    transition: {
+      duration: 0.2,
+      ease: CALM_EASE,
+    },
+  },
+  tap: {
+    y: 0,
+    transition: CUSHION_TAP_SPRING,
   },
 };
 

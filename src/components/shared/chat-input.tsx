@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { ChatCircleDots, X } from '@phosphor-icons/react';
+import { sendButtonVariants, sendIconVariants } from '@/constants/animation';
 
 interface ChatInputProps {
   disabled?: boolean;
@@ -19,6 +20,7 @@ export function ChatInput({
   collapsible = false,
   initialText = '',
 }: ChatInputProps) {
+  const reduceMotion = useReducedMotion();
   const [text, setText] = useState(initialText);
   const [isMultiline, setIsMultiline] = useState(
     initialText.includes('\n') || initialText.length > 36
@@ -100,17 +102,29 @@ export function ChatInput({
           className="w-full bg-transparent text-text-primary placeholder-text-tertiary text-sm sm:text-base resize-none focus:outline-none py-1 leading-normal max-h-36 disabled:opacity-50"
         />
 
-        <button
+        <motion.button
           onClick={handleSend}
           disabled={!text.trim() || disabled}
-          className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-accent hover:bg-accent-hover active:scale-95 text-text-inverse flex items-center justify-center shrink-0 shadow-subtle transition-all disabled:opacity-40 disabled:cursor-not-allowed mb-0.5"
+          variants={reduceMotion ? undefined : sendButtonVariants}
+          initial="rest"
+          animate="rest"
+          whileHover={!text.trim() || disabled || reduceMotion ? undefined : 'hover'}
+          whileTap={!text.trim() || disabled || reduceMotion ? undefined : 'tap'}
+          className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-accent hover:bg-accent-hover text-text-inverse flex items-center justify-center shrink-0 shadow-subtle transition-colors duration-fast disabled:opacity-40 disabled:cursor-not-allowed mb-0.5"
           title="Break it down"
           aria-label="Send message"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+          <motion.svg
+            variants={reduceMotion ? undefined : sendIconVariants}
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            viewBox="0 0 24 24"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 10.5L12 3m0 0l7.5 7.5M12 3v18" />
-          </svg>
-        </button>
+          </motion.svg>
+        </motion.button>
       </div>
     </div>
   );
