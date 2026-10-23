@@ -25,8 +25,6 @@ interface HistoryDrawerProps {
   onClose: () => void;
   onSelectSession: (sessionId: string) => void;
   onDeleteSession: (sessionId: string) => void;
-  onNewSession?: () => void;
-  onClearAllSessions?: () => void;
 }
 
 export function HistoryDrawer({
@@ -119,7 +117,7 @@ export function HistoryDrawer({
             exit="exit"
             tabIndex={-1}
             onKeyDown={handlePanelKeyDown}
-            className="fixed inset-y-0 right-0 z-drawer w-80 sm:w-96 max-w-[calc(100vw-1.5rem)] bg-canvas-subtle border-l border-border-subtle flex flex-col justify-between shadow-modal font-sans focus:outline-none"
+            className="fixed inset-y-0 right-0 z-drawer w-80 sm:w-96 max-w-[calc(100vw-1.5rem)] bg-canvas-subtle flex flex-col justify-between shadow-modal font-sans focus:outline-none"
             role="dialog"
             aria-modal="true"
             aria-label="Task history"
@@ -135,7 +133,7 @@ export function HistoryDrawer({
                     Task history
                   </span>
                   {validSessions.length > 0 && (
-                    <span className="px-2 py-0.5 rounded-full text-2xs font-semibold bg-surface border border-border-subtle text-text-secondary">
+                    <span className="px-2 py-0.5 rounded-full text-2xs font-semibold bg-surface-subtle text-text-secondary">
                       {validSessions.length}
                     </span>
                   )}
@@ -167,7 +165,7 @@ export function HistoryDrawer({
             <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-5 space-y-2">
               {validSessions.length === 0 ? (
                 <div className="py-12 px-4 text-center space-y-3">
-                  <div className="w-12 h-12 mx-auto rounded-2xl bg-surface border border-border-subtle text-text-tertiary flex items-center justify-center shadow-subtle">
+                  <div className="w-12 h-12 mx-auto rounded-2xl bg-surface-subtle text-text-tertiary flex items-center justify-center shadow-subtle">
                     <ClockCounterClockwise size={22} weight="regular" />
                   </div>
                   <div className="space-y-1 max-w-xs mx-auto">
@@ -200,10 +198,10 @@ export function HistoryDrawer({
                           onClose();
                         }}
                         aria-current={isCurrent ? 'true' : undefined}
-                        className={`w-full text-left p-3 pr-10 rounded-xl border flex items-start gap-2.5 transition-all cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                        className={`w-full text-left p-3 pr-10 rounded-xl flex items-start gap-2.5 transition-all cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent active:scale-[0.99] ${
                           isCurrent
-                            ? 'bg-accent-subtle/80 text-accent-text border-accent/40 font-semibold shadow-2xs'
-                            : 'bg-surface hover:bg-surface-subtle text-text-primary border-border-subtle hover:border-border-muted shadow-2xs'
+                            ? 'bg-accent-subtle/80 text-accent-text font-semibold shadow-subtle'
+                            : 'bg-surface hover:bg-surface-subtle text-text-primary shadow-subtle'
                         }`}
                       >
                         <div className="mt-0.5 shrink-0">

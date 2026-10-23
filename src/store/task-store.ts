@@ -48,14 +48,6 @@ export const useTaskStore = create<TaskState>()(
         });
       },
 
-      clearAllSessions: () => {
-        set({
-          sessions: [],
-          currentSessionId: null,
-          focusTunnelSessionId: null,
-        });
-      },
-
       setGranularity: (level: GranularityLevel) => {
         set({ granularity: level });
       },

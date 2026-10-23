@@ -39,7 +39,6 @@ export interface TaskState {
   createNewSession: (switchImmediately?: boolean) => string;
   switchSession: (sessionId: string | null) => void;
   deleteSession: (sessionId: string) => void;
-  clearAllSessions: () => void;
   setGranularity: (level: GranularityLevel) => void;
   togglePeek: () => void;
   openFocusTunnel: (sessionId: string) => void;
