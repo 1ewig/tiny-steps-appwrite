@@ -1,9 +1,16 @@
 'use client';
 
 import type { ComponentType } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import type { IconProps } from '@phosphor-icons/react';
 import { Plant, Leaf, PottedPlant } from '@phosphor-icons/react';
 import type { GranularityLevel } from '@/types/task';
+import {
+  energyPillVariants,
+  energyIconVariants,
+  energyActiveIndicatorTransition,
+  energyDescriptionVariants,
+} from '@/constants/animation';
 
 interface EnergySelectorProps {
   currentLevel: GranularityLevel;
@@ -44,6 +51,7 @@ export function EnergySelector({
   onSelect,
   disabled = false,
 }: EnergySelectorProps) {
+  const reduceMotion = useReducedMotion();
   const selectedOption =
     ENERGY_OPTIONS.find((opt) => opt.level === currentLevel) || ENERGY_OPTIONS[1];
 
@@ -64,36 +72,64 @@ export function EnergySelector({
           const Icon = opt.icon;
 
           return (
-            <button
+            <motion.button
               key={opt.level}
               type="button"
               role="radio"
               aria-checked={isSelected}
               disabled={disabled}
               onClick={() => onSelect(opt.level)}
-              className={`group flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-medium border transition-all duration-fast select-none active:scale-95 disabled:opacity-50 disabled:pointer-events-none ${
+              variants={reduceMotion ? undefined : energyPillVariants}
+              initial="rest"
+              animate="rest"
+              whileHover={disabled || reduceMotion ? undefined : 'hover'}
+              whileTap={disabled || reduceMotion ? undefined : 'tap'}
+              className={`relative group flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-medium border select-none isolate disabled:opacity-50 disabled:pointer-events-none transition-colors duration-fast ${
                 isSelected
-                  ? 'bg-accent-subtle text-accent-text border-accent/40 shadow-subtle ring-1 ring-accent/30 font-semibold'
+                  ? 'text-accent-text border-accent/40 shadow-subtle ring-1 ring-accent/30 font-semibold'
                   : 'bg-surface hover:bg-surface-subtle text-text-secondary hover:text-text-primary border-border-subtle hover:border-border-muted shadow-2xs'
               }`}
             >
-              <Icon
-                size={16}
-                weight={isSelected ? 'fill' : 'regular'}
-                className={`transition-colors shrink-0 ${
-                  isSelected ? 'text-accent' : 'text-text-tertiary group-hover:text-text-secondary'
-                }`}
-              />
-              <span>{opt.label}</span>
-            </button>
+              {isSelected && (
+                <motion.div
+                  layoutId="active-energy-pill"
+                  className="absolute inset-0 rounded-full bg-accent-subtle -z-10"
+                  transition={reduceMotion ? { duration: 0 } : energyActiveIndicatorTransition}
+                />
+              )}
+              <motion.span
+                variants={reduceMotion ? undefined : energyIconVariants}
+                className="shrink-0 flex items-center justify-center"
+              >
+                <Icon
+                  size={16}
+                  weight={isSelected ? 'fill' : 'regular'}
+                  className={`transition-colors shrink-0 ${
+                    isSelected ? 'text-accent' : 'text-text-tertiary group-hover:text-text-secondary'
+                  }`}
+                />
+              </motion.span>
+              <span className="relative z-10">{opt.label}</span>
+            </motion.button>
           );
         })}
       </div>
 
       {/* Empathetic subtitle description */}
-      <p className="text-2xs sm:text-xs text-text-tertiary text-center max-w-md italic transition-all duration-normal">
-        {selectedOption.description}
-      </p>
+      <div className="min-h-5 sm:min-h-6 flex items-center justify-center px-4">
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={selectedOption.level}
+            variants={reduceMotion ? undefined : energyDescriptionVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="text-2xs sm:text-xs text-text-tertiary text-center max-w-md italic"
+          >
+            {selectedOption.description}
+          </motion.p>
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
