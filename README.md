@@ -146,8 +146,7 @@ src/
 │       ├── focus-loader.tsx           # Text-only full-screen start transition with rotating copy
 │       ├── theme-toggle-fab.tsx       # Bottom-left floating action button for sensory light/dim mode
 │       └── layout/
-│           ├── tasks-layout-client.tsx # Persistent layout shell (header, drawer, progress, loader, tunnel)
-│           ├── ambient-progress.tsx   # Top ambient progress bar
+│           ├── tasks-layout-client.tsx # Persistent layout shell (header, drawer, loader, tunnel)
 │           ├── app-header.tsx         # Header with home, history trigger, sensitivity & tunnel launcher
 │           └── history-drawer.tsx     # Slide-over task history drawer (right-side)
 │

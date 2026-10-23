@@ -5,7 +5,6 @@ import { useRouter, useParams } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { generateMicroSteps } from '@/lib/assistant-engine';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
-import { AmbientProgress } from '@/components/shared/layout/ambient-progress';
 import { AppHeader } from '@/components/shared/layout/app-header';
 import { HistoryDrawer } from '@/components/shared/layout/history-drawer';
 import { ThemeToggleFab } from '@/components/shared/theme-toggle-fab';
@@ -82,10 +81,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
   const activeStep = steps.find((s) => !s.completed) || null;
   const activeStepIndex = activeStep ? steps.findIndex((s) => s.id === activeStep.id) : -1;
 
-  const totalSteps = steps.length;
-  const completedSteps = steps.filter((s) => s.completed).length;
-  const progressPct = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
-
   useEffect(() => {
     if (!focusTunnelSessionId || isGeneratingTask) return;
     if (!routeSessionId || focusTunnelSessionId !== routeSessionId) {
@@ -138,9 +133,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
 
   return (
     <div className={`h-screen flex overflow-hidden font-sans ${peekFuture ? 'peek-enabled' : ''}`}>
-      {/* Ambient Top Progress Bar - Persistent & Static */}
-      <AmbientProgress progressPercentage={activeSessionId ? progressPct : 0} />
-
       {/* Main Full-Width Column (Distraction-Free Workspace) */}
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
         {/* AppHeader - Fixed, Static & Never Unmounted */}
