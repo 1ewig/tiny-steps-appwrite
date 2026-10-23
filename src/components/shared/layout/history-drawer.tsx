@@ -117,7 +117,7 @@ export function HistoryDrawer({
             exit="exit"
             tabIndex={-1}
             onKeyDown={handlePanelKeyDown}
-            className="fixed inset-y-0 right-0 z-drawer w-80 sm:w-96 max-w-[calc(100vw-1.5rem)] bg-canvas-subtle flex flex-col justify-between shadow-modal font-sans focus:outline-none"
+            className="fixed inset-y-0 right-0 z-drawer w-full sm:w-1/3 min-w-[320px] sm:min-w-[380px] max-w-[calc(100vw-1.5rem)] bg-canvas-subtle flex flex-col justify-between shadow-modal font-sans focus:outline-none"
             role="dialog"
             aria-modal="true"
             aria-label="Task history"

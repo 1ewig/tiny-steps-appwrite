@@ -83,7 +83,7 @@ export function AppHeader({
             animate="rest"
             whileHover={reduceMotion ? undefined : 'hover'}
             whileTap={reduceMotion ? undefined : 'tap'}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer"
+            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer"
             title="Return home"
           >
             <motion.span
@@ -98,28 +98,6 @@ export function AppHeader({
       </div>
 
       <div className="flex items-center gap-1.5 sm:gap-2">
-        {/* History Drawer Trigger Button */}
-        {handleToggleHistory && (
-          <motion.button
-            onClick={handleToggleHistory}
-            variants={reduceMotion ? undefined : tactileButtonVariants}
-            initial="rest"
-            animate="rest"
-            whileHover={reduceMotion ? undefined : 'hover'}
-            whileTap={reduceMotion ? undefined : 'tap'}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle border border-border-subtle transition-colors duration-fast cursor-pointer"
-            title="Task history (Ctrl+H)"
-            aria-label="Open task history"
-          >
-            <motion.span
-              variants={reduceMotion ? undefined : tactileIconVariants}
-              className="shrink-0 flex items-center"
-            >
-              <ClockCounterClockwise size={15} weight="regular" className="text-accent" />
-            </motion.span>
-            <span className="hidden sm:inline">History</span>
-          </motion.button>
-        )}
         {/* Focus Tunnel Launcher Button */}
         {hasActiveSteps && onOpenFocusTunnel && (
           <motion.button
@@ -129,7 +107,7 @@ export function AppHeader({
             animate="rest"
             whileHover={reduceMotion ? undefined : 'hover'}
             whileTap={reduceMotion ? undefined : 'tap'}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-accent hover:bg-accent-hover text-text-inverse shadow-subtle transition-colors duration-fast"
+            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium bg-accent hover:bg-accent-hover text-text-inverse shadow-subtle transition-colors duration-fast cursor-pointer"
             title="Open distraction-free Focus Tunnel"
           >
             <motion.span variants={reduceMotion ? undefined : tactileIconVariants}>
@@ -149,7 +127,7 @@ export function AppHeader({
               animate="rest"
               whileHover={reduceMotion ? undefined : 'hover'}
               whileTap={reduceMotion ? undefined : 'tap'}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-surface-subtle hover:bg-surface-subtle/80 text-text-primary border border-border-subtle transition-colors duration-fast"
+              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium bg-surface-subtle/70 hover:bg-surface-subtle text-text-secondary hover:text-text-primary transition-colors duration-fast cursor-pointer"
               aria-expanded={dropdownOpen}
               title="Select overwhelm sensitivity level"
             >
@@ -160,7 +138,7 @@ export function AppHeader({
                     variants={reduceMotion ? undefined : tactileIconVariants}
                     className="shrink-0 flex items-center"
                   >
-                    <CurrentIcon size={14} weight="fill" className="text-accent" />
+                    <CurrentIcon size={15} weight="fill" className="text-accent" />
                   </motion.span>
                 );
               })()}
@@ -219,6 +197,29 @@ export function AppHeader({
               )}
             </AnimatePresence>
           </div>
+        )}
+
+        {/* History Drawer Trigger Button (Far Right) */}
+        {handleToggleHistory && (
+          <motion.button
+            onClick={handleToggleHistory}
+            variants={reduceMotion ? undefined : tactileButtonVariants}
+            initial="rest"
+            animate="rest"
+            whileHover={reduceMotion ? undefined : 'hover'}
+            whileTap={reduceMotion ? undefined : 'tap'}
+            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer"
+            title="Task history (Ctrl+H)"
+            aria-label="Open task history"
+          >
+            <motion.span
+              variants={reduceMotion ? undefined : tactileIconVariants}
+              className="shrink-0 flex items-center"
+            >
+              <ClockCounterClockwise size={15} weight="regular" className="text-accent" />
+            </motion.span>
+            <span className="hidden sm:inline">History</span>
+          </motion.button>
         )}
       </div>
     </header>
