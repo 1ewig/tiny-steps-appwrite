@@ -141,7 +141,38 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
       {/* Ambient Top Progress Bar - Persistent & Static */}
       <AmbientProgress progressPercentage={activeSessionId ? progressPct : 0} />
 
-      {/* Slide-over History Drawer (Opens to Right) */}
+      {/* Main Full-Width Column (Distraction-Free Workspace) */}
+      <div className="flex-1 flex flex-col h-full overflow-hidden relative">
+        {/* AppHeader - Fixed, Static & Never Unmounted */}
+        <AppHeader
+          hasActiveSteps={Boolean(activeSession && steps.length > 0)}
+          granularity={granularity}
+          onToggleHistory={toggleHistory}
+          onOpenFocusTunnel={
+            activeSession && activeSessionId && steps.length > 0
+              ? () => openFocusTunnel(activeSessionId)
+              : undefined
+          }
+          onSelectGranularity={activeSessionId ? setGranularity : undefined}
+          showHomeButton={Boolean(activeSessionId)}
+          onHome={() => {
+            closeFocusTunnel();
+            closeHistory();
+            switchSession(null);
+            router.push('/tasks');
+          }}
+        />
+
+        {/* Dynamic Page Content */}
+        {children}
+      </div>
+
+      {/* Floating Theme Toggle (Bottom-Left FAB) */}
+      {!focusTunnelOpen && !isGeneratingTask && (
+        <ThemeToggleFab theme={theme} onToggle={toggleTheme} />
+      )}
+
+      {/* Slide-over History Drawer (Opens to Right, Above Header & Workspace) */}
       <HistoryDrawer
         isOpen={isHistoryOpen}
         sessions={sessions}
@@ -173,37 +204,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
           router.push('/tasks');
         }}
       />
-
-      {/* Main Full-Width Column (Distraction-Free Workspace) */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden relative">
-        {/* AppHeader - Fixed, Static & Never Unmounted */}
-        <AppHeader
-          hasActiveSteps={Boolean(activeSession && steps.length > 0)}
-          granularity={granularity}
-          onToggleHistory={toggleHistory}
-          onOpenFocusTunnel={
-            activeSession && activeSessionId && steps.length > 0
-              ? () => openFocusTunnel(activeSessionId)
-              : undefined
-          }
-          onSelectGranularity={activeSessionId ? setGranularity : undefined}
-          showHomeButton={Boolean(activeSessionId)}
-          onHome={() => {
-            closeFocusTunnel();
-            closeHistory();
-            switchSession(null);
-            router.push('/tasks');
-          }}
-        />
-
-        {/* Dynamic Page Content */}
-        {children}
-      </div>
-
-      {/* Floating Theme Toggle (Bottom-Left FAB) */}
-      {!focusTunnelOpen && !isGeneratingTask && (
-        <ThemeToggleFab theme={theme} onToggle={toggleTheme} />
-      )}
 
       {/* Focus Tunnel Modal - Persistent */}
       <FocusTunnelModal

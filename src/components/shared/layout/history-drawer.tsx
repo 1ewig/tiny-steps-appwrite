@@ -51,7 +51,7 @@ export function HistoryDrawer({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Soft Dim Backdrop */}
+          {/* Soft Dim & Blurred Backdrop */}
           <motion.div
             key="drawer-backdrop"
             variants={reduceMotion ? undefined : backdropVariants}
@@ -59,7 +59,7 @@ export function HistoryDrawer({
             animate="animate"
             exit="exit"
             onClick={onClose}
-            className="fixed inset-0 bg-stone-900/40 backdrop-blur-xs z-backdrop cursor-pointer"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-backdrop cursor-pointer"
             aria-hidden="true"
           />
 
@@ -70,7 +70,7 @@ export function HistoryDrawer({
             initial="initial"
             animate="animate"
             exit="exit"
-            className="fixed inset-y-0 right-0 z-sidebar w-80 sm:w-96 max-w-[calc(100vw-1.5rem)] bg-canvas-subtle border-l border-border-subtle flex flex-col justify-between shadow-modal font-sans"
+            className="fixed inset-y-0 right-0 z-drawer w-80 sm:w-96 max-w-[calc(100vw-1.5rem)] bg-canvas-subtle border-l border-border-subtle flex flex-col justify-between shadow-modal font-sans"
             role="dialog"
             aria-modal="true"
             aria-label="Task history"
@@ -173,11 +173,20 @@ export function HistoryDrawer({
                   return (
                     <div
                       key={sess.id}
+                      role="button"
+                      tabIndex={0}
                       onClick={() => {
                         onSelectSession(sess.id);
                         onClose();
                       }}
-                      className={`group p-3 rounded-xl border flex items-start justify-between gap-2.5 transition-all cursor-pointer ${
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          onSelectSession(sess.id);
+                          onClose();
+                        }
+                      }}
+                      className={`group p-3 rounded-xl border flex items-start justify-between gap-2.5 transition-all cursor-pointer select-none ${
                         isCurrent
                           ? 'bg-accent-subtle/80 text-accent-text border-accent/40 font-semibold shadow-2xs'
                           : 'bg-surface hover:bg-surface-subtle text-text-primary border-border-subtle hover:border-border-muted shadow-2xs'

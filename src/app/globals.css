@@ -94,9 +94,10 @@
   --z-capsule: 30;
   --z-backdrop: 40;
   --z-sidebar: 45;
-  --z-modal: 50;
-  --z-toast: 60;
-  --z-loader: 70;
+  --z-drawer: 50;
+  --z-modal: 60;
+  --z-toast: 70;
+  --z-loader: 80;
 }
 
 /* ==========================================================================
@@ -185,7 +186,27 @@
 
   /* Transitions */
   --ease-calm: var(--ease-calm);
+
+  /* Z-Index Hierarchy */
+  --z-header: 20;
+  --z-capsule: 30;
+  --z-backdrop: 40;
+  --z-sidebar: 45;
+  --z-drawer: 50;
+  --z-modal: 60;
+  --z-toast: 70;
+  --z-loader: 80;
 }
+
+/* Explicit Z-Index Utility Classes */
+.z-header { z-index: var(--z-header, 20); }
+.z-capsule { z-index: var(--z-capsule, 30); }
+.z-backdrop { z-index: var(--z-backdrop, 40); }
+.z-sidebar { z-index: var(--z-sidebar, 45); }
+.z-drawer { z-index: var(--z-drawer, 50); }
+.z-modal { z-index: var(--z-modal, 60); }
+.z-toast { z-index: var(--z-toast, 70); }
+.z-loader { z-index: var(--z-loader, 80); }
 
 /* ==========================================================================
    BASE STYLES & BEHAVIOR
