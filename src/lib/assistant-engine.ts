@@ -20,6 +20,10 @@ export type AssistantIntent =
       dialogue: string;
     }
   | {
+      type: 'all_complete';
+      dialogue: string;
+    }
+  | {
       type: 'new_task';
       title: string;
       dialogue: string;
@@ -213,7 +217,27 @@ export function interpretUserIntent(
     };
   }
 
-  // 2. Overwhelm / Shrink Intent
+  // 2. All Steps Already Complete Intent
+  if (
+    activeSteps.length > 0 &&
+    !nextIncomplete &&
+    (lower.includes('done') ||
+      lower.includes('finished') ||
+      lower.includes('next') ||
+      lower.includes('did it') ||
+      lower === 'k' ||
+      lower === 'ok' ||
+      lower.includes('all done') ||
+      lower.includes('complete'))
+  ) {
+    return {
+      type: 'all_complete',
+      dialogue:
+        'You did it! Every single tiny step is complete. Take a deep breath, unclench your jaw, and celebrate turning something heavy into momentum.',
+    };
+  }
+
+  // 3. Overwhelm / Shrink Intent
   if (
     activeSteps.length > 0 &&
     nextIncomplete &&

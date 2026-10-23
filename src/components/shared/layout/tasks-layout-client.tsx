@@ -90,15 +90,14 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isGeneratingTask) return;
     if (!routeSessionId || focusTunnelSessionId !== routeSessionId) return;
-    if (steps.length === 0) return;
 
+    // Once arrived at the session view, smoothly fade out loader after a brief crossfade
     const timer = setTimeout(() => setGeneratingTask(false), 200);
     return () => clearTimeout(timer);
   }, [
     isGeneratingTask,
     routeSessionId,
     focusTunnelSessionId,
-    steps.length,
     setGeneratingTask,
   ]);
 

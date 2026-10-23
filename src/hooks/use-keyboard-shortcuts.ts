@@ -40,11 +40,16 @@ export function useKeyboardShortcuts({
         return;
       }
 
-      // Space or Enter in Focus Tunnel Mode
+      // Space or Enter in Focus Tunnel Mode (do not intercept when focusing interactive elements like buttons)
       if (isFocusTunnelActive) {
         const target = e.target as HTMLElement | null;
-        const isInput = target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA';
-        if (!isInput && (e.code === 'Space' || e.code === 'Enter')) {
+        const isInteractive =
+          target?.tagName === 'INPUT' ||
+          target?.tagName === 'TEXTAREA' ||
+          target?.tagName === 'BUTTON' ||
+          Boolean(target?.closest('button'));
+
+        if (!isInteractive && (e.code === 'Space' || e.code === 'Enter')) {
           e.preventDefault();
           onCompleteFocusStep?.();
         }

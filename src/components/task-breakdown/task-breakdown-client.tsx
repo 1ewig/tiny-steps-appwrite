@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { useOfflineAssistant } from '@/hooks/use-offline-assistant';
@@ -16,6 +16,7 @@ interface TaskBreakdownClientProps {
 export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
   const router = useRouter();
   const [isTyping, setIsTyping] = useState(false);
+  const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const {
     sessions,
@@ -29,10 +30,19 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
     shrinkStep,
   } = useTaskStore();
 
-  const { interpretUserIntent, generateMicroSteps } = useOfflineAssistant();
+  const { interpretUserIntent } = useOfflineAssistant();
 
   const currentSession = sessions.find((s) => s.id === sessionId);
   const focusTunnelOpen = focusTunnelSessionId === sessionId;
+
+  // Cleanup typing timer on unmount
+  useEffect(() => {
+    return () => {
+      if (typingTimerRef.current) {
+        clearTimeout(typingTimerRef.current);
+      }
+    };
+  }, []);
 
   // Latest message with steps
   const latestMessageWithSteps = currentSession?.messages
@@ -52,7 +62,12 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
 
     setIsTyping(true);
 
-    setTimeout(() => {
+    if (typingTimerRef.current) {
+      clearTimeout(typingTimerRef.current);
+    }
+
+    typingTimerRef.current = setTimeout(() => {
+      typingTimerRef.current = null;
       setIsTyping(false);
 
       const intent = interpretUserIntent(text, steps, granularity);
@@ -60,12 +75,19 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
       if (latestMessageWithSteps) {
         if (intent.type === 'complete_step') {
           toggleStepCompletion(currentSession.id, latestMessageWithSteps.id, intent.targetStepId);
-          updateAssistantMessage(currentSession.id, latestMessageWithSteps.id, {
+          addMessage(currentSession.id, {
+            role: 'assistant',
             text: intent.dialogue,
           });
         } else if (intent.type === 'shrink_step') {
           shrinkStep(currentSession.id, latestMessageWithSteps.id, intent.targetStepIndex, intent.microSteps);
-          updateAssistantMessage(currentSession.id, latestMessageWithSteps.id, {
+          addMessage(currentSession.id, {
+            role: 'assistant',
+            text: intent.dialogue,
+          });
+        } else if (intent.type === 'all_complete') {
+          addMessage(currentSession.id, {
+            role: 'assistant',
             text: intent.dialogue,
           });
         } else if (intent.type === 'new_task') {
@@ -130,9 +152,7 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
             isTyping={isTyping}
             onToggleStep={(msgId, stepId) => toggleStepCompletion(currentSession.id, msgId, stepId)}
             onShrinkStep={(msgId, stepIdx) => {
-              const target = steps[stepIdx];
-              const subSteps = target ? generateMicroSteps(target.text) : undefined;
-              shrinkStep(currentSession.id, msgId, stepIdx, subSteps);
+              shrinkStep(currentSession.id, msgId, stepIdx);
             }}
           />
         </div>
