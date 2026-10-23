@@ -78,12 +78,6 @@ export const energyIconVariants: Variants = {
   },
 };
 
-export const energyActiveIndicatorTransition: Transition = {
-  type: 'spring',
-  stiffness: 380,
-  damping: 32,
-};
-
 export const energyDescriptionVariants: Variants = {
   initial: {
     opacity: 0,

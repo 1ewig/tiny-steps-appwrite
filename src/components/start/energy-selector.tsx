@@ -8,7 +8,6 @@ import type { GranularityLevel } from '@/types/task';
 import {
   energyPillVariants,
   energyIconVariants,
-  energyActiveIndicatorTransition,
   energyDescriptionVariants,
 } from '@/constants/animation';
 
@@ -84,19 +83,12 @@ export function EnergySelector({
               animate="rest"
               whileHover={disabled || reduceMotion ? undefined : 'hover'}
               whileTap={disabled || reduceMotion ? undefined : 'tap'}
-              className={`relative group flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-medium border select-none isolate disabled:opacity-50 disabled:pointer-events-none transition-colors duration-fast ${
+              className={`group flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-medium border select-none disabled:opacity-50 disabled:pointer-events-none transition-colors duration-fast ${
                 isSelected
-                  ? 'text-accent-text border-accent/40 shadow-subtle ring-1 ring-accent/30 font-semibold'
+                  ? 'bg-accent-subtle text-accent-text border-accent/40 shadow-subtle ring-1 ring-accent/30 font-semibold'
                   : 'bg-surface hover:bg-surface-subtle text-text-secondary hover:text-text-primary border-border-subtle hover:border-border-muted shadow-2xs'
               }`}
             >
-              {isSelected && (
-                <motion.div
-                  layoutId="active-energy-pill"
-                  className="absolute inset-0 rounded-full bg-accent-subtle -z-10"
-                  transition={reduceMotion ? { duration: 0 } : energyActiveIndicatorTransition}
-                />
-              )}
               <motion.span
                 variants={reduceMotion ? undefined : energyIconVariants}
                 className="shrink-0 flex items-center justify-center"
@@ -109,7 +101,7 @@ export function EnergySelector({
                   }`}
                 />
               </motion.span>
-              <span className="relative z-10">{opt.label}</span>
+              <span>{opt.label}</span>
             </motion.button>
           );
         })}
