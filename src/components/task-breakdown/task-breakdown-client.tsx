@@ -1,12 +1,17 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { useOfflineAssistant } from '@/hooks/use-offline-assistant';
+import {
+  getLatestMessageWithSteps,
+  getSessionSteps,
+} from '@/lib/session-utils';
 import { MessageFeed } from '@/components/task-breakdown/message-feed';
 import { PeekToggle } from '@/components/task-breakdown/peek-toggle';
 import { ChatInput } from '@/components/shared/chat-input';
+import { FocusLoader } from '@/components/shared/focus-loader';
 import { MagnifyingGlass } from '@phosphor-icons/react';
 
 interface TaskBreakdownClientProps {
@@ -17,6 +22,12 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
   const router = useRouter();
   const [isTyping, setIsTyping] = useState(false);
   const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const hasHydrated = useSyncExternalStore(
+    (callback) => useTaskStore.persist.onFinishHydration(callback),
+    () => useTaskStore.persist.hasHydrated(),
+    () => false
+  );
 
   const {
     sessions,
@@ -45,11 +56,8 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
   }, []);
 
   // Latest message with steps
-  const latestMessageWithSteps = currentSession?.messages
-    ? [...currentSession.messages].reverse().find((m) => m.steps && m.steps.length > 0)
-    : undefined;
-
-  const steps = latestMessageWithSteps?.steps || [];
+  const latestMessageWithSteps = getLatestMessageWithSteps(currentSession);
+  const steps = getSessionSteps(currentSession);
 
   // Handle User Message Submission (Tweaking / Venting)
   const handleSendMessage = (text: string) => {
@@ -119,6 +127,15 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
     }, 600);
   };
 
+  // While localStorage is rehydrating, show gentle quiet loader instead of flashing "not found"
+  if (!hasHydrated) {
+    return (
+      <main className="flex-1 flex flex-col items-center justify-center px-4 text-center">
+        <FocusLoader isVisible={true} />
+      </main>
+    );
+  }
+
   // Missing Session Fallback (Header & Sidebar stay in static layout!)
   if (!currentSession) {
     return (
@@ -134,7 +151,7 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
         </div>
         <button
           onClick={() => router.push('/tasks')}
-          className="py-2.5 px-5 rounded-xl bg-accent hover:bg-accent-hover text-text-inverse text-xs font-semibold shadow-subtle transition-all active:scale-95"
+          className="py-2.5 px-5 rounded-xl bg-accent hover:bg-accent-hover text-text-inverse text-xs font-semibold shadow-subtle transition-all active:scale-95 cursor-pointer"
         >
           Start a new gentle task
         </button>

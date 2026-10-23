@@ -66,13 +66,29 @@ export function StepsChecklist({
           return (
             <div
               key={st.id}
+              role={!isCompleted ? 'button' : undefined}
+              tabIndex={!isCompleted ? 0 : undefined}
+              aria-expanded={isCurrent}
+              aria-label={
+                isCompleted
+                  ? `Completed step: ${st.text}`
+                  : `Step ${idx + 1}: ${st.text}${isCurrent ? ' (active)' : ''}`
+              }
               onClick={() => {
                 if (!isCompleted) setOpenStepId(st.id);
               }}
+              onKeyDown={(e) => {
+                if (!isCompleted && (e.key === 'Enter' || e.key === ' ')) {
+                  if (e.target === e.currentTarget) {
+                    e.preventDefault();
+                    setOpenStepId(st.id);
+                  }
+                }
+              }}
               className={
                 isCurrent
-                  ? 'my-2 rounded-xl p-3.5 bg-surface border border-accent shadow-subtle ring-1 ring-accent/15 transition-all'
-                  : `rounded-lg px-2.5 py-1.5 transition-all ${isCompleted
+                  ? 'my-2 rounded-xl p-3.5 bg-surface border border-accent shadow-subtle ring-1 ring-accent/15 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent'
+                  : `rounded-lg px-2.5 py-1.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${isCompleted
                     ? 'opacity-50 hover:opacity-80'
                     : 'future-step-blur opacity-75 cursor-pointer'
                   }`

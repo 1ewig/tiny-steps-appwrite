@@ -81,17 +81,9 @@ export const useTaskStore = create<TaskState>()(
       },
 
       toggleTheme: () => {
-        set((state) => {
-          const next = state.theme === 'light' ? 'dark' : 'light';
-          if (typeof document !== 'undefined') {
-            if (next === 'dark') {
-              document.documentElement.classList.add('dark');
-            } else {
-              document.documentElement.classList.remove('dark');
-            }
-          }
-          return { theme: next };
-        });
+        set((state) => ({
+          theme: state.theme === 'light' ? 'dark' : 'light',
+        }));
       },
 
       addMessage: (sessionId: string, message) => {
@@ -181,7 +173,6 @@ export const useTaskStore = create<TaskState>()(
       storage: createJSONStorage(() => (typeof window !== 'undefined' ? localStorage : dummyStorage)),
       partialize: (state) => ({
         sessions: state.sessions,
-        currentSessionId: state.currentSessionId,
         granularity: state.granularity,
         peekFuture: state.peekFuture,
         theme: state.theme,

@@ -1,33 +1,29 @@
 'use client';
 
-import { useEffect, useSyncExternalStore } from 'react';
+import { useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { generateMicroSteps } from '@/lib/assistant-engine';
+import {
+  getLatestMessageWithSteps,
+  getSessionSteps,
+  getActiveStep,
+  getActiveStepIndex,
+} from '@/lib/session-utils';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { AppHeader } from '@/components/shared/layout/app-header';
 import { HistoryDrawer } from '@/components/shared/layout/history-drawer';
 import { ThemeToggleFab } from '@/components/shared/theme-toggle-fab';
 import { FocusTunnelModal } from '@/components/task-breakdown/focus-tunnel-modal';
 import { FocusLoader } from '@/components/shared/focus-loader';
-import { AppIcon } from '@/components/shared/app-icon';
-
-const emptySubscribe = () => () => {};
 
 export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const params = useParams();
   const routeSessionId = typeof params?.id === 'string' ? params.id : null;
 
-  const mounted = useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false
-  );
-
   const {
     sessions,
-    currentSessionId,
     granularity,
     peekFuture,
     focusTunnelSessionId,
@@ -47,16 +43,12 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     shrinkStep,
   } = useTaskStore();
 
-  const activeSessionId = routeSessionId ?? currentSessionId;
+  const activeSessionId = routeSessionId;
 
   // Sync route session with Zustand store
   useEffect(() => {
-    if (routeSessionId && routeSessionId !== currentSessionId) {
-      switchSession(routeSessionId);
-    } else if (!routeSessionId && currentSessionId !== null) {
-      switchSession(null);
-    }
-  }, [routeSessionId, currentSessionId, switchSession]);
+    switchSession(routeSessionId);
+  }, [routeSessionId, switchSession]);
 
   // Ensure DOM matches store theme on mount and changes
   useEffect(() => {
@@ -67,18 +59,17 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     }
   }, [theme]);
 
-  const activeSession = sessions.find((s) => s.id === activeSessionId);
+  const activeSession = routeSessionId
+    ? sessions.find((s) => s.id === routeSessionId)
+    : undefined;
   const focusTunnelOpen = Boolean(
     activeSessionId && focusTunnelSessionId === activeSessionId
   );
 
-  const latestMessageWithSteps = activeSession?.messages
-    ? [...activeSession.messages].reverse().find((m) => m.steps && m.steps.length > 0)
-    : undefined;
-
-  const steps = latestMessageWithSteps?.steps || [];
-  const activeStep = steps.find((s) => !s.completed) || null;
-  const activeStepIndex = activeStep ? steps.findIndex((s) => s.id === activeStep.id) : -1;
+  const latestMessageWithSteps = getLatestMessageWithSteps(activeSession);
+  const steps = getSessionSteps(activeSession);
+  const activeStep = getActiveStep(steps);
+  const activeStepIndex = getActiveStepIndex(steps);
 
   useEffect(() => {
     if (!focusTunnelSessionId || isGeneratingTask) return;
@@ -120,14 +111,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     onCloseHistory: closeHistory,
     isHistoryOpen,
   });
-
-  if (!mounted) {
-    return (
-      <div className="h-screen w-full flex items-center justify-center bg-canvas text-text-tertiary">
-        <AppIcon size={52} animated className="rounded-2xl shadow-subtle" />
-      </div>
-    );
-  }
 
   return (
     <div className={`h-screen flex overflow-hidden font-sans ${peekFuture ? 'peek-enabled' : ''}`}>

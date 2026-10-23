@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkle, Check } from '@phosphor-icons/react';
 import type { Step } from '@/types/task';
@@ -24,12 +24,51 @@ export function FocusTunnelModal({
   onComplete,
   onShrink,
 }: FocusTunnelModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousActiveElementRef = useRef<HTMLElement | null>(null);
+
+  // Focus preservation and initial focus
+  useEffect(() => {
+    if (isOpen) {
+      previousActiveElementRef.current = document.activeElement as HTMLElement | null;
+      const timer = setTimeout(() => {
+        const firstFocusable = modalRef.current?.querySelector<HTMLElement>(
+          'button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        firstFocusable?.focus();
+      }, 50);
+      return () => {
+        clearTimeout(timer);
+        previousActiveElementRef.current?.focus();
+      };
+    }
+  }, [isOpen]);
+
+  // Key handling: Escape and Tab trapping
   useEffect(() => {
     if (!isOpen || isBusy) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
         onClose();
+        return;
+      }
+
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusables = modalRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -40,6 +79,10 @@ export function FocusTunnelModal({
     <AnimatePresence>
       {isOpen && (
         <motion.div
+          ref={modalRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={sessionTitle ? `Focus Tunnel: ${sessionTitle}` : 'Focus mode'}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

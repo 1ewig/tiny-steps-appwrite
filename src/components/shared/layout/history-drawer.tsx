@@ -3,6 +3,7 @@
 import { useEffect, useRef, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import type { ChatSession } from '@/types/task';
+import { getSessionSteps } from '@/lib/session-utils';
 import { AppIcon } from '@/components/shared/app-icon';
 import {
   ClockCounterClockwise,
@@ -182,10 +183,7 @@ export function HistoryDrawer({
                   const isCurrent = Boolean(
                     currentSessionId && sess.id === currentSessionId
                   );
-                  const latestMsg = [...sess.messages]
-                    .reverse()
-                    .find((m) => m.steps && m.steps.length > 0);
-                  const steps = latestMsg?.steps || [];
+                  const steps = getSessionSteps(sess);
                   const totalSteps = steps.length;
                   const completedSteps = steps.filter((s) => s.completed).length;
 
@@ -195,7 +193,6 @@ export function HistoryDrawer({
                         type="button"
                         onClick={() => {
                           onSelectSession(sess.id);
-                          onClose();
                         }}
                         aria-current={isCurrent ? 'true' : undefined}
                         className={`w-full text-left p-3 pr-10 rounded-xl flex items-start gap-2.5 transition-all cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent active:scale-[0.99] ${
