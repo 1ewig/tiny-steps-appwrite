@@ -6,8 +6,8 @@ import type { IconProps } from '@phosphor-icons/react';
 import { Plant, Leaf, PottedPlant } from '@phosphor-icons/react';
 import type { GranularityLevel } from '@/types/task';
 import {
-  energyPillVariants,
-  energyIconVariants,
+  tactileButtonVariants,
+  tactileIconVariants,
   energyDescriptionVariants,
 } from '@/constants/animation';
 
@@ -78,7 +78,7 @@ export function EnergySelector({
               aria-checked={isSelected}
               disabled={disabled}
               onClick={() => onSelect(opt.level)}
-              variants={reduceMotion ? undefined : energyPillVariants}
+              variants={reduceMotion ? undefined : tactileButtonVariants}
               initial="rest"
               animate="rest"
               whileHover={disabled || reduceMotion ? undefined : 'hover'}
@@ -90,7 +90,7 @@ export function EnergySelector({
               }`}
             >
               <motion.span
-                variants={reduceMotion ? undefined : energyIconVariants}
+                variants={reduceMotion ? undefined : tactileIconVariants}
                 className="shrink-0 flex items-center justify-center"
               >
                 <Icon

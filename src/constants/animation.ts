@@ -25,14 +25,13 @@ export const GENTLE_SLIDE_SPRING: Transition = {
 };
 
 /**
- * Energy Level Selector Animations
- * Designed for ADHD/sensory calm:
- * - Subtle micro-lift on hover (y: -1.5px, scale: 1.015)
- * - Soft tactile cushion press on tap (scale: 0.97)
- * - Delicate micro-tilt on the leaf/plant icon
- * - Gentle crossfade for the empathetic subtitle
+ * Universal Tactile Button & Pill Animations
+ * Designed for ADHD/sensory calm across all interactive controls:
+ * - Subtle micro-lift on hover (y: -1.5px, scale: 1.02)
+ * - Soft tactile cushion press on tap (scale: 0.96)
+ * - Rest: returns smoothly with calm easing
  */
-export const energyPillVariants: Variants = {
+export const tactileButtonVariants: Variants = {
   rest: {
     y: 0,
     scale: 1,
@@ -43,40 +42,56 @@ export const energyPillVariants: Variants = {
   },
   hover: {
     y: -1.5,
-    scale: 1.015,
+    scale: 1.02,
     transition: CALM_SPRING,
   },
   tap: {
-    scale: 0.97,
+    scale: 0.96,
     y: 0,
     transition: CUSHION_TAP_SPRING,
   },
 };
 
-export const energyIconVariants: Variants = {
+/**
+ * Universal Tactile Icon Animations
+ * Subtle micro-tilt and breath reaction on hover/tap
+ */
+export const tactileIconVariants: Variants = {
   rest: {
     rotate: 0,
     scale: 1,
+    y: 0,
     transition: {
       duration: 0.2,
       ease: CALM_EASE,
     },
   },
   hover: {
-    rotate: -4,
+    rotate: -3,
     scale: 1.06,
+    y: -0.5,
     transition: {
-      duration: 0.24,
+      duration: 0.22,
       ease: CALM_EASE,
     },
   },
   tap: {
     scale: 0.94,
     rotate: 0,
+    y: 0,
     transition: CUSHION_TAP_SPRING,
   },
 };
 
+// Semantic backwards-compatible aliases
+export const energyPillVariants = tactileButtonVariants;
+export const energyIconVariants = tactileIconVariants;
+export const sendButtonVariants = tactileButtonVariants;
+export const sendIconVariants = tactileIconVariants;
+
+/**
+ * Empathetic Subtitle Crossfade
+ */
 export const energyDescriptionVariants: Variants = {
   initial: {
     opacity: 0,
@@ -97,52 +112,6 @@ export const energyDescriptionVariants: Variants = {
       duration: 0.16,
       ease: CALM_EASE,
     },
-  },
-};
-
-/**
- * Chat Input Send Button Animations
- * Same subtle micro-lift and cushion press for tactile feel
- */
-export const sendButtonVariants: Variants = {
-  rest: {
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.2,
-      ease: CALM_EASE,
-    },
-  },
-  hover: {
-    y: -1.5,
-    scale: 1.03,
-    transition: CALM_SPRING,
-  },
-  tap: {
-    scale: 0.95,
-    y: 0,
-    transition: CUSHION_TAP_SPRING,
-  },
-};
-
-export const sendIconVariants: Variants = {
-  rest: {
-    y: 0,
-    transition: {
-      duration: 0.2,
-      ease: CALM_EASE,
-    },
-  },
-  hover: {
-    y: -1,
-    transition: {
-      duration: 0.2,
-      ease: CALM_EASE,
-    },
-  },
-  tap: {
-    y: 0,
-    transition: CUSHION_TAP_SPRING,
   },
 };
 

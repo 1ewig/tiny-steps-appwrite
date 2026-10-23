@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { ChatCircleDots, X } from '@phosphor-icons/react';
-import { sendButtonVariants, sendIconVariants } from '@/constants/animation';
+import { tactileButtonVariants, tactileIconVariants } from '@/constants/animation';
 
 interface ChatInputProps {
   disabled?: boolean;
@@ -105,7 +105,7 @@ export function ChatInput({
         <motion.button
           onClick={handleSend}
           disabled={!text.trim() || disabled}
-          variants={reduceMotion ? undefined : sendButtonVariants}
+          variants={reduceMotion ? undefined : tactileButtonVariants}
           initial="rest"
           animate="rest"
           whileHover={!text.trim() || disabled || reduceMotion ? undefined : 'hover'}
@@ -115,7 +115,7 @@ export function ChatInput({
           aria-label="Send message"
         >
           <motion.svg
-            variants={reduceMotion ? undefined : sendIconVariants}
+            variants={reduceMotion ? undefined : tactileIconVariants}
             className="w-4 h-4"
             fill="none"
             stroke="currentColor"
@@ -145,17 +145,24 @@ export function ChatInput({
             transition={{ duration: 0.16 }}
             className="absolute bottom-0 left-0 right-0 p-4 sm:p-5 flex justify-center pointer-events-none z-capsule"
           >
-            <button
+            <motion.button
               type="button"
               onClick={() => {
                 setIsExpanded(true);
                 setTimeout(() => textareaRef.current?.focus(), 50);
               }}
-              className="pointer-events-auto px-4 py-2 rounded-full bg-surface/95 hover:bg-surface border border-border-subtle shadow-card text-xs font-medium text-text-secondary hover:text-text-primary flex items-center gap-2 transition-all backdrop-blur-md active:scale-95 group"
+              variants={reduceMotion ? undefined : tactileButtonVariants}
+              initial="rest"
+              animate="rest"
+              whileHover={reduceMotion ? undefined : 'hover'}
+              whileTap={reduceMotion ? undefined : 'tap'}
+              className="pointer-events-auto px-4 py-2 rounded-full bg-surface/95 hover:bg-surface border border-border-subtle shadow-card text-xs font-medium text-text-secondary hover:text-text-primary flex items-center gap-2 transition-colors duration-fast backdrop-blur-md group"
             >
-              <ChatCircleDots size={16} weight="regular" className="text-accent group-hover:scale-110 transition-transform shrink-0" />
+              <motion.span variants={reduceMotion ? undefined : tactileIconVariants} className="shrink-0 flex items-center">
+                <ChatCircleDots size={16} weight="regular" className="text-accent" />
+              </motion.span>
               <span>Need to tweak or vent?</span>
-            </button>
+            </motion.button>
           </motion.div>
         ) : (
           <motion.div
