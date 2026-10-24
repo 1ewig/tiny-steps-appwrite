@@ -29,7 +29,7 @@ export function ThemeToggleFab({
       whileTap={reduceMotion ? undefined : 'tap'}
       aria-label={isDark ? 'Switch to sensory light mode' : 'Switch to sensory dim mode'}
       title={isDark ? 'Sensory light mode' : 'Sensory dim mode'}
-      className={`fixed bottom-5 left-4 sm:left-6 z-20 w-11 h-11 rounded-full flex items-center justify-center shadow-card backdrop-blur-md transition-colors duration-fast group cursor-pointer bg-surface/90 hover:bg-surface text-text-secondary hover:text-text-primary shadow-subtle ${className}`}
+      className={`fixed bottom-5 left-4 sm:left-6 z-20 w-11 h-11 rounded-full flex items-center justify-center shadow-card backdrop-blur-md transition-colors duration-fast group cursor-pointer bg-surface/90 hover:bg-surface text-text-secondary hover:text-text-primary shadow-subtle focus:outline-none focus-visible:outline-none ${className}`}
     >
       <motion.span
         variants={reduceMotion ? undefined : tactileIconVariants}

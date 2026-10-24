@@ -32,7 +32,7 @@ export function PeekToggle({
           ? 'Future steps unblurred (click to blur)'
           : 'Future steps blurred (click to unblur)'
       }
-      className={`fixed sm:absolute bottom-5 right-4 sm:right-6 z-20 w-11 h-11 rounded-full flex items-center justify-center shadow-card backdrop-blur-md transition-colors duration-fast group cursor-pointer ${
+      className={`fixed sm:absolute bottom-5 right-4 sm:right-6 z-20 w-11 h-11 rounded-full flex items-center justify-center shadow-card backdrop-blur-md transition-colors duration-fast group cursor-pointer focus:outline-none focus-visible:outline-none ${
         isPeekEnabled
           ? 'bg-accent text-text-inverse hover:bg-accent-hover shadow-subtle'
           : 'bg-surface/90 hover:bg-surface text-text-secondary hover:text-text-primary shadow-subtle'

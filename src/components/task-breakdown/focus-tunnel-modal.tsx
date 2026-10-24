@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Sparkle, Check } from '@phosphor-icons/react';
+import { Sparkle, Check, X } from '@phosphor-icons/react';
 import type { Step } from '@/types/task';
 import {
   tactileButtonVariants,
@@ -58,20 +58,16 @@ export function FocusTunnelModal({
     };
   }, [isOpen]);
 
-  // Move focus into the dialog once it is ready for interaction
+  // Focus the dialog container so keyboard listeners and tab-trapping are active without auto-selecting buttons
   useEffect(() => {
     if (!isOpen || isBusy) return;
 
     const timer = setTimeout(() => {
-      const autofocus = modalRef.current?.querySelector<HTMLElement>('[data-autofocus]');
-      const firstFocusable = modalRef.current?.querySelector<HTMLElement>(
-        'button:not([disabled]), [tabindex]:not([tabindex="-1"])'
-      );
-      (autofocus ?? firstFocusable)?.focus();
+      modalRef.current?.focus({ preventScroll: true });
     }, 50);
 
     return () => clearTimeout(timer);
-  }, [isOpen, isBusy, activeStep?.id, currentSubStep?.id]);
+  }, [isOpen, isBusy]);
 
   // Key handling: Escape and Tab trapping
   useEffect(() => {
@@ -111,11 +107,12 @@ export function FocusTunnelModal({
           ref={modalRef}
           role="dialog"
           aria-modal="true"
+          tabIndex={-1}
           aria-label={sessionTitle ? `Focus Tunnel: ${sessionTitle}` : 'Focus mode'}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-modal bg-canvas/95 backdrop-blur-md flex flex-col items-center justify-between p-6 sm:p-10 select-none overflow-y-auto"
+          className="fixed inset-0 z-modal bg-canvas/95 backdrop-blur-md flex flex-col items-center justify-between p-3.5 sm:p-5 md:p-6 select-none overflow-y-auto focus:outline-none"
         >
           {/* Top Bar: Session Name, Step Indicator & Minimal Close */}
           <div className="w-full flex items-center justify-between z-10 shrink-0">
@@ -137,17 +134,15 @@ export function FocusTunnelModal({
               animate="rest"
               whileHover={isBusy || reduceMotion ? undefined : 'hover'}
               whileTap={isBusy || reduceMotion ? undefined : 'tap'}
-              className="p-2 rounded-full text-text-tertiary hover:text-text-primary hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-40 disabled:cursor-not-allowed"
+              className="p-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
               aria-label="Close Focus Tunnel"
-              title={isBusy ? 'Preparing your steps' : 'Exit (Esc)'}
+              title={isBusy ? 'Preparing your steps' : 'Close (Esc)'}
             >
               <motion.span
                 variants={reduceMotion ? undefined : tactileIconVariants}
                 className="flex items-center"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X size={18} weight="bold" />
               </motion.span>
             </motion.button>
           </div>
@@ -254,7 +249,6 @@ export function FocusTunnelModal({
                 <div className="flex flex-wrap items-center justify-center gap-2.5">
                   {/* Primary: Done */}
                   <motion.button
-                    data-autofocus
                     onClick={onComplete}
                     disabled={isBusy}
                     variants={reduceMotion ? undefined : tactileButtonVariants}
@@ -262,7 +256,7 @@ export function FocusTunnelModal({
                     animate="rest"
                     whileHover={isBusy || reduceMotion ? undefined : 'hover'}
                     whileTap={isBusy || reduceMotion ? undefined : 'tap'}
-                    className="h-10 sm:h-11 px-5 sm:px-6 rounded-full bg-accent hover:bg-accent-hover text-text-inverse font-medium text-xs sm:text-sm shadow-subtle flex items-center gap-2 transition-colors duration-fast cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="h-10 sm:h-11 px-5 sm:px-6 rounded-full bg-accent hover:bg-accent-hover text-text-inverse font-medium text-xs sm:text-sm shadow-subtle flex items-center gap-2 transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <motion.span
                       variants={reduceMotion ? undefined : tactileIconVariants}
@@ -283,7 +277,7 @@ export function FocusTunnelModal({
                       animate="rest"
                       whileHover={isBusy || reduceMotion ? undefined : 'hover'}
                       whileTap={isBusy || reduceMotion ? undefined : 'tap'}
-                      className="h-10 sm:h-11 px-4 rounded-full bg-surface-subtle/80 hover:bg-surface-subtle text-text-secondary hover:text-text-primary text-xs sm:text-sm font-medium transition-colors duration-fast flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="h-10 sm:h-11 px-4 rounded-full bg-surface-subtle/80 hover:bg-surface-subtle text-text-secondary hover:text-text-primary text-xs sm:text-sm font-medium transition-colors duration-fast flex items-center gap-1.5 cursor-pointer focus:outline-none focus-visible:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
                       title="Break into 3 smaller micro-steps (S)"
                     >
                       <motion.span
@@ -306,7 +300,7 @@ export function FocusTunnelModal({
                       animate="rest"
                       whileHover={isBusy || reduceMotion ? undefined : 'hover'}
                       whileTap={isBusy || reduceMotion ? undefined : 'tap'}
-                      className="h-10 sm:h-11 px-4 rounded-full bg-surface-subtle/70 hover:bg-surface-subtle text-text-tertiary hover:text-text-secondary text-xs sm:text-sm font-normal transition-colors duration-fast flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="h-10 sm:h-11 px-4 rounded-full bg-surface-subtle/70 hover:bg-surface-subtle text-text-tertiary hover:text-text-secondary text-xs sm:text-sm font-normal transition-colors duration-fast flex items-center gap-1.5 cursor-pointer focus:outline-none focus-visible:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
                       title="Mark the whole task finished immediately"
                     >
                       <span>Finish whole step</span>
@@ -341,7 +335,7 @@ export function FocusTunnelModal({
                 animate="rest"
                 whileHover={reduceMotion ? undefined : 'hover'}
                 whileTap={reduceMotion ? undefined : 'tap'}
-                className="h-9 sm:h-10 px-5 rounded-full bg-accent hover:bg-accent-hover text-text-inverse text-xs sm:text-sm font-medium shadow-subtle transition-colors duration-fast cursor-pointer"
+                className="h-9 sm:h-10 px-5 rounded-full bg-accent hover:bg-accent-hover text-text-inverse text-xs sm:text-sm font-medium shadow-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:outline-none"
               >
                 Close
               </motion.button>
