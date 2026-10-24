@@ -167,14 +167,14 @@ export function TaskCard({
                       {nowStep.subSteps.length} steps
                     </p>
 
-                    <div className="space-y-3">
+                    <div className="space-y-3.5">
                       {nowStep.subSteps.map((sub) => (
                         <div
                           key={sub.id}
-                          className="flex items-center justify-between gap-3 group cursor-pointer"
+                          className="flex items-start justify-between gap-3 group cursor-pointer"
                           onClick={() => onToggleSubStep?.(nowStep.id, sub.id)}
                         >
-                          <div className="flex items-center gap-3 min-w-0">
+                          <div className="flex items-start gap-3 min-w-0 flex-1">
                             <motion.button
                               type="button"
                               onClick={(e) => {
@@ -187,7 +187,7 @@ export function TaskCard({
                               whileHover={reduceMotion ? undefined : 'hover'}
                               whileTap={reduceMotion ? undefined : 'tap'}
                               aria-label={sub.completed ? 'Mark incomplete' : 'Mark complete'}
-                              className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-colors duration-fast ${
+                              className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-colors duration-fast ${
                                 sub.completed
                                   ? 'bg-accent border border-accent text-text-inverse'
                                   : 'border border-border-muted group-hover:border-accent'
@@ -196,7 +196,7 @@ export function TaskCard({
                               {sub.completed && <Check size={11} weight="bold" />}
                             </motion.button>
                             <span
-                              className={`text-sm leading-snug select-none truncate transition-colors ${
+                              className={`text-sm leading-snug select-none break-words transition-colors ${
                                 sub.completed
                                   ? 'line-through text-text-tertiary'
                                   : 'text-text-primary'
@@ -206,7 +206,7 @@ export function TaskCard({
                             </span>
                           </div>
                           {sub.effort && (
-                            <span className="text-xs text-text-secondary font-mono shrink-0">
+                            <span className="mt-0.5 text-xs text-text-secondary font-mono shrink-0">
                               {sub.effort}
                             </span>
                           )}
