@@ -13,6 +13,7 @@ import {
   getActiveStepIndex,
 } from '@/lib/session-utils';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
+import { useDelayedShrink } from '@/hooks/use-delayed-shrink';
 import { AppHeader } from '@/components/shared/layout/app-header';
 import { HistoryDrawer } from '@/components/shared/layout/history-drawer';
 import { ThemeToggleFab } from '@/components/shared/theme-toggle-fab';
@@ -112,7 +113,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     );
   };
 
-  const handleShrinkFocusStep = () => {
+  const shrinkFocusStepNow = () => {
     if (
       activeStepIndex !== -1 &&
       latestMessageWithSteps &&
@@ -124,6 +125,16 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
       shrinkStep(activeSession.id, latestMessageWithSteps.id, activeStepIndex, subSteps);
     }
   };
+
+  const {
+    isShrinking: isShrinkingFocusStep,
+    trigger: handleShrinkFocusStep,
+    cancel: cancelShrinkFocusStep,
+  } = useDelayedShrink(shrinkFocusStepNow);
+
+  useEffect(() => {
+    cancelShrinkFocusStep();
+  }, [activeStep?.id, focusTunnelOpen, cancelShrinkFocusStep]);
 
   useEffect(() => {
     if (!focusTunnelSessionId || isGeneratingTask) return;
@@ -166,7 +177,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     },
     onCompleteFocusStep: handleCompleteFocusStep,
     onShrinkFocusStep: handleShrinkFocusStep,
-    isFocusTunnelActive: focusTunnelOpen && !isGeneratingTask,
+    isFocusTunnelActive: focusTunnelOpen && !isGeneratingTask && !isShrinkingFocusStep,
     onToggleHistory: toggleHistory,
     onCloseHistory: closeHistory,
     isHistoryOpen,
@@ -231,6 +242,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
       <FocusTunnelModal
         isOpen={focusTunnelOpen}
         isBusy={isGeneratingTask}
+        isShrinking={isShrinkingFocusStep}
         activeStep={activeStep}
         activeStepNumber={activeStepNumber}
         totalStepsCount={totalStepsCount}

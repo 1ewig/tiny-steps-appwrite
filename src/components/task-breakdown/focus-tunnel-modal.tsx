@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Sparkle, Check, X } from '@phosphor-icons/react';
+import { Sparkle, Check, X, SpinnerGap } from '@phosphor-icons/react';
 import type { Step } from '@/types/task';
 import {
   tactileButtonVariants,
@@ -13,6 +13,7 @@ import {
 interface FocusTunnelModalProps {
   isOpen: boolean;
   isBusy?: boolean;
+  isShrinking?: boolean;
   activeStep: Step | null;
   activeStepNumber?: number | null;
   totalStepsCount?: number;
@@ -26,6 +27,7 @@ interface FocusTunnelModalProps {
 export function FocusTunnelModal({
   isOpen,
   isBusy = false,
+  isShrinking = false,
   activeStep,
   activeStepNumber,
   totalStepsCount,
@@ -256,12 +258,12 @@ export function FocusTunnelModal({
                   {/* Primary: Done */}
                   <motion.button
                     onClick={onComplete}
-                    disabled={isBusy}
+                    disabled={isBusy || isShrinking}
                     variants={reduceMotion ? undefined : tactileButtonVariants}
                     initial="rest"
                     animate="rest"
-                    whileHover={isBusy || reduceMotion ? undefined : 'hover'}
-                    whileTap={isBusy || reduceMotion ? undefined : 'tap'}
+                    whileHover={isBusy || isShrinking || reduceMotion ? undefined : 'hover'}
+                    whileTap={isBusy || isShrinking || reduceMotion ? undefined : 'tap'}
                     className="h-10 sm:h-11 px-5 sm:px-6 rounded-full bg-accent hover:bg-accent-hover text-text-inverse font-medium text-xs sm:text-sm shadow-subtle flex items-center gap-2 transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <motion.span
@@ -277,12 +279,13 @@ export function FocusTunnelModal({
                   {!hasSubSteps && activeStep.canSplit && (
                     <motion.button
                       onClick={onShrink}
-                      disabled={isBusy}
+                      disabled={isBusy || isShrinking}
+                      aria-busy={isShrinking}
                       variants={reduceMotion ? undefined : tactileButtonVariants}
                       initial="rest"
                       animate="rest"
-                      whileHover={isBusy || reduceMotion ? undefined : 'hover'}
-                      whileTap={isBusy || reduceMotion ? undefined : 'tap'}
+                      whileHover={isBusy || isShrinking || reduceMotion ? undefined : 'hover'}
+                      whileTap={isBusy || isShrinking || reduceMotion ? undefined : 'tap'}
                       className="h-10 sm:h-11 px-4 rounded-full bg-surface-subtle/80 hover:bg-surface-subtle text-text-secondary hover:text-text-primary text-xs sm:text-sm font-medium transition-colors duration-fast flex items-center gap-1.5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-40 disabled:cursor-not-allowed"
                       title="Break into 3 smaller micro-steps (S)"
                     >
@@ -290,9 +293,19 @@ export function FocusTunnelModal({
                         variants={reduceMotion ? undefined : tactileIconVariants}
                         className="flex items-center"
                       >
-                        <Sparkle size={13} weight="duotone" className="text-accent" />
+                        {isShrinking ? (
+                          <SpinnerGap
+                            size={13}
+                            weight="bold"
+                            className={reduceMotion ? undefined : 'animate-spin'}
+                          />
+                        ) : (
+                          <Sparkle size={13} weight="duotone" className="text-accent" />
+                        )}
                       </motion.span>
-                      <span>Shrink</span>
+                      <span aria-live="polite">
+                        {isShrinking ? 'Shrinking…' : 'Shrink'}
+                      </span>
                     </motion.button>
                   )}
 
@@ -300,12 +313,12 @@ export function FocusTunnelModal({
                   {hasSubSteps && currentSubStep && onCompleteWholeStep && (
                     <motion.button
                       onClick={onCompleteWholeStep}
-                      disabled={isBusy}
+                      disabled={isBusy || isShrinking}
                       variants={reduceMotion ? undefined : tactileButtonVariants}
                       initial="rest"
                       animate="rest"
-                      whileHover={isBusy || reduceMotion ? undefined : 'hover'}
-                      whileTap={isBusy || reduceMotion ? undefined : 'tap'}
+                      whileHover={isBusy || isShrinking || reduceMotion ? undefined : 'hover'}
+                      whileTap={isBusy || isShrinking || reduceMotion ? undefined : 'tap'}
                       className="h-10 sm:h-11 px-4 rounded-full bg-surface-subtle/70 hover:bg-surface-subtle text-text-tertiary hover:text-text-secondary text-xs sm:text-sm font-normal transition-colors duration-fast flex items-center gap-1.5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-40 disabled:cursor-not-allowed"
                       title="Mark the whole task finished immediately"
                     >

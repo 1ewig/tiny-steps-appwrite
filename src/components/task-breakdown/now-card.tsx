@@ -2,8 +2,9 @@
 
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import type { RefObject } from 'react';
-import { Sparkle, Check, CaretDown, ArrowCounterClockwise } from '@phosphor-icons/react';
+import { Sparkle, Check, CaretDown, ArrowCounterClockwise, SpinnerGap } from '@phosphor-icons/react';
 import type { Step } from '@/types/task';
+import { useDelayedShrink } from '@/hooks/use-delayed-shrink';
 import {
   tactileButtonVariants,
   tactileIconVariants,
@@ -172,6 +173,10 @@ function NowCardBody({
   const subSteps = step.subSteps ?? [];
   const hasSubSteps = subSteps.length > 0;
   const canBreakDown = step.canSplit && stepIndex !== -1;
+  const { isShrinking, trigger: triggerBreakDown } = useDelayedShrink(() => {
+    onExpandSubSteps();
+    onShrinkStep(stepIndex);
+  });
 
   return (
     <>
@@ -194,12 +199,13 @@ function NowCardBody({
         <motion.button
           type="button"
           onClick={onMarkDone}
+          disabled={isShrinking}
           variants={reduceMotion ? undefined : tactileButtonVariants}
           initial="rest"
           animate="rest"
-          whileHover={reduceMotion ? undefined : 'hover'}
-          whileTap={reduceMotion ? undefined : 'tap'}
-          className="h-10 px-6 rounded-full bg-accent hover:bg-accent-hover text-text-inverse font-semibold text-xs sm:text-sm shadow-subtle flex items-center gap-2 transition-colors duration-fast cursor-pointer"
+          whileHover={isShrinking || reduceMotion ? undefined : 'hover'}
+          whileTap={isShrinking || reduceMotion ? undefined : 'tap'}
+          className="h-10 px-6 rounded-full bg-accent hover:bg-accent-hover text-text-inverse font-semibold text-xs sm:text-sm shadow-subtle flex items-center gap-2 transition-colors duration-fast cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <motion.span variants={reduceMotion ? undefined : tactileIconVariants}>
             <Check size={14} weight="bold" />
@@ -217,24 +223,33 @@ function NowCardBody({
         ) : canBreakDown ? (
           <motion.button
             type="button"
-            onClick={() => {
-              onExpandSubSteps();
-              onShrinkStep(stepIndex);
-            }}
+            onClick={triggerBreakDown}
+            disabled={isShrinking}
+            aria-busy={isShrinking}
             variants={reduceMotion ? undefined : tactileButtonVariants}
             initial="rest"
             animate="rest"
-            whileHover={reduceMotion ? undefined : 'hover'}
-            whileTap={reduceMotion ? undefined : 'tap'}
-            className="text-xs font-medium text-text-tertiary hover:text-accent transition-colors cursor-pointer flex items-center gap-1.5"
+            whileHover={isShrinking || reduceMotion ? undefined : 'hover'}
+            whileTap={isShrinking || reduceMotion ? undefined : 'tap'}
+            className="text-xs font-medium text-text-tertiary hover:text-accent transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <motion.span
               variants={reduceMotion ? undefined : tactileIconVariants}
               className="inline-flex"
             >
-              <Sparkle size={13} weight="duotone" className="text-accent" />
+              {isShrinking ? (
+                <SpinnerGap
+                  size={13}
+                  weight="bold"
+                  className={reduceMotion ? undefined : 'animate-spin'}
+                />
+              ) : (
+                <Sparkle size={13} weight="duotone" className="text-accent" />
+              )}
             </motion.span>
-            <span>Still too big? Break it down</span>
+            <span aria-live="polite">
+              {isShrinking ? 'Breaking it down…' : 'Still too big? Break it down'}
+            </span>
           </motion.button>
         ) : null}
       </div>
