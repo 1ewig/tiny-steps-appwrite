@@ -152,11 +152,16 @@ export function TaskCard({
 
                   {/* Toggle Sub-steps or Break Down text link */}
                   {nowStep.subSteps && nowStep.subSteps.length > 0 ? (
-                    <button
+                    <motion.button
                       type="button"
                       onClick={() => setShowSubSteps((prev) => !prev)}
                       aria-expanded={showSubSteps}
-                      className="group text-xs font-medium text-text-tertiary hover:text-text-primary transition-colors cursor-pointer inline-flex items-center gap-1.5 py-1.5 px-2 -mx-2 rounded-lg hover:bg-surface-subtle/50 select-none"
+                      variants={reduceMotion ? undefined : tactileButtonVariants}
+                      initial="rest"
+                      animate="rest"
+                      whileHover={reduceMotion ? undefined : 'hover'}
+                      whileTap={reduceMotion ? undefined : 'tap'}
+                      className="group text-xs font-medium text-text-tertiary hover:text-text-primary transition-colors cursor-pointer inline-flex items-center gap-1.5 select-none"
                     >
                       <span className="relative inline-grid">
                         <motion.span
@@ -187,25 +192,40 @@ export function TaskCard({
                         </motion.span>
                       </span>
                       <motion.span
-                        animate={{ rotate: showSubSteps ? 180 : 0 }}
-                        transition={{ type: 'spring', stiffness: 360, damping: 26 }}
+                        variants={reduceMotion ? undefined : tactileIconVariants}
                         className="inline-flex text-text-tertiary group-hover:text-text-primary transition-colors"
                       >
-                        <CaretDown size={12} weight="bold" />
+                        <motion.span
+                          animate={reduceMotion ? undefined : { rotate: showSubSteps ? 180 : 0 }}
+                          transition={{ type: 'spring', stiffness: 360, damping: 26 }}
+                          className="inline-flex"
+                        >
+                          <CaretDown size={12} weight="bold" />
+                        </motion.span>
                       </motion.span>
-                    </button>
+                    </motion.button>
                   ) : nowStep.canSplit && nowStepIndex !== -1 ? (
-                    <button
+                    <motion.button
                       type="button"
                       onClick={() => {
                         setShowSubSteps(true);
                         onShrinkStep(nowStepIndex);
                       }}
+                      variants={reduceMotion ? undefined : tactileButtonVariants}
+                      initial="rest"
+                      animate="rest"
+                      whileHover={reduceMotion ? undefined : 'hover'}
+                      whileTap={reduceMotion ? undefined : 'tap'}
                       className="text-xs font-medium text-text-tertiary hover:text-accent transition-colors cursor-pointer flex items-center gap-1.5"
                     >
-                      <Sparkle size={13} weight="duotone" className="text-accent" />
+                      <motion.span
+                        variants={reduceMotion ? undefined : tactileIconVariants}
+                        className="inline-flex"
+                      >
+                        <Sparkle size={13} weight="duotone" className="text-accent" />
+                      </motion.span>
                       <span>Still too big? Break it down</span>
-                    </button>
+                    </motion.button>
                   ) : null}
                 </div>
 
@@ -246,58 +266,66 @@ export function TaskCard({
                               <motion.div
                                 key={sub.id}
                                 variants={reduceMotion ? undefined : subStepItemVariants}
-                                className="flex items-center justify-between gap-3 p-1.5 rounded-xl hover:bg-surface-subtle/50 transition-colors group cursor-pointer"
-                                onClick={() => onToggleSubStep?.(nowStep.id, sub.id)}
                               >
-                                <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                                  <motion.button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      onToggleSubStep?.(nowStep.id, sub.id);
-                                    }}
-                                    variants={reduceMotion ? undefined : tactileCheckboxVariants}
-                                    initial="rest"
-                                    animate="rest"
-                                    whileHover={reduceMotion ? undefined : 'hover'}
-                                    whileTap={reduceMotion ? undefined : 'tap'}
-                                    aria-label={sub.completed ? 'Mark incomplete' : 'Mark complete'}
-                                    className={`w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 transition-colors duration-fast ${
-                                      sub.completed
-                                        ? 'bg-accent border border-accent text-text-inverse'
-                                        : 'border border-border-muted group-hover:border-accent'
-                                    }`}
-                                  >
-                                    <AnimatePresence initial={false}>
-                                      {sub.completed && (
-                                        <motion.span
-                                          key="check"
-                                          initial={reduceMotion ? false : { scale: 0.4, opacity: 0 }}
-                                          animate={{ scale: 1, opacity: 1 }}
-                                          exit={reduceMotion ? undefined : { scale: 0.4, opacity: 0 }}
-                                          transition={{ type: 'spring', stiffness: 500, damping: 28 }}
-                                          className="flex items-center justify-center"
-                                        >
-                                          <Check size={10} weight="bold" />
-                                        </motion.span>
-                                      )}
-                                    </AnimatePresence>
-                                  </motion.button>
-                                  <span
-                                    className={`text-xs leading-snug select-none break-words transition-colors duration-fast ${
-                                      sub.completed
-                                        ? 'line-through text-text-tertiary'
-                                        : 'text-text-primary'
-                                    }`}
-                                  >
-                                    {sub.text}
-                                  </span>
-                                </div>
-                                {sub.effort && (
-                                  <span className="text-2xs text-text-tertiary font-mono shrink-0">
-                                    {sub.effort}
-                                  </span>
-                                )}
+                                <motion.div
+                                  variants={reduceMotion ? undefined : tactileButtonVariants}
+                                  initial="rest"
+                                  animate="rest"
+                                  whileHover={reduceMotion ? undefined : 'hover'}
+                                  whileTap={reduceMotion ? undefined : 'tap'}
+                                  className="relative flex items-center justify-between gap-3 p-1.5 rounded-xl hover:z-10 hover:bg-surface-subtle/50 transition-colors group cursor-pointer"
+                                  onClick={() => onToggleSubStep?.(nowStep.id, sub.id)}
+                                >
+                                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                    <motion.button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onToggleSubStep?.(nowStep.id, sub.id);
+                                      }}
+                                      variants={reduceMotion ? undefined : tactileCheckboxVariants}
+                                      initial="rest"
+                                      animate="rest"
+                                      whileHover={reduceMotion ? undefined : 'hover'}
+                                      whileTap={reduceMotion ? undefined : 'tap'}
+                                      aria-label={sub.completed ? 'Mark incomplete' : 'Mark complete'}
+                                      className={`w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 transition-colors duration-fast ${
+                                        sub.completed
+                                          ? 'bg-accent border border-accent text-text-inverse'
+                                          : 'border border-border-muted group-hover:border-accent'
+                                      }`}
+                                    >
+                                      <AnimatePresence initial={false}>
+                                        {sub.completed && (
+                                          <motion.span
+                                            key="check"
+                                            initial={reduceMotion ? false : { scale: 0.4, opacity: 0 }}
+                                            animate={{ scale: 1, opacity: 1 }}
+                                            exit={reduceMotion ? undefined : { scale: 0.4, opacity: 0 }}
+                                            transition={{ type: 'spring', stiffness: 500, damping: 28 }}
+                                            className="flex items-center justify-center"
+                                          >
+                                            <Check size={10} weight="bold" />
+                                          </motion.span>
+                                        )}
+                                      </AnimatePresence>
+                                    </motion.button>
+                                    <span
+                                      className={`text-xs leading-snug select-none break-words transition-colors duration-fast ${
+                                        sub.completed
+                                          ? 'line-through text-text-tertiary'
+                                          : 'text-text-primary'
+                                      }`}
+                                    >
+                                      {sub.text}
+                                    </span>
+                                  </div>
+                                  {sub.effort && (
+                                    <span className="text-2xs text-text-tertiary font-mono shrink-0">
+                                      {sub.effort}
+                                    </span>
+                                  )}
+                                </motion.div>
                               </motion.div>
                             ))}
                           </div>
