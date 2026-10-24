@@ -9,7 +9,7 @@ import {
   getLatestMessageWithSteps,
   getSessionSteps,
 } from '@/lib/session-utils';
-import { MessageFeed } from '@/components/task-breakdown/message-feed';
+import { TaskCard } from '@/components/task-breakdown/task-card';
 import { PeekToggle } from '@/components/task-breakdown/peek-toggle';
 import { ChatInput } from '@/components/shared/chat-input';
 import { FocusLoader } from '@/components/shared/focus-loader';
@@ -156,15 +156,22 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
 
   return (
     <>
-      {/* Scrollable Feed */}
+      {/* Task Workspace */}
       <main className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 scroll-smooth">
         <div className="max-w-2xl mx-auto space-y-6 pb-28">
-          <MessageFeed
-            messages={currentSession.messages}
-            isTyping={isTyping}
-            onToggleStep={(msgId, stepId) => toggleStepCompletion(currentSession.id, msgId, stepId)}
-            onShrinkStep={(msgId, stepIdx) => {
-              shrinkStep(currentSession.id, msgId, stepIdx);
+          <TaskCard
+            guidanceText={latestMessageWithSteps?.text}
+            steps={steps}
+            isAdjusting={isTyping}
+            onToggleStep={(stepId) => {
+              if (latestMessageWithSteps) {
+                toggleStepCompletion(currentSession.id, latestMessageWithSteps.id, stepId);
+              }
+            }}
+            onShrinkStep={(stepIdx) => {
+              if (latestMessageWithSteps) {
+                shrinkStep(currentSession.id, latestMessageWithSteps.id, stepIdx);
+              }
             }}
           />
         </div>
