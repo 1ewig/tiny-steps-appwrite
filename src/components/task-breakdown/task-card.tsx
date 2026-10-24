@@ -32,9 +32,15 @@ export function TaskCard({
     laterSteps,
     completedSteps,
     nowStepIndex,
+    nowStepNumber,
+    naturalFirstStepNumber,
+    totalStepsCount,
+    isOutOfOrder,
     showSubSteps,
     showCompleted,
+    getStepNumber,
     selectStep,
+    resetOrder,
     markNowDone,
     toggleSubSteps,
     expandSubSteps,
@@ -75,6 +81,11 @@ export function TaskCard({
         <NowCard
           nowStep={nowStep}
           nowStepIndex={nowStepIndex}
+          nowStepNumber={nowStepNumber}
+          totalStepsCount={totalStepsCount}
+          isOutOfOrder={isOutOfOrder}
+          naturalFirstStepNumber={naturalFirstStepNumber}
+          onResetOrder={resetOrder}
           showSubSteps={showSubSteps}
           onToggleSubSteps={toggleSubSteps}
           onExpandSubSteps={expandSubSteps}
@@ -83,12 +94,17 @@ export function TaskCard({
           onToggleSubStep={onToggleSubStep}
         />
 
-        <NextCard steps={nextSteps} onSelectStep={selectStep} />
+        <NextCard
+          steps={nextSteps}
+          getStepNumber={getStepNumber}
+          onSelectStep={selectStep}
+        />
 
         <LaterCard
           laterSteps={laterSteps}
           completedSteps={completedSteps}
           showCompleted={showCompleted}
+          getStepNumber={getStepNumber}
           onToggleCompleted={toggleCompleted}
           onSelectStep={selectStep}
           onToggleStep={onToggleStep}

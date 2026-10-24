@@ -6,10 +6,11 @@ import { tactileButtonVariants, unblurFadeInVariants } from '@/constants/animati
 
 interface NextCardProps {
   steps: Step[];
+  getStepNumber: (stepId: number) => number;
   onSelectStep: (stepId: number) => void;
 }
 
-export function NextCard({ steps, onSelectStep }: NextCardProps) {
+export function NextCard({ steps, getStepNumber, onSelectStep }: NextCardProps) {
   const reduceMotion = useReducedMotion();
 
   return (
@@ -22,7 +23,7 @@ export function NextCard({ steps, onSelectStep }: NextCardProps) {
           Next
         </h2>
         {steps.length > 0 && (
-          <span className="text-3xs text-text-tertiary">{steps.length} queued</span>
+          <span className="text-2xs text-text-tertiary">{steps.length} queued</span>
         )}
       </div>
 
@@ -41,11 +42,16 @@ export function NextCard({ steps, onSelectStep }: NextCardProps) {
               title="Click to switch to this step"
             >
               <div className="flex items-start justify-between gap-3">
-                <h4 className="text-xs sm:text-sm font-medium text-text-primary group-hover:text-accent transition-colors leading-snug">
-                  {st.text}
-                </h4>
+                <div className="flex items-start gap-2.5 min-w-0">
+                  <span className="text-2xs font-mono text-text-tertiary/70 bg-surface-subtle px-1.5 py-0.5 rounded-md shrink-0 mt-0.5 select-none">
+                    {getStepNumber(st.id)}
+                  </span>
+                  <h4 className="text-xs sm:text-sm font-medium text-text-primary group-hover:text-accent transition-colors leading-snug">
+                    {st.text}
+                  </h4>
+                </div>
                 {st.effort && (
-                  <span className="text-3xs font-mono text-text-tertiary shrink-0 mt-0.5">
+                  <span className="text-2xs font-mono text-text-tertiary shrink-0 mt-0.5">
                     {st.effort}
                   </span>
                 )}

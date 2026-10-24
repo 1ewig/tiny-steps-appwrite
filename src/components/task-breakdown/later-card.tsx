@@ -13,6 +13,7 @@ interface LaterCardProps {
   laterSteps: Step[];
   completedSteps: Step[];
   showCompleted: boolean;
+  getStepNumber: (stepId: number) => number;
   onToggleCompleted: () => void;
   onSelectStep: (stepId: number) => void;
   onToggleStep: (stepId: number) => void;
@@ -22,6 +23,7 @@ export function LaterCard({
   laterSteps,
   completedSteps,
   showCompleted,
+  getStepNumber,
   onToggleCompleted,
   onSelectStep,
   onToggleStep,
@@ -53,10 +55,13 @@ export function LaterCard({
                   animate="rest"
                   whileHover={reduceMotion ? undefined : 'hover'}
                   whileTap={reduceMotion ? undefined : 'tap'}
-                  className="relative w-full text-left text-xs text-text-tertiary hover:text-text-primary hover:z-10 transition-colors py-1 cursor-pointer truncate block"
+                  className="relative w-full text-left text-xs text-text-tertiary hover:text-text-primary hover:z-10 flex items-center transition-colors py-1 cursor-pointer truncate"
                   title="Click to bring this to Now"
                 >
-                  · {st.text}
+                  <span className="text-2xs font-mono text-text-tertiary/70 mr-1.5 shrink-0 select-none">
+                    {getStepNumber(st.id)}.
+                  </span>
+                  <span className="truncate">{st.text}</span>
                 </motion.button>
               </li>
             ))}
@@ -85,7 +90,7 @@ export function LaterCard({
                 <Check size={11} weight="bold" className="text-accent" />
               </motion.span>
               <span>{completedSteps.length} finished</span>
-              <span className="text-3xs opacity-60">({showCompleted ? 'hide' : 'view'})</span>
+              <span className="text-2xs opacity-60">({showCompleted ? 'hide' : 'view'})</span>
             </motion.button>
 
             <AnimatePresence>
@@ -115,6 +120,9 @@ export function LaterCard({
                         >
                           <Check size={10} weight="bold" className="text-accent/60" />
                         </motion.span>
+                        <span className="text-2xs font-mono text-text-tertiary/60 shrink-0 select-none">
+                          {getStepNumber(st.id)}.
+                        </span>
                         <span className="truncate">{st.text}</span>
                       </motion.button>
                     </li>

@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Sparkle, Check, CaretDown } from '@phosphor-icons/react';
+import { Sparkle, Check, CaretDown, ArrowCounterClockwise } from '@phosphor-icons/react';
 import type { Step } from '@/types/task';
 import {
   tactileButtonVariants,
@@ -15,6 +15,11 @@ import {
 interface NowCardProps {
   nowStep: Step | null;
   nowStepIndex: number;
+  nowStepNumber?: number | null;
+  totalStepsCount?: number;
+  isOutOfOrder?: boolean;
+  naturalFirstStepNumber?: number | null;
+  onResetOrder?: () => void;
   showSubSteps: boolean;
   onToggleSubSteps: () => void;
   onExpandSubSteps: () => void;
@@ -26,6 +31,11 @@ interface NowCardProps {
 export function NowCard({
   nowStep,
   nowStepIndex,
+  nowStepNumber,
+  totalStepsCount,
+  isOutOfOrder = false,
+  naturalFirstStepNumber,
+  onResetOrder,
   showSubSteps,
   onToggleSubSteps,
   onExpandSubSteps,
@@ -40,9 +50,49 @@ export function NowCard({
       variants={reduceMotion ? undefined : unblurFadeInVariants}
       className="lg:col-span-6 xl:col-span-5 space-y-2.5"
     >
-      <h2 className="text-2xs font-semibold uppercase tracking-widest text-accent px-1">
-        Now
-      </h2>
+      <div className="flex items-center justify-between px-1 min-h-[1.5rem]">
+        <div className="flex items-center gap-2">
+          <h2 className="text-2xs font-semibold uppercase tracking-widest text-accent">
+            Now
+          </h2>
+          {nowStepNumber && totalStepsCount && (
+            <span className="text-2xs font-mono text-text-tertiary">
+              · Step {nowStepNumber} of {totalStepsCount}
+            </span>
+          )}
+        </div>
+
+        <AnimatePresence>
+          {isOutOfOrder && naturalFirstStepNumber && onResetOrder && (
+            <motion.div
+              initial={reduceMotion ? false : { opacity: 0, x: 6 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={reduceMotion ? undefined : { opacity: 0, x: 6 }}
+              transition={{ duration: 0.15 }}
+            >
+              <motion.button
+                type="button"
+                onClick={onResetOrder}
+                variants={reduceMotion ? undefined : tactileButtonVariants}
+                initial="rest"
+                animate="rest"
+                whileHover={reduceMotion ? undefined : 'hover'}
+                whileTap={reduceMotion ? undefined : 'tap'}
+                className="text-2xs font-medium text-text-tertiary hover:text-accent flex items-center gap-1.5 transition-colors cursor-pointer select-none group"
+                title={`Return to recommended Step ${naturalFirstStepNumber}`}
+              >
+                <motion.span
+                  variants={reduceMotion ? undefined : tactileIconVariants}
+                  className="inline-flex"
+                >
+                  <ArrowCounterClockwise size={12} weight="bold" />
+                </motion.span>
+                <span>Resume step {naturalFirstStepNumber}</span>
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       <AnimatePresence mode="wait">
         {nowStep ? (
