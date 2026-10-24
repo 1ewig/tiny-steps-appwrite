@@ -9,6 +9,7 @@ import { MAX_BREAKDOWN_WAIT_MS } from '@/lib/task-generation';
 import { getActiveStep, getActiveStepIndex } from '@/lib/task-utils';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { useShrinkStep } from '@/hooks/use-shrink-step';
+import { AppIcon } from '@/components/shared/app-icon';
 import { AppHeader } from '@/components/shared/layout/app-header';
 import { HistoryDrawer } from '@/components/shared/layout/history-drawer';
 import { ThemeToggleFab } from '@/components/shared/theme-toggle-fab';
@@ -172,6 +173,14 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     onCloseHistory: closeHistory,
     isHistoryOpen,
   });
+
+  if (!hasHydrated) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-canvas">
+        <AppIcon size={52} animated className="rounded-2xl shadow-subtle" />
+      </div>
+    );
+  }
 
   return (
     <div className={`h-screen flex overflow-hidden font-sans ${peekEnabled ? 'peek-enabled' : ''}`}>

@@ -8,7 +8,7 @@ import { interpretUserIntent } from '@/lib/assistant-engine';
 import { TaskCard } from '@/components/task-breakdown/task-card';
 import { PeekToggle } from '@/components/task-breakdown/peek-toggle';
 import { ChatInput } from '@/components/shared/chat-input';
-import { FocusLoader } from '@/components/shared/focus-loader';
+import { AppIcon } from '@/components/shared/app-icon';
 import { MagnifyingGlass } from '@phosphor-icons/react';
 
 interface TaskBreakdownClientProps {
@@ -103,11 +103,11 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
     }, 600);
   };
 
-  // While localStorage is rehydrating, show gentle quiet loader instead of flashing "not found"
+  // While localStorage is rehydrating, show gentle quiet animated cairn instead of flashing "not found"
   if (!hasHydrated) {
     return (
       <main className="flex-1 flex flex-col items-center justify-center px-4 text-center">
-        <FocusLoader isVisible={true} />
+        <AppIcon size={52} animated className="rounded-2xl shadow-subtle" />
       </main>
     );
   }
