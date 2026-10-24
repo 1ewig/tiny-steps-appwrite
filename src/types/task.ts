@@ -7,6 +7,7 @@ export interface Step {
   hint?: string;
   completed: boolean;
   canSplit: boolean;
+  subSteps?: Step[];
 }
 
 export interface ChatMessage {
@@ -56,5 +57,11 @@ export interface TaskState {
     updates: { text?: string; steps?: Step[] }
   ) => void;
   toggleStepCompletion: (sessionId: string, messageId: string, stepId: number) => void;
+  toggleSubStepCompletion: (
+    sessionId: string,
+    messageId: string,
+    parentStepId: number,
+    subStepId: number
+  ) => void;
   shrinkStep: (sessionId: string, messageId: string, stepIndex: number, subSteps?: Step[]) => void;
 }

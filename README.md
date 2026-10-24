@@ -133,8 +133,7 @@ src/
 │   │
 │   ├── task-breakdown/
 │   │   ├── task-breakdown-client.tsx  # Dynamic task breakdown orchestrator for /tasks/[id]
-│   │   ├── task-card.tsx              # Single living task card (empathetic note & steps checklist)
-│   │   ├── steps-checklist.tsx        # Framer Motion animated checklist (Shrink / Done)
+│   │   ├── task-card.tsx              # 3-column Now / Next / Later spatial task workspace
 │   │   ├── focus-tunnel-modal.tsx     # Distraction-free single-task execution modal
 │   │   └── peek-toggle.tsx            # Floating round future-step blur/unblur toggle
 │   │

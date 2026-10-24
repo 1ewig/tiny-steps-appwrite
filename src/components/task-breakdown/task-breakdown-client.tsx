@@ -36,6 +36,7 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
     updateAssistantMessage,
     setSessionTitle,
     toggleStepCompletion,
+    toggleSubStepCompletion,
     shrinkStep,
   } = useTaskStore();
 
@@ -156,9 +157,9 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
 
   return (
     <>
-      {/* Task Workspace */}
+      {/* Task Workspace (Expansive 3-Column Grid) */}
       <main className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 scroll-smooth">
-        <div className="max-w-2xl mx-auto space-y-6 pb-28">
+        <div className="w-full max-w-6xl mx-auto space-y-6 pb-28">
           <TaskCard
             guidanceText={latestMessageWithSteps?.text}
             steps={steps}
@@ -171,6 +172,16 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
             onShrinkStep={(stepIdx) => {
               if (latestMessageWithSteps) {
                 shrinkStep(currentSession.id, latestMessageWithSteps.id, stepIdx);
+              }
+            }}
+            onToggleSubStep={(parentStepId, subStepId) => {
+              if (latestMessageWithSteps) {
+                toggleSubStepCompletion(
+                  currentSession.id,
+                  latestMessageWithSteps.id,
+                  parentStepId,
+                  subStepId
+                );
               }
             }}
           />

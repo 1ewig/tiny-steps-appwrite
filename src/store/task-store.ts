@@ -144,7 +144,38 @@ export const useTaskStore = create<TaskState>()(
             if (sess.id !== sessionId) return sess;
             const messages = sess.messages.map((msg) => {
               if (msg.id !== messageId || !msg.steps) return msg;
-              const steps = msg.steps.map((st) => (st.id === stepId ? { ...st, completed: !st.completed } : st));
+              const steps = msg.steps.map((st) => {
+                if (st.id !== stepId) return st;
+                const nextCompleted = !st.completed;
+                const subSteps = st.subSteps?.map((sub) => ({ ...sub, completed: nextCompleted }));
+                return { ...st, completed: nextCompleted, subSteps };
+              });
+              return { ...msg, steps };
+            });
+            return { ...sess, messages };
+          });
+          return { sessions };
+        });
+      },
+
+      toggleSubStepCompletion: (
+        sessionId: string,
+        messageId: string,
+        parentStepId: number,
+        subStepId: number
+      ) => {
+        set((state) => {
+          const sessions = state.sessions.map((sess) => {
+            if (sess.id !== sessionId) return sess;
+            const messages = sess.messages.map((msg) => {
+              if (msg.id !== messageId || !msg.steps) return msg;
+              const steps = msg.steps.map((st) => {
+                if (st.id !== parentStepId || !st.subSteps) return st;
+                const subSteps = st.subSteps.map((sub) =>
+                  sub.id === subStepId ? { ...sub, completed: !sub.completed } : sub
+                );
+                return { ...st, subSteps };
+              });
               return { ...msg, steps };
             });
             return { ...sess, messages };
@@ -162,8 +193,13 @@ export const useTaskStore = create<TaskState>()(
               const original = msg.steps[stepIndex];
               const microSteps = subSteps ?? generateMicroSteps(original.text);
 
+              // Keep parent step as container, nest micro-steps directly within it
               const updatedSteps = [...msg.steps];
-              updatedSteps.splice(stepIndex, 1, ...microSteps);
+              updatedSteps[stepIndex] = {
+                ...original,
+                subSteps: microSteps,
+                canSplit: false,
+              };
               return { ...msg, steps: updatedSteps };
             });
             return { ...sess, messages };
