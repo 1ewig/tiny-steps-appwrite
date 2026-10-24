@@ -129,24 +129,31 @@ export function HistoryDrawer({
               </div>
 
               {/* Middle: Saved Tasks List */}
-              <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-5 space-y-2.5">
-                {validTasks.length === 0 ? (
-                  <div className="py-12 px-4 text-center space-y-3">
-                    <div className="w-12 h-12 mx-auto rounded-2xl bg-surface-subtle text-text-tertiary flex items-center justify-center shadow-subtle">
-                      <ClockCounterClockwise size={22} weight="regular" />
-                    </div>
-                    <div className="space-y-1 max-w-xs mx-auto">
-                      <p className="text-xs font-semibold text-text-primary">
-                        No saved tasks yet
-                      </p>
-                      <p className="text-2xs text-text-secondary leading-relaxed">
-                        Whenever you break down a task, it stays saved here automatically on your device.
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <AnimatePresence initial={false}>
-                    {validTasks.map((task) => {
+              <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-5">
+                <AnimatePresence initial={false}>
+                  {validTasks.length === 0 ? (
+                    <motion.div
+                      key="empty-history"
+                      initial={reduceMotion ? false : { opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={reduceMotion ? undefined : { opacity: 0 }}
+                      transition={{ duration: 0.2, ease: CALM_EASE }}
+                      className="py-12 px-4 text-center space-y-3"
+                    >
+                      <div className="w-12 h-12 mx-auto rounded-2xl bg-surface-subtle text-text-tertiary flex items-center justify-center shadow-subtle">
+                        <ClockCounterClockwise size={22} weight="regular" />
+                      </div>
+                      <div className="space-y-1 max-w-xs mx-auto">
+                        <p className="text-xs font-semibold text-text-primary">
+                          No saved tasks yet
+                        </p>
+                        <p className="text-2xs text-text-secondary leading-relaxed">
+                          Whenever you break down a task, it stays saved here automatically on your device.
+                        </p>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    validTasks.map((task) => {
                       const isCurrent = Boolean(
                         currentTaskId && task.id === currentTaskId
                       );
@@ -166,109 +173,124 @@ export function HistoryDrawer({
                           key={task.id}
                           layout
                           initial={reduceMotion ? false : { opacity: 0, y: 6 }}
-                          animate={{ opacity: 1, y: 0 }}
+                          animate={{ opacity: 1, y: 0, height: 'auto' }}
                           exit={
                             reduceMotion
                               ? undefined
                               : {
                                   opacity: 0,
-                                  scale: 0.95,
-                                  transition: { duration: 0.16, ease: CALM_EASE },
+                                  scale: 0.96,
+                                  height: 0,
+                                  transition: {
+                                    opacity: { duration: 0.14, ease: 'easeOut' },
+                                    scale: { duration: 0.14, ease: 'easeOut' },
+                                    height: { duration: 0.26, ease: CALM_EASE },
+                                  },
                                 }
                           }
-                          whileHover={reduceMotion ? undefined : { y: -1 }}
-                          className={`w-full rounded-xl transition-colors duration-fast select-none border shadow-subtle flex items-center justify-between p-3 sm:p-3.5 gap-2.5 ${
-                            isCurrent
-                              ? 'bg-accent-subtle/80 text-accent-text border-accent/25'
-                              : 'bg-surface hover:bg-surface-subtle/90 text-text-primary border-border-subtle hover:border-border-muted'
-                          }`}
+                          transition={{
+                            layout: { duration: 0.26, ease: CALM_EASE },
+                          }}
+                          className="overflow-hidden"
                         >
-                          {/* Main interactive area for selecting the task */}
-                          <button
-                            type="button"
-                            onClick={() => onSelectTask(task.id)}
-                            aria-current={isCurrent ? 'true' : undefined}
-                            className="min-w-0 flex-1 text-left flex items-start gap-2.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-lg"
-                          >
-                            {/* Step Status Icon */}
-                            <div className="mt-0.5 shrink-0 text-text-tertiary">
-                              {totalSteps > 0 ? (
-                                <CheckCircle
-                                  size={17}
-                                  weight={allCompleted ? 'fill' : 'regular'}
-                                  className={
-                                    allCompleted
-                                      ? 'text-accent'
-                                      : 'text-accent/80'
-                                  }
-                                />
-                              ) : (
-                                <ChatText
-                                  size={17}
-                                  weight="regular"
-                                />
-                              )}
-                            </div>
-
-                            {/* Task Title & Details */}
-                            <div className="min-w-0 flex-1 space-y-1">
-                              <div className="flex items-center gap-1.5 justify-between pr-1">
-                                <p className="text-xs font-semibold text-text-primary truncate leading-snug">
-                                  {task.title || 'Untitled task'}
-                                </p>
-                                {isCurrent && (
-                                  <span className="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-accent text-text-inverse tracking-wide uppercase shadow-subtle">
-                                    Active
-                                  </span>
-                                )}
-                              </div>
-
-                              {/* Progress & Timestamp Meta */}
-                              <div className="flex items-center gap-2 text-2xs text-text-tertiary">
-                                <span>
-                                  {totalSteps > 0
-                                    ? allCompleted
-                                      ? 'All steps done'
-                                      : `${completedSteps} of ${totalSteps} done`
-                                    : 'No steps yet'}
-                                </span>
-
-                                {dateLabel && (
-                                  <>
-                                    <span aria-hidden="true" className="opacity-60">·</span>
-                                    <span>{dateLabel}</span>
-                                  </>
-                                )}
-                              </div>
-
-                              {/* Micro Progress Bar (Non-intrusive momentum tracker) */}
-                              {totalSteps > 0 && (
-                                <div className="w-full h-1 bg-border-subtle/80 rounded-full overflow-hidden mt-1.5">
-                                  <div
-                                    className="h-full bg-accent rounded-full transition-all duration-300"
-                                    style={{ width: `${progressPct}%` }}
-                                  />
+                          {/* Spacing lives inside the animated height container so it collapses smoothly with the card */}
+                          <div className="pt-0.5 pb-2.5">
+                            <motion.div
+                              whileHover={reduceMotion ? undefined : { y: -1 }}
+                              className={`w-full rounded-xl transition-colors duration-fast select-none border shadow-subtle flex items-center justify-between p-3 sm:p-3.5 gap-2.5 ${
+                                isCurrent
+                                  ? 'bg-accent-subtle/80 text-accent-text border-accent/25'
+                                  : 'bg-surface hover:bg-surface-subtle/90 text-text-primary border-border-subtle hover:border-border-muted'
+                              }`}
+                            >
+                              {/* Main interactive area for selecting the task */}
+                              <button
+                                type="button"
+                                onClick={() => onSelectTask(task.id)}
+                                aria-current={isCurrent ? 'true' : undefined}
+                                className="min-w-0 flex-1 text-left flex items-start gap-2.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-lg"
+                              >
+                                {/* Step Status Icon */}
+                                <div className="mt-0.5 shrink-0 text-text-tertiary">
+                                  {totalSteps > 0 ? (
+                                    <CheckCircle
+                                      size={17}
+                                      weight={allCompleted ? 'fill' : 'regular'}
+                                      className={
+                                        allCompleted
+                                          ? 'text-accent'
+                                          : 'text-accent/80'
+                                      }
+                                    />
+                                  ) : (
+                                    <ChatText
+                                      size={17}
+                                      weight="regular"
+                                    />
+                                  )}
                                 </div>
-                              )}
-                            </div>
-                          </button>
 
-                          {/* Delete Task Button: Native part of task card, tactile tap feedback preserved */}
-                          <motion.button
-                            type="button"
-                            onClick={(e) => handleRequestDelete(e, task)}
-                            whileTap={reduceMotion ? undefined : { scale: 0.88 }}
-                            className="shrink-0 p-1.5 rounded-lg text-text-tertiary hover:text-danger-text hover:bg-danger-subtle transition-colors duration-fast cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger"
-                            title={`Delete "${task.title || 'task'}"`}
-                            aria-label={`Delete "${task.title || 'task'}"`}
-                          >
-                            <Trash size={15} weight="regular" />
-                          </motion.button>
+                                {/* Task Title & Details */}
+                                <div className="min-w-0 flex-1 space-y-1">
+                                  <div className="flex items-center gap-1.5 justify-between pr-1">
+                                    <p className="text-xs font-semibold text-text-primary truncate leading-snug">
+                                      {task.title || 'Untitled task'}
+                                    </p>
+                                    {isCurrent && (
+                                      <span className="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-accent text-text-inverse tracking-wide uppercase shadow-subtle">
+                                        Active
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  {/* Progress & Timestamp Meta */}
+                                  <div className="flex items-center gap-2 text-2xs text-text-tertiary">
+                                    <span>
+                                      {totalSteps > 0
+                                        ? allCompleted
+                                          ? 'All steps done'
+                                          : `${completedSteps} of ${totalSteps} done`
+                                        : 'No steps yet'}
+                                    </span>
+
+                                    {dateLabel && (
+                                      <>
+                                        <span aria-hidden="true" className="opacity-60">·</span>
+                                        <span>{dateLabel}</span>
+                                      </>
+                                    )}
+                                  </div>
+
+                                  {/* Micro Progress Bar (Non-intrusive momentum tracker) */}
+                                  {totalSteps > 0 && (
+                                    <div className="w-full h-1 bg-border-subtle/80 rounded-full overflow-hidden mt-1.5">
+                                      <div
+                                        className="h-full bg-accent rounded-full transition-all duration-300"
+                                        style={{ width: `${progressPct}%` }}
+                                      />
+                                    </div>
+                                  )}
+                                </div>
+                              </button>
+
+                              {/* Delete Task Button: Native part of task card, tactile tap feedback preserved */}
+                              <motion.button
+                                type="button"
+                                onClick={(e) => handleRequestDelete(e, task)}
+                                whileTap={reduceMotion ? undefined : { scale: 0.88 }}
+                                className="shrink-0 p-1.5 rounded-lg text-text-tertiary hover:text-danger-text hover:bg-danger-subtle transition-colors duration-fast cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger"
+                                title={`Delete "${task.title || 'task'}"`}
+                                aria-label={`Delete "${task.title || 'task'}"`}
+                              >
+                                <Trash size={15} weight="regular" />
+                              </motion.button>
+                            </motion.div>
+                          </div>
                         </motion.div>
                       );
-                    })}
-                  </AnimatePresence>
-                )}
+                    })
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* Bottom Drawer Footer */}
