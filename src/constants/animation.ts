@@ -350,3 +350,35 @@ export const backdropVariants: Variants = {
     },
   },
 };
+
+/**
+ * Optical Blur-Dissolve / Text Morph Variants (0.5s)
+ * Designed for tranquil step transitions in the Focus Tunnel.
+ * Simultaneously dissolves and focuses text using opacity and optical blur.
+ */
+export const opticalMorphVariants: Variants = {
+  initial: {
+    opacity: 0,
+    filter: 'blur(8px)',
+    scale: 1.015,
+  },
+  animate: {
+    opacity: 1,
+    filter: 'blur(0px)',
+    scale: 1,
+    transition: {
+      duration: 0.5,
+      ease: CALM_EASE,
+    },
+  },
+  exit: {
+    opacity: 0,
+    filter: 'blur(8px)',
+    scale: 0.985,
+    transition: {
+      duration: 0.5,
+      ease: CALM_EASE,
+    },
+  },
+};
+

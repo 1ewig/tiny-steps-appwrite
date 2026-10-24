@@ -8,6 +8,7 @@ import {
   tactileButtonVariants,
   tactileIconVariants,
   CALM_EASE,
+  opticalMorphVariants,
 } from '@/constants/animation';
 
 interface FocusTunnelModalProps {
@@ -40,6 +41,14 @@ export function FocusTunnelModal({
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElementRef = useRef<HTMLElement | null>(null);
   const reduceMotion = useReducedMotion();
+
+  const morphVariants = reduceMotion
+    ? {
+        initial: { opacity: 0 },
+        animate: { opacity: 1, transition: { duration: 0.15 } },
+        exit: { opacity: 0, transition: { duration: 0.15 } },
+      }
+    : opticalMorphVariants;
 
   const subSteps = activeStep?.subSteps ?? [];
   const hasSubSteps = subSteps.length > 0;
@@ -172,78 +181,92 @@ export function FocusTunnelModal({
             )}
           </AnimatePresence>
 
-          {/* Centered Active Step / Micro-Step Spotlight */}
-          <motion.div
-            key={
-              activeStep
-                ? hasSubSteps && currentSubStep
-                  ? `sub_${activeStep.id}_${currentSubStep.id}`
-                  : `step_${activeStep.id}`
-                : 'completed'
-            }
-            initial={reduceMotion ? false : { opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
-            className="flex-1 flex flex-col items-center justify-center text-center px-4 sm:px-6 py-8 max-w-4xl lg:max-w-5xl mx-auto w-full my-auto"
-          >
-            {activeStep ? (
-              hasSubSteps && currentSubStep ? (
-                <div className="space-y-4 max-w-4xl w-full mx-auto">
-                  {/* Spotlight Tiny Step Text */}
-                  <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-text-primary leading-snug sm:leading-tight tracking-tight text-center max-w-4xl mx-auto">
-                    {currentSubStep.text}
-                  </h1>
+          {/* Centered Active Step / Micro-Step Spotlight with Overlapping Blur Morph */}
+          <div className="flex-1 flex flex-col items-center justify-center text-center px-4 sm:px-6 py-8 max-w-4xl lg:max-w-5xl mx-auto w-full my-auto">
+            <div className="grid grid-cols-1 grid-rows-1 place-items-center w-full max-w-4xl mx-auto min-h-[140px] sm:min-h-[180px] md:min-h-[200px]">
+              <AnimatePresence initial={false}>
+                <motion.div
+                  key={
+                    activeStep
+                      ? hasSubSteps && currentSubStep
+                        ? `sub_${activeStep.id}_${currentSubStep.id}`
+                        : `step_${activeStep.id}`
+                      : 'completed'
+                  }
+                  variants={morphVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  style={{ willChange: reduceMotion ? undefined : 'filter, opacity, transform' }}
+                  className="col-start-1 row-start-1 w-full flex flex-col items-center justify-center text-center px-2"
+                >
+                  {activeStep ? (
+                    hasSubSteps && currentSubStep ? (
+                      <div className="space-y-3 max-w-4xl w-full mx-auto">
+                        {/* Spotlight Tiny Step Text */}
+                        <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-text-primary leading-snug sm:leading-tight tracking-tight text-center max-w-4xl mx-auto">
+                          {currentSubStep.text}
+                        </h1>
+                        {currentSubStep.hint && (
+                          <p className="text-xs sm:text-sm text-text-secondary leading-relaxed max-w-xl mx-auto">
+                            {currentSubStep.hint}
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="space-y-3 max-w-4xl w-full mx-auto">
+                        <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-text-primary leading-snug sm:leading-tight tracking-tight text-center max-w-4xl mx-auto">
+                          {activeStep.text}
+                        </h1>
+                        {activeStep.hint ? (
+                          <p className="text-xs sm:text-sm text-text-secondary leading-relaxed max-w-xl mx-auto">
+                            {activeStep.hint}
+                          </p>
+                        ) : activeStep.effort ? (
+                          <p className="text-xs text-text-tertiary">
+                            Takes about {activeStep.effort.replace('~', '')}
+                          </p>
+                        ) : null}
+                      </div>
+                    )
+                  ) : (
+                    <div className="space-y-4 max-w-md">
+                      <div className="w-12 h-12 rounded-2xl bg-accent-subtle text-accent flex items-center justify-center orb-pulse mx-auto">
+                        <Sparkle size={28} weight="duotone" className="text-accent" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <h1 className="text-2xl sm:text-3xl font-bold text-text-primary leading-tight">
+                          You made it through.
+                        </h1>
+                        <p className="text-text-secondary text-sm sm:text-base leading-relaxed">
+                          Take a breath and unclench your jaw. You turned something heavy into momentum.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </div>
 
-                  {/* Micro-step Stepping Stone Dots */}
-                  <div className="flex items-center justify-center gap-2 pt-2 select-none">
-                    {subSteps.map((sub, idx) => (
-                      <span
-                        key={sub.id}
-                        className={`h-1.5 rounded-full transition-all duration-300 ${
-                          sub.completed
-                            ? 'w-4 bg-accent'
-                            : idx === currentSubStepIndex
-                            ? 'w-7 bg-accent shadow-sm'
-                            : 'w-2 bg-border-muted/80'
-                        }`}
-                        title={`Step ${idx + 1}: ${sub.text}`}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-3 max-w-4xl w-full mx-auto">
-                  <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-text-primary leading-snug sm:leading-tight tracking-tight text-center max-w-4xl mx-auto">
-                    {activeStep.text}
-                  </h1>
-                  {activeStep.hint ? (
-                    <p className="text-xs sm:text-sm text-text-secondary leading-relaxed max-w-xl mx-auto">
-                      {activeStep.hint}
-                    </p>
-                  ) : activeStep.effort ? (
-                    <p className="text-xs text-text-tertiary">
-                      Takes about {activeStep.effort.replace('~', '')}
-                    </p>
-                  ) : null}
-                </div>
-              )
-            ) : (
-              <div className="space-y-4 max-w-md">
-                <div className="w-12 h-12 rounded-2xl bg-accent-subtle text-accent flex items-center justify-center orb-pulse mx-auto">
-                  <Sparkle size={28} weight="duotone" className="text-accent" />
-                </div>
-                <div className="space-y-1.5">
-                  <h1 className="text-2xl sm:text-3xl font-bold text-text-primary leading-tight">
-                    You made it through.
-                  </h1>
-                  <p className="text-text-secondary text-sm sm:text-base leading-relaxed">
-                    Take a breath and unclench your jaw. You turned something heavy into momentum.
-                  </p>
-                </div>
+            {/* Micro-step Stepping Stone Dots (Persistently anchored with smooth width transition) */}
+            {activeStep && hasSubSteps && currentSubStep && (
+              <div className="flex items-center justify-center gap-2 pt-4 select-none">
+                {subSteps.map((sub, idx) => (
+                  <span
+                    key={sub.id}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      sub.completed
+                        ? 'w-4 bg-accent'
+                        : idx === currentSubStepIndex
+                        ? 'w-7 bg-accent shadow-sm'
+                        : 'w-2 bg-border-muted/80'
+                    }`}
+                    title={`Step ${idx + 1}: ${sub.text}`}
+                  />
+                ))}
               </div>
             )}
-          </motion.div>
+          </div>
 
           {/* Bottom Action Area */}
           <motion.div
