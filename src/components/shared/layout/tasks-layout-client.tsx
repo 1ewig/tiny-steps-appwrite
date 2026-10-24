@@ -41,6 +41,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     closeHistory,
     toggleHistory,
     toggleStepCompletion,
+    toggleSubStepCompletion,
     shrinkStep,
   } = useTaskStore();
 
@@ -67,6 +68,62 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
   const steps = getSessionSteps(activeSession);
   const activeStep = getActiveStep(steps);
   const activeStepIndex = getActiveStepIndex(steps);
+  const totalStepsCount = steps.length;
+  const activeStepNumber = activeStep
+    ? steps.findIndex((s) => s.id === activeStep.id) + 1
+    : null;
+
+  const handleCompleteFocusStep = () => {
+    if (!activeStep || !latestMessageWithSteps || !activeSession) return;
+    const subSteps = activeStep.subSteps ?? [];
+    const incompleteSubSteps = subSteps.filter((s) => !s.completed);
+
+    if (incompleteSubSteps.length > 0) {
+      const currentSubStep = incompleteSubSteps[0];
+      const isLast = incompleteSubSteps.length === 1;
+      toggleSubStepCompletion(
+        activeSession.id,
+        latestMessageWithSteps.id,
+        activeStep.id,
+        currentSubStep.id
+      );
+      if (isLast) {
+        toggleStepCompletion(
+          activeSession.id,
+          latestMessageWithSteps.id,
+          activeStep.id
+        );
+      }
+    } else {
+      toggleStepCompletion(
+        activeSession.id,
+        latestMessageWithSteps.id,
+        activeStep.id
+      );
+    }
+  };
+
+  const handleCompleteWholeStep = () => {
+    if (!activeStep || !latestMessageWithSteps || !activeSession) return;
+    toggleStepCompletion(
+      activeSession.id,
+      latestMessageWithSteps.id,
+      activeStep.id
+    );
+  };
+
+  const handleShrinkFocusStep = () => {
+    if (
+      activeStepIndex !== -1 &&
+      latestMessageWithSteps &&
+      activeStep &&
+      activeSession &&
+      activeStep.canSplit
+    ) {
+      const subSteps = generateMicroSteps(activeStep.text);
+      shrinkStep(activeSession.id, latestMessageWithSteps.id, activeStepIndex, subSteps);
+    }
+  };
 
   useEffect(() => {
     if (!focusTunnelSessionId || isGeneratingTask) return;
@@ -107,11 +164,8 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
       closeHistory();
       router.push('/tasks');
     },
-    onCompleteFocusStep: () => {
-      if (activeStep && latestMessageWithSteps && activeSession) {
-        toggleStepCompletion(activeSession.id, latestMessageWithSteps.id, activeStep.id);
-      }
-    },
+    onCompleteFocusStep: handleCompleteFocusStep,
+    onShrinkFocusStep: handleShrinkFocusStep,
     isFocusTunnelActive: focusTunnelOpen && !isGeneratingTask,
     onToggleHistory: toggleHistory,
     onCloseHistory: closeHistory,
@@ -178,19 +232,13 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
         isOpen={focusTunnelOpen}
         isBusy={isGeneratingTask}
         activeStep={activeStep}
+        activeStepNumber={activeStepNumber}
+        totalStepsCount={totalStepsCount}
         sessionTitle={activeSession?.title || 'Focus Tunnel'}
         onClose={closeFocusTunnel}
-        onComplete={() => {
-          if (activeStep && latestMessageWithSteps && activeSession) {
-            toggleStepCompletion(activeSession.id, latestMessageWithSteps.id, activeStep.id);
-          }
-        }}
-        onShrink={() => {
-          if (activeStepIndex !== -1 && latestMessageWithSteps && activeStep && activeSession) {
-            const subSteps = generateMicroSteps(activeStep.text);
-            shrinkStep(activeSession.id, latestMessageWithSteps.id, activeStepIndex, subSteps);
-          }
-        }}
+        onComplete={handleCompleteFocusStep}
+        onCompleteWholeStep={handleCompleteWholeStep}
+        onShrink={handleShrinkFocusStep}
       />
 
       <FocusLoader isVisible={isGeneratingTask} />

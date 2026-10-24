@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 interface ShortcutOptions {
   onNewSession?: () => void;
   onCompleteFocusStep?: () => void;
+  onShrinkFocusStep?: () => void;
   isFocusTunnelActive?: boolean;
   onToggleHistory?: () => void;
   onCloseHistory?: () => void;
@@ -12,6 +13,7 @@ interface ShortcutOptions {
 export function useKeyboardShortcuts({
   onNewSession,
   onCompleteFocusStep,
+  onShrinkFocusStep,
   isFocusTunnelActive,
   onToggleHistory,
   onCloseHistory,
@@ -40,18 +42,34 @@ export function useKeyboardShortcuts({
         return;
       }
 
-      // Space or Enter in Focus Tunnel Mode (do not intercept when focusing interactive elements like buttons)
+      // Focus Tunnel Mode shortcuts
       if (isFocusTunnelActive) {
         const target = e.target as HTMLElement | null;
-        const isInteractive =
-          target?.tagName === 'INPUT' ||
-          target?.tagName === 'TEXTAREA' ||
+        const isInputField =
+          target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA';
+        const isButtonOrInteractive =
+          isInputField ||
           target?.tagName === 'BUTTON' ||
           Boolean(target?.closest('button'));
 
-        if (!isInteractive && (e.code === 'Space' || e.code === 'Enter')) {
+        // Space or Enter: Advance/Complete
+        if (!isButtonOrInteractive && (e.code === 'Space' || e.code === 'Enter')) {
           e.preventDefault();
           onCompleteFocusStep?.();
+          return;
+        }
+
+        // S: Shrink current step if not typing in an input
+        if (
+          !isInputField &&
+          (e.key === 's' || e.key === 'S') &&
+          !e.ctrlKey &&
+          !e.metaKey &&
+          !e.altKey
+        ) {
+          e.preventDefault();
+          onShrinkFocusStep?.();
+          return;
         }
       }
     };
@@ -61,6 +79,7 @@ export function useKeyboardShortcuts({
   }, [
     onNewSession,
     onCompleteFocusStep,
+    onShrinkFocusStep,
     isFocusTunnelActive,
     onToggleHistory,
     onCloseHistory,
