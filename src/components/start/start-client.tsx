@@ -1,5 +1,6 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ClockCounterClockwise } from '@phosphor-icons/react';
 import { useTaskStore } from '@/store/task-store';
@@ -8,10 +9,15 @@ import { useStartTask } from '@/hooks/use-start-task';
 import { HeroWelcome } from '@/components/start/hero-welcome';
 import { EnergySelector } from '@/components/start/energy-selector';
 import { ChatInput } from '@/components/shared/chat-input';
-import { tactileButtonVariants } from '@/constants/animation';
+import {
+  tactileButtonVariants,
+  startScreenStaggerVariants,
+  heroItemEntranceVariants,
+} from '@/constants/animation';
 
 export function StartClient() {
   const hasHydrated = useHydrated();
+  const pathname = usePathname();
   const { granularity, setGranularity, sessions, openHistory } = useTaskStore();
   const { startTask, isGeneratingTask, error, restoreText } = useStartTask();
   const reduceMotion = useReducedMotion();
@@ -22,16 +28,24 @@ export function StartClient() {
 
   return (
     <main className="flex-1 flex flex-col items-center justify-between px-4 sm:px-6 py-6 sm:py-8 overflow-y-auto">
-      <div className="w-full max-w-2xl mx-auto my-auto space-y-6">
+      <motion.div
+        key={pathname}
+        variants={reduceMotion ? undefined : startScreenStaggerVariants}
+        initial="initial"
+        animate="animate"
+        className="w-full max-w-2xl mx-auto my-auto space-y-6"
+      >
         <HeroWelcome />
         <div className="space-y-4">
-          <ChatInput
-            key={restoreText ?? 'fresh'}
-            disabled={isGeneratingTask}
-            onSubmit={startTask}
-            initialText={restoreText ?? ''}
-            isCentered
-          />
+          <motion.div variants={reduceMotion ? undefined : heroItemEntranceVariants}>
+            <ChatInput
+              key={restoreText ?? 'fresh'}
+              disabled={isGeneratingTask}
+              onSubmit={startTask}
+              initialText={restoreText ?? ''}
+              isCentered
+            />
+          </motion.div>
           {error && (
             <p
               aria-live="polite"
@@ -40,13 +54,15 @@ export function StartClient() {
               {error}
             </p>
           )}
-          <EnergySelector
-            currentLevel={displayedGranularity}
-            onSelect={setGranularity}
-            disabled={isGeneratingTask}
-          />
+          <motion.div variants={reduceMotion ? undefined : heroItemEntranceVariants}>
+            <EnergySelector
+              currentLevel={displayedGranularity}
+              onSelect={setGranularity}
+              disabled={isGeneratingTask}
+            />
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
 
       {hasSavedTasks && !isGeneratingTask && (
         <div className="pt-4 pb-2 text-center shrink-0">

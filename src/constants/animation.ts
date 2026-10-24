@@ -200,6 +200,48 @@ export const staggerContainerVariants: Variants = {
 };
 
 /**
+ * Start Screen & Hero Entrance Variants
+ * Calming top-to-bottom wave: Icon -> Headline -> Subtitle -> ChatInput -> EnergySelector
+ * Combines opacity fade, gentle slide up, and sensory-friendly unblur (6px -> 0px)
+ */
+export const startScreenStaggerVariants: Variants = {
+  initial: {},
+  animate: {
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.04,
+    },
+  },
+};
+
+export const heroStaggerContainerVariants: Variants = {
+  initial: {},
+  animate: {
+    transition: {
+      staggerChildren: 0.09,
+      delayChildren: 0.02,
+    },
+  },
+};
+
+export const heroItemEntranceVariants: Variants = {
+  initial: {
+    opacity: 0,
+    y: 14,
+    filter: 'blur(6px)',
+  },
+  animate: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transition: {
+      duration: 0.42,
+      ease: CALM_EASE,
+    },
+  },
+};
+
+/**
  * Slide-over Drawer Variants (Right Side)
  */
 export const drawerSlideVariants: Variants = {

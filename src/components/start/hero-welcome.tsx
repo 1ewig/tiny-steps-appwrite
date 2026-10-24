@@ -1,22 +1,43 @@
 'use client';
 
+import { motion, useReducedMotion } from 'framer-motion';
 import { AppIcon } from '@/components/shared/app-icon';
+import {
+  heroStaggerContainerVariants,
+  heroItemEntranceVariants,
+} from '@/constants/animation';
 
 export function HeroWelcome() {
+  const reduceMotion = useReducedMotion();
+
   return (
-    <div className="text-center max-w-xl mx-auto space-y-4 chat-enter">
-      <div className="mx-auto flex items-center justify-center">
+    <motion.div
+      variants={reduceMotion ? undefined : heroStaggerContainerVariants}
+      initial="initial"
+      animate="animate"
+      className="text-center max-w-xl mx-auto space-y-4"
+    >
+      <motion.div
+        variants={reduceMotion ? undefined : heroItemEntranceVariants}
+        className="mx-auto flex items-center justify-center"
+      >
         <AppIcon size={52} hoverAnimated className="shadow-subtle rounded-2xl" />
-      </div>
+      </motion.div>
 
-      <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-text-primary leading-tight">
+      <motion.h1
+        variants={reduceMotion ? undefined : heroItemEntranceVariants}
+        className="text-3xl sm:text-4xl font-bold tracking-tight text-text-primary leading-tight"
+      >
         What feels heavy right now?
-      </h1>
+      </motion.h1>
 
-      <p className="text-text-secondary text-sm sm:text-base leading-relaxed max-w-md mx-auto">
+      <motion.p
+        variants={reduceMotion ? undefined : heroItemEntranceVariants}
+        className="text-text-secondary text-sm sm:text-base leading-relaxed max-w-md mx-auto"
+      >
         Brain-dump your thoughts. We&apos;ll make it tiny.
-      </p>
-    </div>
+      </motion.p>
+    </motion.div>
   );
 }
 

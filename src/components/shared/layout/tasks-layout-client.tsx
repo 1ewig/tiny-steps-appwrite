@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, usePathname } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { useHydrated } from '@/hooks/use-hydrated';
 import { generateMicroSteps } from '@/lib/assistant-engine';
@@ -22,6 +22,7 @@ import { FocusLoader } from '@/components/shared/focus-loader';
 export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const params = useParams();
+  const pathname = usePathname();
   const routeSessionId = typeof params?.id === 'string' ? params.id : null;
   const hasHydrated = useHydrated();
 
@@ -145,7 +146,9 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
         />
 
         {/* Dynamic Page Content */}
-        {children}
+        <div key={pathname} className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          {children}
+        </div>
       </div>
 
       {/* Floating Theme Toggle (Bottom-Left FAB) */}
