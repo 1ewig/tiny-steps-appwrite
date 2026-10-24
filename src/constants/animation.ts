@@ -382,3 +382,35 @@ export const opticalMorphVariants: Variants = {
   },
 };
 
+/**
+ * Extra-Subtle Optical Blur-Dissolve / Text Morph Variants (1.0s)
+ * Designed for tranquil rotating lines in the Focus Loader.
+ * Soft 5px optical blur with ultra-gentle micro-scale for a dreamlike dissolve.
+ */
+export const subtleMorphVariants: Variants = {
+  initial: {
+    opacity: 0,
+    filter: 'blur(5px)',
+    scale: 1.008,
+  },
+  animate: {
+    opacity: 1,
+    filter: 'blur(0px)',
+    scale: 1,
+    transition: {
+      duration: 1.0,
+      ease: CALM_EASE,
+    },
+  },
+  exit: {
+    opacity: 0,
+    filter: 'blur(5px)',
+    scale: 0.992,
+    transition: {
+      duration: 1.0,
+      ease: CALM_EASE,
+    },
+  },
+};
+
+
