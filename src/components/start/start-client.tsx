@@ -27,12 +27,15 @@ export function StartClient() {
     hasHydrated && sessions.some((s) => s.messages && s.messages.length > 0);
 
   return (
-    <main className="flex-1 flex flex-col items-center justify-between px-4 sm:px-6 py-6 sm:py-8 overflow-y-auto">
+    <motion.main
+      key={pathname}
+      variants={reduceMotion ? undefined : staggerRelaxedVariants}
+      initial="initial"
+      animate="animate"
+      className="flex-1 flex flex-col items-center justify-between px-4 sm:px-6 py-6 sm:py-8 overflow-y-auto"
+    >
       <motion.div
-        key={pathname}
         variants={reduceMotion ? undefined : staggerRelaxedVariants}
-        initial="initial"
-        animate="animate"
         className="w-full max-w-2xl mx-auto my-auto space-y-6"
       >
         <HeroWelcome />
@@ -64,24 +67,28 @@ export function StartClient() {
         </div>
       </motion.div>
 
-      {hasSavedTasks && !isGeneratingTask && (
-        <div className="pt-4 pb-2 text-center shrink-0">
+      {hasSavedTasks && (
+        <motion.div
+          variants={reduceMotion ? undefined : unblurFadeInVariants}
+          className="pt-4 pb-2 text-center shrink-0"
+        >
           <motion.button
             type="button"
             onClick={openHistory}
+            disabled={isGeneratingTask}
             variants={reduceMotion ? undefined : tactileButtonVariants}
             initial="rest"
             animate="rest"
-            whileHover={reduceMotion ? undefined : 'hover'}
-            whileTap={reduceMotion ? undefined : 'tap'}
-            className="inline-flex items-center gap-1.5 text-xs text-text-tertiary hover:text-text-secondary transition-colors duration-fast cursor-pointer py-1.5 px-3.5 rounded-full hover:bg-surface-subtle"
+            whileHover={reduceMotion || isGeneratingTask ? undefined : 'hover'}
+            whileTap={reduceMotion || isGeneratingTask ? undefined : 'tap'}
+            className="inline-flex items-center gap-1.5 text-xs text-text-tertiary hover:text-text-secondary transition-colors duration-fast cursor-pointer py-1.5 px-3.5 rounded-full hover:bg-surface-subtle disabled:pointer-events-none"
           >
             <ClockCounterClockwise size={14} className="text-accent" />
             <span>Looking for an earlier task? View history</span>
             <span aria-hidden="true">→</span>
           </motion.button>
-        </div>
+        </motion.div>
       )}
-    </main>
+    </motion.main>
   );
 }

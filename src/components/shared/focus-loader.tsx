@@ -25,18 +25,18 @@ function FocusLoaderContent({ reduceMotion }: { reduceMotion: boolean }) {
   const [showText, setShowText] = useState(reduceMotion);
   const [lineIndex, setLineIndex] = useState(0);
 
-  // Overlay covers screen first (~1.5s) before loading text begins
+  // Overlay covers screen first (~0.2s) before loading text begins
   useEffect(() => {
     if (reduceMotion) return;
 
     const overlayTimer = setTimeout(() => {
       setShowText(true);
-    }, 1500);
+    }, 200);
 
     return () => clearTimeout(overlayTimer);
   }, [reduceMotion]);
 
-  // Once text begins: 0.5s entrance + 1.5s hold = 2000ms until exit begins (0.5s exit)
+  // Once text begins: 0.3s entrance + 1.5s hold = 1800ms until exit begins (0.3s exit)
   useEffect(() => {
     if (reduceMotion || !showText) return;
 
@@ -47,15 +47,15 @@ function FocusLoaderContent({ reduceMotion }: { reduceMotion: boolean }) {
         setLineIndex((prev) => {
           if (prev >= LOADING_LINES.length - 1) return prev;
           const next = prev + 1;
-          // Subsequent lines: 500ms exit + 500ms entrance + 1500ms hold = 2500ms
-          scheduleNext(2500);
+          // Subsequent lines: 300ms exit + 300ms entrance + 1500ms hold = 2100ms
+          scheduleNext(2100);
           return next;
         });
       }, delayMs);
     };
 
-    // First line starts its exit after 0.5s entrance + 1.5s hold = 2000ms
-    scheduleNext(2000);
+    // First line starts its exit after 0.3s entrance + 1.5s hold = 1800ms
+    scheduleNext(1800);
 
     return () => clearTimeout(timeoutId);
   }, [showText, reduceMotion]);
@@ -65,7 +65,7 @@ function FocusLoaderContent({ reduceMotion }: { reduceMotion: boolean }) {
     animate: {
       opacity: 1,
       transition: {
-        duration: reduceMotion ? 0 : 1.5,
+        duration: reduceMotion ? 0 : 0.2,
         ease: CALM_EASE,
       },
     },
@@ -81,21 +81,21 @@ function FocusLoaderContent({ reduceMotion }: { reduceMotion: boolean }) {
   const lineVariants = {
     initial: {
       opacity: 0,
-      filter: reduceMotion ? 'none' : 'blur(10px)',
+      filter: reduceMotion ? 'none' : 'blur(4px)',
     },
     animate: {
       opacity: 1,
       filter: 'blur(0px)',
       transition: {
-        duration: reduceMotion ? 0 : 0.5,
+        duration: reduceMotion ? 0 : 0.3,
         ease: CALM_EASE,
       },
     },
     exit: {
       opacity: 0,
-      filter: reduceMotion ? 'none' : 'blur(10px)',
+      filter: reduceMotion ? 'none' : 'blur(4px)',
       transition: {
-        duration: reduceMotion ? 0 : 0.5,
+        duration: reduceMotion ? 0 : 0.3,
         ease: CALM_EASE,
       },
     },
