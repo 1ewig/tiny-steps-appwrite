@@ -249,7 +249,7 @@ export function TaskCard({
                       className="overflow-hidden"
                     >
                       {/* Spacing lives inside the animated height so nothing outside it changes at mount/unmount */}
-                      <div className="pt-5">
+                      <div className="pt-5 pb-1">
                         <div className="pt-4 border-t border-border-subtle space-y-3">
                           <motion.div
                             variants={reduceMotion ? undefined : subStepItemVariants}
@@ -273,7 +273,7 @@ export function TaskCard({
                                   animate="rest"
                                   whileHover={reduceMotion ? undefined : 'hover'}
                                   whileTap={reduceMotion ? undefined : 'tap'}
-                                  className="relative flex items-center justify-between gap-3 p-1.5 rounded-xl hover:z-10 hover:bg-surface-subtle/50 transition-colors group cursor-pointer"
+                                  className="relative flex items-center justify-between gap-3 p-1.5 rounded-xl hover:z-10 transition-colors group cursor-pointer"
                                   onClick={() => onToggleSubStep?.(nowStep.id, sub.id)}
                                 >
                                   <div className="flex items-center gap-2.5 min-w-0 flex-1">
@@ -379,10 +379,15 @@ export function TaskCard({
           <div className="space-y-2.5">
             {nextSteps.length > 0 ? (
               nextSteps.map((st) => (
-                <div
+                <motion.div
                   key={st.id}
                   onClick={() => setSelectedStepId(st.id)}
-                  className="group rounded-2xl p-4 bg-surface border border-border-subtle/80 hover:border-accent/40 shadow-subtle hover:shadow-card cursor-pointer transition-all duration-fast future-step-blur"
+                  variants={reduceMotion ? undefined : tactileButtonVariants}
+                  initial="rest"
+                  animate="rest"
+                  whileHover={reduceMotion ? undefined : 'hover'}
+                  whileTap={reduceMotion ? undefined : 'tap'}
+                  className="group relative rounded-2xl p-4 bg-surface border border-border-subtle/80 hover:border-accent/40 shadow-subtle hover:shadow-card hover:z-10 cursor-pointer transition-[border-color,box-shadow] duration-fast future-step-blur"
                   title="Click to switch to this step"
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -395,7 +400,7 @@ export function TaskCard({
                       </span>
                     )}
                   </div>
-                </div>
+                </motion.div>
               ))
             ) : (
               <div className="p-4 rounded-2xl border border-dashed border-border-subtle/60 text-center">
@@ -424,14 +429,19 @@ export function TaskCard({
               <ul className="space-y-1.5">
                 {laterSteps.map((st) => (
                   <li key={st.id}>
-                    <button
+                    <motion.button
                       type="button"
                       onClick={() => setSelectedStepId(st.id)}
-                      className="w-full text-left text-xs text-text-tertiary hover:text-text-primary transition-colors py-1 cursor-pointer truncate block"
+                      variants={reduceMotion ? undefined : tactileButtonVariants}
+                      initial="rest"
+                      animate="rest"
+                      whileHover={reduceMotion ? undefined : 'hover'}
+                      whileTap={reduceMotion ? undefined : 'tap'}
+                      className="relative w-full text-left text-xs text-text-tertiary hover:text-text-primary hover:z-10 transition-colors py-1 cursor-pointer truncate block"
                       title="Click to bring this to Now"
                     >
                       · {st.text}
-                    </button>
+                    </motion.button>
                   </li>
                 ))}
               </ul>
@@ -442,15 +452,25 @@ export function TaskCard({
             {/* Completed Tasks — Collapsed Pill Summary */}
             {completedSteps.length > 0 && (
               <div className="pt-3 border-t border-border-subtle/60 space-y-2">
-                <button
+                <motion.button
                   type="button"
                   onClick={() => setShowCompleted(!showCompleted)}
-                  className="text-2xs font-medium text-text-tertiary hover:text-text-secondary flex items-center gap-1.5 transition-colors cursor-pointer select-none"
+                  variants={reduceMotion ? undefined : tactileButtonVariants}
+                  initial="rest"
+                  animate="rest"
+                  whileHover={reduceMotion ? undefined : 'hover'}
+                  whileTap={reduceMotion ? undefined : 'tap'}
+                  className="relative text-2xs font-medium text-text-tertiary hover:text-text-secondary flex items-center gap-1.5 hover:z-10 transition-colors cursor-pointer select-none"
                 >
-                  <Check size={11} weight="bold" className="text-accent shrink-0" />
+                  <motion.span
+                    variants={reduceMotion ? undefined : tactileIconVariants}
+                    className="inline-flex shrink-0"
+                  >
+                    <Check size={11} weight="bold" className="text-accent" />
+                  </motion.span>
                   <span>{completedSteps.length} finished</span>
                   <span className="text-3xs opacity-60">({showCompleted ? 'hide' : 'view'})</span>
-                </button>
+                </motion.button>
 
                 <AnimatePresence>
                   {showCompleted && (
@@ -458,19 +478,29 @@ export function TaskCard({
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="space-y-1.5 pt-1 overflow-hidden"
+                      className="space-y-1.5 px-1 pt-1 pb-1 overflow-hidden"
                     >
                       {completedSteps.map((st) => (
                         <li key={st.id}>
-                          <button
+                          <motion.button
                             type="button"
                             onClick={() => onToggleStep(st.id)}
-                            className="w-full text-left text-xs line-through text-text-tertiary hover:text-text-secondary flex items-center gap-1.5 transition-colors cursor-pointer truncate"
+                            variants={reduceMotion ? undefined : tactileButtonVariants}
+                            initial="rest"
+                            animate="rest"
+                            whileHover={reduceMotion ? undefined : 'hover'}
+                            whileTap={reduceMotion ? undefined : 'tap'}
+                            className="relative w-full text-left text-xs line-through text-text-tertiary hover:text-text-secondary hover:z-10 flex items-center gap-1.5 transition-colors cursor-pointer truncate"
                             title="Click to restore"
                           >
-                            <Check size={10} weight="bold" className="text-accent/60 shrink-0" />
+                            <motion.span
+                              variants={reduceMotion ? undefined : tactileIconVariants}
+                              className="inline-flex shrink-0"
+                            >
+                              <Check size={10} weight="bold" className="text-accent/60" />
+                            </motion.span>
                             <span className="truncate">{st.text}</span>
-                          </button>
+                          </motion.button>
                         </li>
                       ))}
                     </motion.ul>
