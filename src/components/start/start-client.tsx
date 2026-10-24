@@ -11,8 +11,8 @@ import { EnergySelector } from '@/components/start/energy-selector';
 import { ChatInput } from '@/components/shared/chat-input';
 import {
   tactileButtonVariants,
-  startScreenStaggerVariants,
-  heroItemEntranceVariants,
+  staggerRelaxedVariants,
+  unblurFadeInVariants,
 } from '@/constants/animation';
 
 export function StartClient() {
@@ -30,14 +30,14 @@ export function StartClient() {
     <main className="flex-1 flex flex-col items-center justify-between px-4 sm:px-6 py-6 sm:py-8 overflow-y-auto">
       <motion.div
         key={pathname}
-        variants={reduceMotion ? undefined : startScreenStaggerVariants}
+        variants={reduceMotion ? undefined : staggerRelaxedVariants}
         initial="initial"
         animate="animate"
         className="w-full max-w-2xl mx-auto my-auto space-y-6"
       >
         <HeroWelcome />
         <div className="space-y-4">
-          <motion.div variants={reduceMotion ? undefined : heroItemEntranceVariants}>
+          <motion.div variants={reduceMotion ? undefined : unblurFadeInVariants}>
             <ChatInput
               key={restoreText ?? 'fresh'}
               disabled={isGeneratingTask}
@@ -54,7 +54,7 @@ export function StartClient() {
               {error}
             </p>
           )}
-          <motion.div variants={reduceMotion ? undefined : heroItemEntranceVariants}>
+          <motion.div variants={reduceMotion ? undefined : unblurFadeInVariants}>
             <EnergySelector
               currentLevel={displayedGranularity}
               onSelect={setGranularity}

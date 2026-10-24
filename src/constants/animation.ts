@@ -189,42 +189,12 @@ export const fadeInScaleVariants: Variants = {
   },
 };
 
-export const staggerContainerVariants: Variants = {
-  initial: {},
-  animate: {
-    transition: {
-      staggerChildren: 0.05,
-      delayChildren: 0.02,
-    },
-  },
-};
-
 /**
- * Start Screen & Hero Entrance Variants
- * Calming top-to-bottom wave: Icon -> Headline -> Subtitle -> ChatInput -> EnergySelector
- * Combines opacity fade, gentle slide up, and sensory-friendly unblur (6px -> 0px)
+ * Universal Sensory Entrance Variants
+ * Combines opacity fade, gentle slide up (14px), and soft focus unblur (6px -> 0px)
+ * Aligned with Tiny Steps calm curve (--ease-calm)
  */
-export const startScreenStaggerVariants: Variants = {
-  initial: {},
-  animate: {
-    transition: {
-      staggerChildren: 0.12,
-      delayChildren: 0.04,
-    },
-  },
-};
-
-export const heroStaggerContainerVariants: Variants = {
-  initial: {},
-  animate: {
-    transition: {
-      staggerChildren: 0.09,
-      delayChildren: 0.02,
-    },
-  },
-};
-
-export const heroItemEntranceVariants: Variants = {
+export const unblurFadeInVariants: Variants = {
   initial: {
     opacity: 0,
     y: 14,
@@ -242,10 +212,10 @@ export const heroItemEntranceVariants: Variants = {
 };
 
 /**
- * Task Breakdown Workspace Stagger Variants
- * Staggers Guidance Whisper -> Now Hero Card -> Next Queue -> Later Section
+ * Universal Stagger Container Variants
+ * Standard / Balanced (0.08s): Ideal for card groups, column blocks, and content sections
  */
-export const taskWorkspaceStaggerVariants: Variants = {
+export const staggerContainerVariants: Variants = {
   initial: {},
   animate: {
     transition: {
@@ -254,6 +224,26 @@ export const taskWorkspaceStaggerVariants: Variants = {
     },
   },
 };
+
+/**
+ * Relaxed / Page-Level Stagger Variants (0.12s)
+ * Ideal for full-page waterfall entrances
+ */
+export const staggerRelaxedVariants: Variants = {
+  initial: {},
+  animate: {
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.04,
+    },
+  },
+};
+
+// Semantic backwards-compatible aliases
+export const heroItemEntranceVariants = unblurFadeInVariants;
+export const heroStaggerContainerVariants = staggerContainerVariants;
+export const taskWorkspaceStaggerVariants = staggerContainerVariants;
+export const startScreenStaggerVariants = staggerRelaxedVariants;
 
 /**
  * Slide-over Drawer Variants (Right Side)

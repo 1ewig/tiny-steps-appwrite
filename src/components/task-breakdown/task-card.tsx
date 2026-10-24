@@ -8,8 +8,8 @@ import {
   tactileButtonVariants,
   tactileIconVariants,
   tactileCheckboxVariants,
-  taskWorkspaceStaggerVariants,
-  heroItemEntranceVariants,
+  staggerContainerVariants,
+  unblurFadeInVariants,
 } from '@/constants/animation';
 
 interface TaskCardProps {
@@ -64,7 +64,7 @@ export function TaskCard({
 
   return (
     <motion.div
-      variants={reduceMotion ? undefined : taskWorkspaceStaggerVariants}
+      variants={reduceMotion ? undefined : staggerContainerVariants}
       initial="initial"
       animate="animate"
       className="w-full max-w-6xl mx-auto space-y-6"
@@ -72,7 +72,7 @@ export function TaskCard({
       {/* Empathetic Guidance Whisper */}
       {guidanceText && (
         <motion.div
-          variants={reduceMotion ? undefined : heroItemEntranceVariants}
+          variants={reduceMotion ? undefined : unblurFadeInVariants}
           className="text-center max-w-xl mx-auto py-1"
         >
           <p className="text-xs sm:text-sm text-text-tertiary leading-relaxed font-normal">
@@ -97,7 +97,7 @@ export function TaskCard({
             COLUMN 1: NOW (Focused Hero Card)
             ================================================================= */}
         <motion.section
-          variants={reduceMotion ? undefined : heroItemEntranceVariants}
+          variants={reduceMotion ? undefined : unblurFadeInVariants}
           className="lg:col-span-6 xl:col-span-5 space-y-2.5"
         >
           <h2 className="text-2xs font-semibold uppercase tracking-widest text-accent px-1">
@@ -258,7 +258,7 @@ export function TaskCard({
             COLUMN 2: NEXT (Gentle Uncluttered Cards with Future Blur)
             ================================================================= */}
         <motion.section
-          variants={reduceMotion ? undefined : heroItemEntranceVariants}
+          variants={reduceMotion ? undefined : unblurFadeInVariants}
           className="lg:col-span-4 xl:col-span-4 space-y-2.5"
         >
           <div className="flex items-center justify-between px-1">
@@ -305,7 +305,7 @@ export function TaskCard({
             COLUMN 3: LATER & COMPLETED (Quiet Whisper & Collapsed Summary)
             ================================================================= */}
         <motion.section
-          variants={reduceMotion ? undefined : heroItemEntranceVariants}
+          variants={reduceMotion ? undefined : unblurFadeInVariants}
           className="lg:col-span-2 xl:col-span-3 space-y-2.5"
         >
           <div className="flex items-center justify-between px-1">
