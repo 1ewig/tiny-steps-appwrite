@@ -413,4 +413,35 @@ export const subtleMorphVariants: Variants = {
   },
 };
 
+/**
+ * Tranquil Dialog & Confirmation Card Entrance Variants
+ * Subtle micro-scale (0.99 -> 1.0) and 5px vertical glide with zero bouncy overshoot.
+ */
+export const dialogCardVariants: Variants = {
+  initial: {
+    opacity: 0,
+    scale: 0.99,
+    y: 5,
+  },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      duration: 0.22,
+      ease: CALM_EASE,
+    },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.99,
+    y: 3,
+    transition: {
+      duration: 0.16,
+      ease: CALM_EASE,
+    },
+  },
+};
+
+
 

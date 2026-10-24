@@ -14,5 +14,5 @@ export default async function TaskDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return <TaskBreakdownClient sessionId={id} />;
+  return <TaskBreakdownClient taskId={id} />;
 }

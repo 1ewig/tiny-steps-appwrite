@@ -18,13 +18,13 @@ import {
 export function StartClient() {
   const hasHydrated = useHydrated();
   const pathname = usePathname();
-  const { granularity, setGranularity, sessions, openHistory } = useTaskStore();
+  const { granularity, setGranularity, tasks, openHistory } = useTaskStore();
   const { startTask, isGeneratingTask, error, restoreText } = useStartTask();
   const reduceMotion = useReducedMotion();
 
   const displayedGranularity = hasHydrated ? granularity : 2;
   const hasSavedTasks =
-    hasHydrated && sessions.some((s) => s.messages && s.messages.length > 0);
+    hasHydrated && tasks.some((t) => t.steps && t.steps.length > 0);
 
   return (
     <motion.main

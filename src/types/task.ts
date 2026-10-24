@@ -1,4 +1,5 @@
-export type GranularityLevel = 1 | 2 | 3;
+export type EnergyLevel = 1 | 2 | 3;
+export type GranularityLevel = EnergyLevel; // Backward-compatibility alias
 
 export interface Step {
   id: number;
@@ -6,42 +7,54 @@ export interface Step {
   effort?: string;
   hint?: string;
   completed: boolean;
+  completedAt?: number;
   canSplit: boolean;
   subSteps?: Step[];
 }
 
-export interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant';
-  text: string;
-  timestamp: number;
-  steps?: Step[];
-}
+export type MicroStep = Step;
 
-export interface ChatSession {
+export interface Task {
   id: string;
   title: string;
+  prompt: string;
+  guidance: string;
+  energyLevel: EnergyLevel;
   createdAt: number;
-  messages: ChatMessage[];
+  updatedAt: number;
+  steps: Step[];
 }
+
+// Backward-compatibility aliases during transition
+export type ChatSession = Task;
 
 export interface TaskState {
   // State
-  sessions: ChatSession[];
-  granularity: GranularityLevel;
+  tasks: Task[];
+  granularity: EnergyLevel;
   peekFuture: boolean;
-  focusTunnelSessionId: string | null;
+  focusTunnelTaskId: string | null;
   isGeneratingTask: boolean;
   isHistoryOpen: boolean;
   theme: 'light' | 'dark';
 
-  // Actions
-  createNewSession: (title?: string) => string;
-  setSessionTitle: (sessionId: string, title: string) => void;
-  deleteSession: (sessionId: string) => void;
-  setGranularity: (level: GranularityLevel) => void;
+  // Task Actions
+  createTask: (params: {
+    title?: string;
+    prompt: string;
+    guidance?: string;
+    steps?: Step[];
+    energyLevel?: EnergyLevel;
+  }) => string;
+  setTaskTitle: (taskId: string, title: string) => void;
+  updateTask: (
+    taskId: string,
+    updates: { title?: string; guidance?: string; steps?: Step[] }
+  ) => void;
+  deleteTask: (taskId: string) => void;
+  setGranularity: (level: EnergyLevel) => void;
   togglePeek: () => void;
-  openFocusTunnel: (sessionId: string) => void;
+  openFocusTunnel: (taskId: string) => void;
   closeFocusTunnel: () => void;
   setGeneratingTask: (isGenerating: boolean) => void;
   openHistory: () => void;
@@ -49,19 +62,17 @@ export interface TaskState {
   toggleHistory: () => void;
   toggleTheme: () => void;
 
-  // Chat & Step Actions
-  addMessage: (sessionId: string, message: Omit<ChatMessage, 'id' | 'timestamp'>) => void;
-  updateAssistantMessage: (
-    sessionId: string,
-    messageId: string,
-    updates: { text?: string; steps?: Step[] }
-  ) => void;
-  toggleStepCompletion: (sessionId: string, messageId: string, stepId: number) => void;
+  // Step Actions (Clean 2-level addressing: taskId + stepId)
+  toggleStepCompletion: (taskId: string, stepId: number) => void;
   toggleSubStepCompletion: (
-    sessionId: string,
-    messageId: string,
+    taskId: string,
     parentStepId: number,
     subStepId: number
   ) => void;
-  shrinkStep: (sessionId: string, messageId: string, stepIndex: number, subSteps?: Step[]) => void;
+  shrinkStep: (taskId: string, stepIndex: number, subSteps?: Step[]) => void;
+
+  // Compatibility aliases
+  sessions?: Task[];
+  focusTunnelSessionId?: string | null;
+  deleteSession?: (sessionId: string) => void;
 }

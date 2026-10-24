@@ -1,8 +1,8 @@
 'use client';
 
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import type { ChatSession } from '@/types/task';
-import { getSessionSteps, formatSessionDate } from '@/lib/session-utils';
+import type { Task } from '@/types/task';
+import { formatTaskDate } from '@/lib/task-utils';
 import { useHistoryDrawer } from '@/hooks/use-history-drawer';
 import { AppIcon } from '@/components/shared/app-icon';
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
@@ -23,26 +23,26 @@ import {
 
 interface HistoryDrawerProps {
   isOpen: boolean;
-  sessions: ChatSession[];
-  currentSessionId: string | null;
+  tasks: Task[];
+  currentTaskId: string | null;
   onClose: () => void;
-  onSelectSession: (sessionId: string) => void;
-  onDeleteSession: (sessionId: string) => void;
+  onSelectTask: (taskId: string) => void;
+  onDeleteTask: (taskId: string) => void;
 }
 
 export function HistoryDrawer({
   isOpen,
-  sessions,
-  currentSessionId,
+  tasks,
+  currentTaskId,
   onClose,
-  onSelectSession,
-  onDeleteSession,
+  onSelectTask,
+  onDeleteTask,
 }: HistoryDrawerProps) {
   const reduceMotion = useReducedMotion();
 
   const {
-    validSessions,
-    sessionToDelete,
+    validTasks,
+    taskToDelete,
     panelRef,
     closeButtonRef,
     handlePanelKeyDown,
@@ -52,9 +52,9 @@ export function HistoryDrawer({
     handleClose,
   } = useHistoryDrawer({
     isOpen,
-    sessions,
+    tasks,
     onClose,
-    onDeleteSession,
+    onDeleteTask,
   });
 
   return (
@@ -99,9 +99,9 @@ export function HistoryDrawer({
                     <span className="font-bold text-sm tracking-tight text-text-primary">
                       Task history
                     </span>
-                    {validSessions.length > 0 && (
+                    {validTasks.length > 0 && (
                       <span className="px-2 py-0.5 rounded-full text-2xs font-semibold bg-surface-subtle text-text-secondary border border-border-subtle">
-                        {validSessions.length}
+                        {validTasks.length}
                       </span>
                     )}
                   </div>
@@ -128,9 +128,9 @@ export function HistoryDrawer({
                 </motion.button>
               </div>
 
-              {/* Middle: Saved Sessions List */}
+              {/* Middle: Saved Tasks List */}
               <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-5 space-y-2.5">
-                {validSessions.length === 0 ? (
+                {validTasks.length === 0 ? (
                   <div className="py-12 px-4 text-center space-y-3">
                     <div className="w-12 h-12 mx-auto rounded-2xl bg-surface-subtle text-text-tertiary flex items-center justify-center shadow-subtle">
                       <ClockCounterClockwise size={22} weight="regular" />
@@ -146,11 +146,11 @@ export function HistoryDrawer({
                   </div>
                 ) : (
                   <AnimatePresence initial={false}>
-                    {validSessions.map((sess) => {
+                    {validTasks.map((task) => {
                       const isCurrent = Boolean(
-                        currentSessionId && sess.id === currentSessionId
+                        currentTaskId && task.id === currentTaskId
                       );
-                      const steps = getSessionSteps(sess);
+                      const steps = task.steps;
                       const totalSteps = steps.length;
                       const completedSteps = steps.filter((s) => s.completed).length;
                       const allCompleted =
@@ -159,11 +159,11 @@ export function HistoryDrawer({
                         totalSteps > 0
                           ? Math.round((completedSteps / totalSteps) * 100)
                           : 0;
-                      const dateLabel = formatSessionDate(sess.createdAt);
+                      const dateLabel = formatTaskDate(task.createdAt);
 
                       return (
                         <motion.div
-                          key={sess.id}
+                          key={task.id}
                           layout
                           initial={reduceMotion ? false : { opacity: 0, y: 6 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -183,10 +183,10 @@ export function HistoryDrawer({
                               : 'bg-surface hover:bg-surface-subtle/90 text-text-primary border-border-subtle hover:border-border-muted'
                           }`}
                         >
-                          {/* Main interactive area for selecting the session */}
+                          {/* Main interactive area for selecting the task */}
                           <button
                             type="button"
-                            onClick={() => onSelectSession(sess.id)}
+                            onClick={() => onSelectTask(task.id)}
                             aria-current={isCurrent ? 'true' : undefined}
                             className="min-w-0 flex-1 text-left flex items-start gap-2.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-lg"
                           >
@@ -214,7 +214,7 @@ export function HistoryDrawer({
                             <div className="min-w-0 flex-1 space-y-1">
                               <div className="flex items-center gap-1.5 justify-between pr-1">
                                 <p className="text-xs font-semibold text-text-primary truncate leading-snug">
-                                  {sess.title || 'Untitled task'}
+                                  {task.title || 'Untitled task'}
                                 </p>
                                 {isCurrent && (
                                   <span className="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-accent text-text-inverse tracking-wide uppercase shadow-subtle">
@@ -230,9 +230,7 @@ export function HistoryDrawer({
                                     ? allCompleted
                                       ? 'All steps done'
                                       : `${completedSteps} of ${totalSteps} done`
-                                    : `${sess.messages.length} message${
-                                        sess.messages.length > 1 ? 's' : ''
-                                      }`}
+                                    : 'No steps yet'}
                                 </span>
 
                                 {dateLabel && (
@@ -255,14 +253,14 @@ export function HistoryDrawer({
                             </div>
                           </button>
 
-                          {/* Delete Session Button: Native part of task card, no separate hover animation, tactile tap feedback preserved */}
+                          {/* Delete Task Button: Native part of task card, tactile tap feedback preserved */}
                           <motion.button
                             type="button"
-                            onClick={(e) => handleRequestDelete(e, sess)}
+                            onClick={(e) => handleRequestDelete(e, task)}
                             whileTap={reduceMotion ? undefined : { scale: 0.88 }}
                             className="shrink-0 p-1.5 rounded-lg text-text-tertiary hover:text-danger-text hover:bg-danger-subtle transition-colors duration-fast cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger"
-                            title={`Delete "${sess.title || 'task'}"`}
-                            aria-label={`Delete "${sess.title || 'task'}"`}
+                            title={`Delete "${task.title || 'task'}"`}
+                            aria-label={`Delete "${task.title || 'task'}"`}
                           >
                             <Trash size={15} weight="regular" />
                           </motion.button>
@@ -293,14 +291,14 @@ export function HistoryDrawer({
 
       {/* Reusable ConfirmDialog wired to Task Deletion */}
       <ConfirmDialog
-        isOpen={Boolean(sessionToDelete)}
+        isOpen={Boolean(taskToDelete)}
         title="Delete this task?"
         description={
-          sessionToDelete ? (
+          taskToDelete ? (
             <span>
               Are you sure you want to delete{' '}
               <strong className="text-text-primary font-semibold">
-                “{sessionToDelete.title}”
+                “{taskToDelete.title}”
               </strong>
               ? Its step breakdown and progress will be permanently removed from this device.
             </span>

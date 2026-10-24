@@ -1,55 +1,80 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { TaskState, ChatSession, GranularityLevel, Step } from '@/types/task';
+import type { TaskState, Task, EnergyLevel, Step } from '@/types/task';
 import { generateMicroSteps } from '@/lib/assistant-engine';
 
 export const useTaskStore = create<TaskState>()(
   persist(
     (set) => ({
-      sessions: [],
+      tasks: [],
       granularity: 2,
       peekFuture: false,
-      focusTunnelSessionId: null,
+      focusTunnelTaskId: null,
       isGeneratingTask: false,
       isHistoryOpen: false,
       theme: 'light',
 
-      createNewSession: (title = 'New gentle task') => {
-        const newId = 'session_' + Date.now();
-        const newSession: ChatSession = {
+      createTask: ({
+        title,
+        prompt,
+        guidance = '',
+        steps = [],
+        energyLevel = 2,
+      }) => {
+        const newId = 'task_' + Date.now();
+        const cleanTitle =
+          title || (prompt.length > 28 ? prompt.substring(0, 25) + '...' : prompt) || 'New gentle task';
+
+        const newTask: Task = {
           id: newId,
-          title,
+          title: cleanTitle,
+          prompt,
+          guidance,
+          energyLevel,
           createdAt: Date.now(),
-          messages: [],
+          updatedAt: Date.now(),
+          steps,
         };
 
         set((state) => ({
-          sessions: [newSession, ...state.sessions],
+          tasks: [newTask, ...state.tasks],
         }));
 
         return newId;
       },
 
-      setSessionTitle: (sessionId: string, title: string) => {
+      setTaskTitle: (taskId: string, title: string) => {
         set((state) => ({
-          sessions: state.sessions.map((sess) =>
-            sess.id === sessionId ? { ...sess, title } : sess
+          tasks: state.tasks.map((t) =>
+            t.id === taskId ? { ...t, title, updatedAt: Date.now() } : t
           ),
         }));
       },
 
-      deleteSession: (sessionId: string) => {
-        set((state) => {
-          const filtered = state.sessions.filter((s) => s.id !== sessionId);
-          return {
-            sessions: filtered,
-            focusTunnelSessionId:
-              state.focusTunnelSessionId === sessionId ? null : state.focusTunnelSessionId,
-          };
-        });
+      updateTask: (taskId, updates) => {
+        set((state) => ({
+          tasks: state.tasks.map((t) => {
+            if (t.id !== taskId) return t;
+            return {
+              ...t,
+              title: updates.title !== undefined ? updates.title : t.title,
+              guidance: updates.guidance !== undefined ? updates.guidance : t.guidance,
+              steps: updates.steps !== undefined ? updates.steps : t.steps,
+              updatedAt: Date.now(),
+            };
+          }),
+        }));
       },
 
-      setGranularity: (level: GranularityLevel) => {
+      deleteTask: (taskId: string) => {
+        set((state) => ({
+          tasks: state.tasks.filter((t) => t.id !== taskId),
+          focusTunnelTaskId:
+            state.focusTunnelTaskId === taskId ? null : state.focusTunnelTaskId,
+        }));
+      },
+
+      setGranularity: (level: EnergyLevel) => {
         set({ granularity: level });
       },
 
@@ -57,12 +82,12 @@ export const useTaskStore = create<TaskState>()(
         set((state) => ({ peekFuture: !state.peekFuture }));
       },
 
-      openFocusTunnel: (sessionId: string) => {
-        set({ focusTunnelSessionId: sessionId });
+      openFocusTunnel: (taskId: string) => {
+        set({ focusTunnelTaskId: taskId });
       },
 
       closeFocusTunnel: () => {
-        set({ focusTunnelSessionId: null });
+        set({ focusTunnelTaskId: null });
       },
 
       setGeneratingTask: (isGenerating: boolean) => {
@@ -87,133 +112,75 @@ export const useTaskStore = create<TaskState>()(
         }));
       },
 
-      addMessage: (sessionId: string, message) => {
-        set((state) => {
-          const sessions = state.sessions.map((sess) => {
-            if (sess.id !== sessionId) return sess;
-
-            const fullMessage = {
-              ...message,
-              id: 'msg_' + Date.now() + Math.random().toString(36).slice(2, 6),
-              timestamp: Date.now(),
-            };
-
-            const updatedMessages = [...sess.messages, fullMessage];
-            // Auto update session title from first user prompt
-            let updatedTitle = sess.title;
-            if (
-              sess.messages.length === 0 &&
-              message.role === 'user' &&
-              sess.title === 'New gentle task'
-            ) {
-              updatedTitle = message.text.length > 28 ? message.text.substring(0, 25) + '...' : message.text;
-            }
-
-            return {
-              ...sess,
-              title: updatedTitle,
-              messages: updatedMessages,
-            };
-          });
-
-          return { sessions };
-        });
-      },
-
-      updateAssistantMessage: (sessionId, messageId, updates) => {
-        set((state) => {
-          const sessions = state.sessions.map((sess) => {
-            if (sess.id !== sessionId) return sess;
-            const messages = sess.messages.map((msg) => {
-              if (msg.id !== messageId) return msg;
+      toggleStepCompletion: (taskId: string, stepId: number) => {
+        set((state) => ({
+          tasks: state.tasks.map((task) => {
+            if (task.id !== taskId) return task;
+            const updatedSteps = task.steps.map((st) => {
+              if (st.id !== stepId) return st;
+              const nextCompleted = !st.completed;
+              const subSteps = st.subSteps?.map((sub) => ({ ...sub, completed: nextCompleted }));
               return {
-                ...msg,
-                text: updates.text !== undefined ? updates.text : msg.text,
-                steps: updates.steps !== undefined ? updates.steps : msg.steps,
+                ...st,
+                completed: nextCompleted,
+                completedAt: nextCompleted ? Date.now() : undefined,
+                subSteps,
               };
             });
-            return { ...sess, messages };
-          });
-          return { sessions };
-        });
-      },
-
-      toggleStepCompletion: (sessionId: string, messageId: string, stepId: number) => {
-        set((state) => {
-          const sessions = state.sessions.map((sess) => {
-            if (sess.id !== sessionId) return sess;
-            const messages = sess.messages.map((msg) => {
-              if (msg.id !== messageId || !msg.steps) return msg;
-              const steps = msg.steps.map((st) => {
-                if (st.id !== stepId) return st;
-                const nextCompleted = !st.completed;
-                const subSteps = st.subSteps?.map((sub) => ({ ...sub, completed: nextCompleted }));
-                return { ...st, completed: nextCompleted, subSteps };
-              });
-              return { ...msg, steps };
-            });
-            return { ...sess, messages };
-          });
-          return { sessions };
-        });
+            return { ...task, steps: updatedSteps, updatedAt: Date.now() };
+          }),
+        }));
       },
 
       toggleSubStepCompletion: (
-        sessionId: string,
-        messageId: string,
+        taskId: string,
         parentStepId: number,
         subStepId: number
       ) => {
-        set((state) => {
-          const sessions = state.sessions.map((sess) => {
-            if (sess.id !== sessionId) return sess;
-            const messages = sess.messages.map((msg) => {
-              if (msg.id !== messageId || !msg.steps) return msg;
-              const steps = msg.steps.map((st) => {
-                if (st.id !== parentStepId || !st.subSteps) return st;
-                const subSteps = st.subSteps.map((sub) =>
-                  sub.id === subStepId ? { ...sub, completed: !sub.completed } : sub
-                );
-                return { ...st, subSteps };
-              });
-              return { ...msg, steps };
+        set((state) => ({
+          tasks: state.tasks.map((task) => {
+            if (task.id !== taskId) return task;
+            const updatedSteps = task.steps.map((st) => {
+              if (st.id !== parentStepId || !st.subSteps) return st;
+              const updatedSubSteps = st.subSteps.map((sub) =>
+                sub.id === subStepId
+                  ? {
+                      ...sub,
+                      completed: !sub.completed,
+                      completedAt: !sub.completed ? Date.now() : undefined,
+                    }
+                  : sub
+              );
+              return { ...st, subSteps: updatedSubSteps };
             });
-            return { ...sess, messages };
-          });
-          return { sessions };
-        });
+            return { ...task, steps: updatedSteps, updatedAt: Date.now() };
+          }),
+        }));
       },
 
-      shrinkStep: (sessionId: string, messageId: string, stepIndex: number, subSteps?: Step[]) => {
-        set((state) => {
-          const sessions = state.sessions.map((sess) => {
-            if (sess.id !== sessionId) return sess;
-            const messages = sess.messages.map((msg) => {
-              if (msg.id !== messageId || !msg.steps || !msg.steps[stepIndex]) return msg;
-              const original = msg.steps[stepIndex];
-              const microSteps = subSteps ?? generateMicroSteps(original.text);
+      shrinkStep: (taskId: string, stepIndex: number, subSteps?: Step[]) => {
+        set((state) => ({
+          tasks: state.tasks.map((task) => {
+            if (task.id !== taskId || !task.steps[stepIndex]) return task;
+            const original = task.steps[stepIndex];
+            const microSteps = subSteps ?? generateMicroSteps(original.text);
 
-              // Keep parent step as container, nest micro-steps directly within it
-              const updatedSteps = [...msg.steps];
-              updatedSteps[stepIndex] = {
-                ...original,
-                subSteps: microSteps,
-                canSplit: false,
-              };
-              return { ...msg, steps: updatedSteps };
-            });
-            return { ...sess, messages };
-          });
-          return { sessions };
-        });
+            const updatedSteps = [...task.steps];
+            updatedSteps[stepIndex] = {
+              ...original,
+              subSteps: microSteps,
+              canSplit: false,
+            };
+            return { ...task, steps: updatedSteps, updatedAt: Date.now() };
+          }),
+        }));
       },
-
     }),
     {
       name: 'tinysteps_zustand_store',
       storage: createJSONStorage(() => (typeof window !== 'undefined' ? localStorage : dummyStorage)),
       partialize: (state) => ({
-        sessions: state.sessions,
+        tasks: state.tasks,
         granularity: state.granularity,
         peekFuture: state.peekFuture,
         theme: state.theme,
@@ -224,15 +191,44 @@ export const useTaskStore = create<TaskState>()(
         }
       },
       merge: (persistedState, currentState) => {
-        const state = persistedState as Partial<TaskState> | undefined;
+        const state = persistedState as any;
         if (!state) return currentState;
-        const validSessions = (state.sessions || []).filter(
-          (s) => s.messages && s.messages.length > 0
-        );
+
+        // Backward compatibility migration: convert legacy sessions to tasks if needed
+        let tasks: Task[] = [];
+        if (Array.isArray(state.tasks)) {
+          tasks = state.tasks;
+        } else if (Array.isArray(state.sessions)) {
+          tasks = state.sessions
+            .map((s: any): Task | null => {
+              const latestMsg = [...(s.messages || [])]
+                .reverse()
+                .find((m: any) => m.steps && m.steps.length > 0);
+              const steps = latestMsg?.steps || [];
+              if (steps.length === 0 && (!s.messages || s.messages.length === 0)) return null;
+              const prompt =
+                s.messages?.find((m: any) => m.role === 'user')?.text || s.title || '';
+              const guidance = latestMsg?.text || '';
+              return {
+                id: s.id,
+                title: s.title || 'Untitled task',
+                prompt,
+                guidance,
+                energyLevel: s.energyLevel || state.granularity || 2,
+                createdAt: s.createdAt || Date.now(),
+                updatedAt: s.createdAt || Date.now(),
+                steps,
+              };
+            })
+            .filter(Boolean) as Task[];
+        }
+
+        const validTasks = tasks.filter((t) => t.steps && t.steps.length > 0);
+
         return {
           ...currentState,
           ...state,
-          sessions: validSessions,
+          tasks: validTasks,
         };
       },
     }

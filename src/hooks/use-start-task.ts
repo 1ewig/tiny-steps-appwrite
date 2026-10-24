@@ -26,8 +26,7 @@ export function useStartTask() {
   const {
     granularity,
     isGeneratingTask,
-    createNewSession,
-    addMessage,
+    createTask,
     openFocusTunnel,
     setGeneratingTask,
   } = useTaskStore();
@@ -71,21 +70,16 @@ export function useStartTask() {
         await sleep(MIN_BREAKDOWN_LOADER_MS - elapsed);
       }
 
-      const newSessionId = createNewSession(breakdown.title);
-
-      addMessage(newSessionId, {
-        role: 'user',
-        text: trimmed,
-      });
-
-      addMessage(newSessionId, {
-        role: 'assistant',
-        text: breakdown.dialogue,
+      const newTaskId = createTask({
+        title: breakdown.title,
+        prompt: trimmed,
+        guidance: breakdown.dialogue,
         steps: breakdown.steps,
+        energyLevel: granularity,
       });
 
-      openFocusTunnel(newSessionId);
-      router.push(`/tasks/${newSessionId}`);
+      openFocusTunnel(newTaskId);
+      router.push(`/tasks/${newTaskId}`);
     } catch (err) {
       console.error(err);
       setGeneratingTask(false);

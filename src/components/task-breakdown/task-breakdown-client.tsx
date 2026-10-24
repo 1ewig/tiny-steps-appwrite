@@ -5,10 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { useHydrated } from '@/hooks/use-hydrated';
 import { interpretUserIntent } from '@/lib/assistant-engine';
-import {
-  getLatestMessageWithSteps,
-  getSessionSteps,
-} from '@/lib/session-utils';
 import { TaskCard } from '@/components/task-breakdown/task-card';
 import { PeekToggle } from '@/components/task-breakdown/peek-toggle';
 import { ChatInput } from '@/components/shared/chat-input';
@@ -16,33 +12,32 @@ import { FocusLoader } from '@/components/shared/focus-loader';
 import { MagnifyingGlass } from '@phosphor-icons/react';
 
 interface TaskBreakdownClientProps {
-  sessionId: string;
+  taskId?: string;
+  sessionId?: string; // Backward compatibility
 }
 
-export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
+export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientProps) {
   const router = useRouter();
   const [isTyping, setIsTyping] = useState(false);
   const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const activeId = taskId || sessionId || '';
   const hasHydrated = useHydrated();
 
   const {
-    sessions,
+    tasks,
     granularity,
     peekFuture,
     togglePeek,
-    focusTunnelSessionId,
-    addMessage,
-    updateAssistantMessage,
-    setSessionTitle,
+    focusTunnelTaskId,
+    updateTask,
     toggleStepCompletion,
     toggleSubStepCompletion,
     shrinkStep,
   } = useTaskStore();
 
-
-  const currentSession = sessions.find((s) => s.id === sessionId);
-  const focusTunnelOpen = focusTunnelSessionId === sessionId;
+  const currentTask = tasks.find((t) => t.id === activeId);
+  const focusTunnelOpen = focusTunnelTaskId === activeId;
 
   // Cleanup typing timer on unmount
   useEffect(() => {
@@ -53,13 +48,11 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
     };
   }, []);
 
-  // Latest message with steps
-  const latestMessageWithSteps = getLatestMessageWithSteps(currentSession);
-  const steps = getSessionSteps(currentSession);
+  const steps = currentTask?.steps ?? [];
 
-  // Handle User Message Submission (Tweaking / Venting)
+  // Handle User Message Submission (Tweaking / Venting on the Living Card)
   const handleSendMessage = (text: string) => {
-    if (!currentSession) return;
+    if (!currentTask) return;
 
     setIsTyping(true);
 
@@ -73,50 +66,38 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
 
       const intent = interpretUserIntent(text, steps, granularity);
 
-      if (latestMessageWithSteps) {
-        if (intent.type === 'complete_step') {
-          toggleStepCompletion(currentSession.id, latestMessageWithSteps.id, intent.targetStepId);
-          updateAssistantMessage(currentSession.id, latestMessageWithSteps.id, {
-            text: intent.dialogue,
-          });
-        } else if (intent.type === 'shrink_step') {
-          shrinkStep(currentSession.id, latestMessageWithSteps.id, intent.targetStepIndex, intent.microSteps);
-          updateAssistantMessage(currentSession.id, latestMessageWithSteps.id, {
-            text: intent.dialogue,
-          });
-        } else if (intent.type === 'all_complete') {
-          updateAssistantMessage(currentSession.id, latestMessageWithSteps.id, {
-            text: intent.dialogue,
-          });
-        } else if (intent.type === 'new_task') {
-          const existingCompleted = (latestMessageWithSteps.steps || []).filter((s) => s.completed);
-          const combinedSteps = [
-            ...existingCompleted,
-            ...intent.steps.map((st, i) => ({ ...st, id: Date.now() + i, completed: false })),
-          ];
-          const dialogue =
-            existingCompleted.length > 0
-              ? `${intent.dialogue}\n\nI kept your ${existingCompleted.length} completed step${
-                  existingCompleted.length > 1 ? 's' : ''
-                } and adjusted the rest.`
-              : intent.dialogue;
+      if (intent.type === 'complete_step') {
+        toggleStepCompletion(currentTask.id, intent.targetStepId);
+        updateTask(currentTask.id, {
+          guidance: intent.dialogue,
+        });
+      } else if (intent.type === 'shrink_step') {
+        shrinkStep(currentTask.id, intent.targetStepIndex, intent.microSteps);
+        updateTask(currentTask.id, {
+          guidance: intent.dialogue,
+        });
+      } else if (intent.type === 'all_complete') {
+        updateTask(currentTask.id, {
+          guidance: intent.dialogue,
+        });
+      } else if (intent.type === 'new_task') {
+        const existingCompleted = steps.filter((s) => s.completed);
+        const combinedSteps = [
+          ...existingCompleted,
+          ...intent.steps.map((st, i) => ({ ...st, id: Date.now() + i, completed: false })),
+        ];
+        const dialogue =
+          existingCompleted.length > 0
+            ? `${intent.dialogue}\n\nI kept your ${existingCompleted.length} completed step${
+                existingCompleted.length > 1 ? 's' : ''
+              } and adjusted the rest.`
+            : intent.dialogue;
 
-          if (intent.title) {
-            setSessionTitle(currentSession.id, intent.title);
-          }
-
-          // Single Living Task Card: Mutate existing card text and steps in-place
-          updateAssistantMessage(currentSession.id, latestMessageWithSteps.id, {
-            text: dialogue,
-            steps: combinedSteps,
-          });
-        }
-      } else {
-        const initialSteps = intent.type === 'new_task' ? intent.steps : [];
-        addMessage(currentSession.id, {
-          role: 'assistant',
-          text: intent.dialogue,
-          steps: initialSteps,
+        // Single Living Task Card: Mutate existing card guidance and steps in-place
+        updateTask(currentTask.id, {
+          title: intent.title || currentTask.title,
+          guidance: dialogue,
+          steps: combinedSteps,
         });
       }
     }, 600);
@@ -131,8 +112,8 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
     );
   }
 
-  // Missing Session Fallback (Header & Sidebar stay in static layout!)
-  if (!currentSession) {
+  // Missing Task Fallback (Header & Sidebar stay in static layout!)
+  if (!currentTask) {
     return (
       <main className="flex-1 flex flex-col items-center justify-center px-4 text-center space-y-4">
         <div className="w-12 h-12 rounded-2xl bg-surface-subtle text-text-tertiary flex items-center justify-center shadow-subtle">
@@ -160,28 +141,21 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
       <main className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 scroll-smooth">
         <div className="w-full max-w-6xl mx-auto space-y-6 pb-28">
           <TaskCard
-            guidanceText={latestMessageWithSteps?.text}
+            guidanceText={currentTask.guidance}
             steps={steps}
             isAdjusting={isTyping}
             onToggleStep={(stepId) => {
-              if (latestMessageWithSteps) {
-                toggleStepCompletion(currentSession.id, latestMessageWithSteps.id, stepId);
-              }
+              toggleStepCompletion(currentTask.id, stepId);
             }}
             onShrinkStep={(stepIdx) => {
-              if (latestMessageWithSteps) {
-                shrinkStep(currentSession.id, latestMessageWithSteps.id, stepIdx);
-              }
+              shrinkStep(currentTask.id, stepIdx);
             }}
             onToggleSubStep={(parentStepId, subStepId) => {
-              if (latestMessageWithSteps) {
-                toggleSubStepCompletion(
-                  currentSession.id,
-                  latestMessageWithSteps.id,
-                  parentStepId,
-                  subStepId
-                );
-              }
+              toggleSubStepCompletion(
+                currentTask.id,
+                parentStepId,
+                subStepId
+              );
             }}
           />
         </div>
