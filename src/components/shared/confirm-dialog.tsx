@@ -8,8 +8,33 @@ import {
   tactileButtonVariants,
   tactileIconVariants,
   CALM_EASE,
-  CALM_SPRING,
 } from '@/constants/animation';
+
+const subtleDialogVariants = {
+  initial: {
+    opacity: 0,
+    scale: 0.99,
+    y: 5,
+  },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      duration: 0.22,
+      ease: CALM_EASE,
+    },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.99,
+    y: 3,
+    transition: {
+      duration: 0.16,
+      ease: CALM_EASE,
+    },
+  },
+};
 
 export interface ConfirmDialogProps {
   isOpen: boolean;
@@ -144,25 +169,7 @@ export function ConfirmDialog({
               aria-labelledby="confirm-dialog-title"
               aria-describedby={description ? 'confirm-dialog-desc' : undefined}
               tabIndex={-1}
-              variants={
-                reduceMotion
-                  ? undefined
-                  : {
-                      initial: { opacity: 0, scale: 0.95, y: 8 },
-                      animate: {
-                        opacity: 1,
-                        scale: 1,
-                        y: 0,
-                        transition: CALM_SPRING,
-                      },
-                      exit: {
-                        opacity: 0,
-                        scale: 0.96,
-                        y: 4,
-                        transition: { duration: 0.16, ease: CALM_EASE },
-                      },
-                    }
-              }
+              variants={reduceMotion ? undefined : subtleDialogVariants}
               initial="initial"
               animate="animate"
               exit="exit"
