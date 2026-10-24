@@ -56,7 +56,7 @@ export function AppHeader({
             animate="rest"
             whileHover={reduceMotion ? undefined : 'hover'}
             whileTap={reduceMotion ? undefined : 'tap'}
-            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:outline-none"
+            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             title="Return home"
           >
             <motion.span
@@ -80,7 +80,7 @@ export function AppHeader({
             animate="rest"
             whileHover={reduceMotion ? undefined : 'hover'}
             whileTap={reduceMotion ? undefined : 'tap'}
-            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium bg-accent hover:bg-accent-hover text-text-inverse shadow-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:outline-none"
+            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium bg-accent hover:bg-accent-hover text-text-inverse shadow-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             title="Open distraction-free Focus Tunnel"
           >
             <motion.span variants={reduceMotion ? undefined : tactileIconVariants}>
@@ -99,7 +99,7 @@ export function AppHeader({
             animate="rest"
             whileHover={reduceMotion ? undefined : 'hover'}
             whileTap={reduceMotion ? undefined : 'tap'}
-            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:outline-none"
+            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             title="Task history (Ctrl+H)"
             aria-label="Open task history"
           >
