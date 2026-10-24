@@ -242,6 +242,20 @@ export const heroItemEntranceVariants: Variants = {
 };
 
 /**
+ * Task Breakdown Workspace Stagger Variants
+ * Staggers Guidance Whisper -> Now Hero Card -> Next Queue -> Later Section
+ */
+export const taskWorkspaceStaggerVariants: Variants = {
+  initial: {},
+  animate: {
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.02,
+    },
+  },
+};
+
+/**
  * Slide-over Drawer Variants (Right Side)
  */
 export const drawerSlideVariants: Variants = {

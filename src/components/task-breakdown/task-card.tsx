@@ -8,6 +8,8 @@ import {
   tactileButtonVariants,
   tactileIconVariants,
   tactileCheckboxVariants,
+  taskWorkspaceStaggerVariants,
+  heroItemEntranceVariants,
 } from '@/constants/animation';
 
 interface TaskCardProps {
@@ -61,14 +63,22 @@ export function TaskCard({
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-6">
+    <motion.div
+      variants={reduceMotion ? undefined : taskWorkspaceStaggerVariants}
+      initial="initial"
+      animate="animate"
+      className="w-full max-w-6xl mx-auto space-y-6"
+    >
       {/* Empathetic Guidance Whisper */}
       {guidanceText && (
-        <div className="text-center max-w-xl mx-auto py-1">
+        <motion.div
+          variants={reduceMotion ? undefined : heroItemEntranceVariants}
+          className="text-center max-w-xl mx-auto py-1"
+        >
           <p className="text-xs sm:text-sm text-text-tertiary leading-relaxed font-normal">
             {guidanceText}
           </p>
-        </div>
+        </motion.div>
       )}
 
       {/* Adjusting Indicator */}
@@ -86,7 +96,10 @@ export function TaskCard({
         {/* =================================================================
             COLUMN 1: NOW (Focused Hero Card)
             ================================================================= */}
-        <section className="lg:col-span-6 xl:col-span-5 space-y-2.5">
+        <motion.section
+          variants={reduceMotion ? undefined : heroItemEntranceVariants}
+          className="lg:col-span-6 xl:col-span-5 space-y-2.5"
+        >
           <h2 className="text-2xs font-semibold uppercase tracking-widest text-accent px-1">
             Now
           </h2>
@@ -239,12 +252,15 @@ export function TaskCard({
               </motion.article>
             )}
           </AnimatePresence>
-        </section>
+        </motion.section>
 
         {/* =================================================================
             COLUMN 2: NEXT (Gentle Uncluttered Cards with Future Blur)
             ================================================================= */}
-        <section className="lg:col-span-4 xl:col-span-4 space-y-2.5">
+        <motion.section
+          variants={reduceMotion ? undefined : heroItemEntranceVariants}
+          className="lg:col-span-4 xl:col-span-4 space-y-2.5"
+        >
           <div className="flex items-center justify-between px-1">
             <h2 className="text-2xs font-semibold uppercase tracking-widest text-text-tertiary">
               Next
@@ -283,12 +299,15 @@ export function TaskCard({
               </div>
             )}
           </div>
-        </section>
+        </motion.section>
 
         {/* =================================================================
             COLUMN 3: LATER & COMPLETED (Quiet Whisper & Collapsed Summary)
             ================================================================= */}
-        <section className="lg:col-span-2 xl:col-span-3 space-y-2.5">
+        <motion.section
+          variants={reduceMotion ? undefined : heroItemEntranceVariants}
+          className="lg:col-span-2 xl:col-span-3 space-y-2.5"
+        >
           <div className="flex items-center justify-between px-1">
             <h2 className="text-2xs font-semibold uppercase tracking-widest text-text-tertiary">
               Later
@@ -356,8 +375,8 @@ export function TaskCard({
               </div>
             )}
           </div>
-        </section>
+        </motion.section>
       </div>
-    </div>
+    </motion.div>
   );
 }
