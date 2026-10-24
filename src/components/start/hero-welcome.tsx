@@ -13,8 +13,6 @@ export function HeroWelcome() {
   return (
     <motion.div
       variants={reduceMotion ? undefined : staggerContainerVariants}
-      initial="initial"
-      animate="animate"
       className="text-center max-w-xl mx-auto space-y-4"
     >
       <motion.div

@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import type { Step } from '@/types/task';
 import { useTaskCard } from '@/hooks/use-task-card';
-import { staggerContainerVariants, unblurFadeInVariants } from '@/constants/animation';
+import { taskWorkspaceStaggerVariants, unblurFadeInVariants } from '@/constants/animation';
 import { NowCard } from './now-card';
 import { NextCard } from './next-card';
 import { LaterCard } from './later-card';
@@ -75,7 +75,7 @@ export function TaskCard({
 
   return (
     <motion.div
-      variants={reduceMotion ? undefined : staggerContainerVariants}
+      variants={reduceMotion ? undefined : taskWorkspaceStaggerVariants}
       initial="initial"
       animate="animate"
       className="w-full max-w-6xl mx-auto space-y-6"

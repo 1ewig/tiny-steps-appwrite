@@ -234,7 +234,7 @@ export const staggerRelaxedVariants: Variants = {
   animate: {
     transition: {
       staggerChildren: 0.12,
-      delayChildren: 0.04,
+      delayChildren: 0.12,
     },
   },
 };
@@ -242,7 +242,15 @@ export const staggerRelaxedVariants: Variants = {
 // Semantic backwards-compatible aliases
 export const heroItemEntranceVariants = unblurFadeInVariants;
 export const heroStaggerContainerVariants = staggerContainerVariants;
-export const taskWorkspaceStaggerVariants = staggerContainerVariants;
+export const taskWorkspaceStaggerVariants: Variants = {
+  initial: {},
+  animate: {
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1,
+    },
+  },
+};
 export const startScreenStaggerVariants = staggerRelaxedVariants;
 
 /**

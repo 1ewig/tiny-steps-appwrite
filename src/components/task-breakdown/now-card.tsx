@@ -92,7 +92,7 @@ export function NowCard({
                 >
                   <ArrowCounterClockwise size={12} weight="bold" />
                 </motion.span>
-                <span>Resume step {naturalFirstStepNumber}</span>
+                <span>Back to step {naturalFirstStepNumber}</span>
               </motion.button>
             </motion.div>
           )}

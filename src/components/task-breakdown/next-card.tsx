@@ -22,9 +22,6 @@ export function NextCard({ steps, getStepNumber, onSelectStep }: NextCardProps) 
         <h2 className="text-2xs font-semibold uppercase tracking-widest text-text-tertiary">
           Next
         </h2>
-        {steps.length > 0 && (
-          <span className="text-2xs text-text-tertiary">{steps.length} queued</span>
-        )}
       </div>
 
       <div className="space-y-2.5">
