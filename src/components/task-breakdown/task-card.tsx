@@ -28,6 +28,7 @@ export function TaskCard({
   onToggleSubStep,
 }: TaskCardProps) {
   const [selectedStepId, setSelectedStepId] = useState<number | null>(null);
+  const [showSubSteps, setShowSubSteps] = useState(true);
   const [isLaterHidden, setIsLaterHidden] = useState(false);
   const reduceMotion = useReducedMotion();
 
@@ -98,82 +99,24 @@ export function TaskCard({
                 animate={{ opacity: 1, y: 0 }}
                 exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
                 transition={{ duration: 0.2 }}
-                className="w-full bg-surface border-2 border-accent/40 rounded-3xl p-6 sm:p-8 shadow-card ring-1 ring-accent/15 space-y-5"
+                className="w-full bg-surface border border-accent/40 rounded-3xl p-6 sm:p-8 shadow-card ring-1 ring-accent/15 space-y-5"
               >
-                {/* Main Task Title & Time Estimate */}
-                <div className="space-y-2">
-                  <h3 className="text-2xl sm:text-3xl font-bold text-text-primary tracking-tight leading-snug">
+                {/* Main Task Title & Clean Minimal Subtitle */}
+                <div className="space-y-1.5">
+                  <h3 className="text-3xl sm:text-4xl font-bold text-text-primary tracking-tight leading-tight">
                     {nowStep.text}
                   </h3>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs sm:text-sm font-medium text-text-secondary">
-                      {nowStep.effort ? `About ${nowStep.effort.replace('~', '')}` : 'About 1 minute'}
-                    </span>
-                  </div>
-                  {nowStep.hint && (
-                    <p className="text-xs text-text-tertiary leading-relaxed pt-1">
-                      {nowStep.hint}
-                    </p>
-                  )}
+                  <p className="text-sm text-text-secondary leading-relaxed">
+                    {nowStep.hint
+                      ? `${nowStep.effort && !nowStep.hint.toLowerCase().includes(nowStep.effort.replace('~', '').toLowerCase()) ? `${nowStep.effort.replace('~', '')}. ` : ''}${nowStep.hint}`
+                      : nowStep.effort
+                        ? `About ${nowStep.effort.replace('~', '')}`
+                        : 'A gentle starter action.'}
+                  </p>
                 </div>
 
-                {/* Nested Broken-Down Micro-Steps (Father Task Container) */}
-                {nowStep.subSteps && nowStep.subSteps.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    className="p-3.5 sm:p-4 rounded-2xl bg-surface-subtle/70 border border-border-subtle space-y-2.5 my-3"
-                  >
-                    <p className="text-2xs font-semibold uppercase tracking-wider text-accent">
-                      Micro-steps
-                    </p>
-                    <div className="space-y-2">
-                      {nowStep.subSteps.map((sub) => (
-                        <div
-                          key={sub.id}
-                          className="flex items-start gap-2.5 group cursor-pointer"
-                          onClick={() => onToggleSubStep?.(nowStep.id, sub.id)}
-                        >
-                          <motion.button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onToggleSubStep?.(nowStep.id, sub.id);
-                            }}
-                            variants={reduceMotion ? undefined : tactileCheckboxVariants}
-                            initial="rest"
-                            animate="rest"
-                            whileHover={reduceMotion ? undefined : 'hover'}
-                            whileTap={reduceMotion ? undefined : 'tap'}
-                            aria-label={sub.completed ? 'Mark incomplete' : 'Mark complete'}
-                            className={`mt-0.5 rounded-full flex items-center justify-center shrink-0 transition-colors duration-fast ${
-                              sub.completed
-                                ? 'w-4 h-4 bg-accent border border-accent text-text-inverse'
-                                : 'w-4 h-4 border border-border-muted hover:border-accent'
-                            }`}
-                          >
-                            {sub.completed && <Check size={10} weight="bold" />}
-                          </motion.button>
-                          <span
-                            className={`text-xs leading-snug select-none flex-1 ${
-                              sub.completed
-                                ? 'line-through text-text-tertiary'
-                                : 'text-text-primary'
-                            }`}
-                          >
-                            {sub.text}
-                          </span>
-                          <span className="text-2xs text-text-tertiary font-mono shrink-0">
-                            {sub.effort}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* Primary Action Buttons */}
-                <div className="pt-2 flex flex-wrap items-center gap-2.5">
+                {/* Primary Action Row: Mark as done pill + Minimal text link */}
+                <div className="flex items-center gap-4 pt-1">
                   <motion.button
                     type="button"
                     onClick={handleMarkNowDone}
@@ -182,36 +125,96 @@ export function TaskCard({
                     animate="rest"
                     whileHover={reduceMotion ? undefined : 'hover'}
                     whileTap={reduceMotion ? undefined : 'tap'}
-                    className="h-11 px-6 rounded-full bg-accent hover:bg-accent-hover text-text-inverse font-semibold text-sm shadow-subtle flex items-center gap-2 transition-colors duration-fast cursor-pointer"
+                    className="h-10 px-5 rounded-full bg-accent hover:bg-accent-hover text-text-inverse font-semibold text-xs sm:text-sm shadow-subtle flex items-center gap-1.5 transition-colors duration-fast cursor-pointer"
                   >
                     <motion.span variants={reduceMotion ? undefined : tactileIconVariants}>
-                      <Check size={16} weight="bold" />
+                      <Check size={14} weight="bold" />
                     </motion.span>
                     <span>Mark as done</span>
                   </motion.button>
 
-                  {/* On-demand Breakdown Button inside Now Card */}
-                  {!nowStep.subSteps && nowStep.canSplit && nowStepIndex !== -1 && (
-                    <motion.button
+                  {/* Toggle Sub-steps or Break Down text link */}
+                  {nowStep.subSteps && nowStep.subSteps.length > 0 ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowSubSteps(!showSubSteps)}
+                      className="text-xs font-medium text-text-secondary hover:text-text-primary underline underline-offset-4 decoration-border-muted hover:decoration-text-primary transition-colors cursor-pointer"
+                    >
+                      {showSubSteps ? 'Hide steps' : 'Show steps'}
+                    </button>
+                  ) : nowStep.canSplit && nowStepIndex !== -1 ? (
+                    <button
                       type="button"
                       onClick={() => onShrinkStep(nowStepIndex)}
-                      variants={reduceMotion ? undefined : tactileButtonVariants}
-                      initial="rest"
-                      animate="rest"
-                      whileHover={reduceMotion ? undefined : 'hover'}
-                      whileTap={reduceMotion ? undefined : 'tap'}
-                      className="h-11 px-4 rounded-full bg-surface-subtle hover:bg-surface-subtle/80 text-text-primary font-medium text-xs sm:text-sm flex items-center gap-1.5 transition-colors duration-fast cursor-pointer"
+                      className="text-xs font-medium text-text-secondary hover:text-accent underline underline-offset-4 decoration-border-muted hover:decoration-accent transition-colors cursor-pointer flex items-center gap-1"
                     >
-                      <motion.span
-                        variants={reduceMotion ? undefined : tactileIconVariants}
-                        className="text-accent"
-                      >
-                        <Sparkle size={14} weight="duotone" />
-                      </motion.span>
+                      <Sparkle size={13} weight="duotone" className="text-accent" />
                       <span>Break down</span>
-                    </motion.button>
-                  )}
+                    </button>
+                  ) : null}
                 </div>
+
+                {/* Unboxed Micro-Steps Section (Matches reference design) */}
+                {nowStep.subSteps && nowStep.subSteps.length > 0 && showSubSteps && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="pt-5 border-t border-border-subtle space-y-3.5"
+                  >
+                    <p className="text-xs font-medium text-text-secondary">
+                      {nowStep.subSteps.filter((s) => s.completed).length} of{' '}
+                      {nowStep.subSteps.length} steps
+                    </p>
+
+                    <div className="space-y-3">
+                      {nowStep.subSteps.map((sub) => (
+                        <div
+                          key={sub.id}
+                          className="flex items-center justify-between gap-3 group cursor-pointer"
+                          onClick={() => onToggleSubStep?.(nowStep.id, sub.id)}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <motion.button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onToggleSubStep?.(nowStep.id, sub.id);
+                              }}
+                              variants={reduceMotion ? undefined : tactileCheckboxVariants}
+                              initial="rest"
+                              animate="rest"
+                              whileHover={reduceMotion ? undefined : 'hover'}
+                              whileTap={reduceMotion ? undefined : 'tap'}
+                              aria-label={sub.completed ? 'Mark incomplete' : 'Mark complete'}
+                              className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-colors duration-fast ${
+                                sub.completed
+                                  ? 'bg-accent border border-accent text-text-inverse'
+                                  : 'border border-border-muted group-hover:border-accent'
+                              }`}
+                            >
+                              {sub.completed && <Check size={11} weight="bold" />}
+                            </motion.button>
+                            <span
+                              className={`text-sm leading-snug select-none truncate transition-colors ${
+                                sub.completed
+                                  ? 'line-through text-text-tertiary'
+                                  : 'text-text-primary'
+                              }`}
+                            >
+                              {sub.text}
+                            </span>
+                          </div>
+                          {sub.effort && (
+                            <span className="text-xs text-text-secondary font-mono shrink-0">
+                              {sub.effort}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
               </motion.article>
             ) : (
               <motion.article
