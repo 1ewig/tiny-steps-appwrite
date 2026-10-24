@@ -128,6 +128,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
         <AppHeader
           hasActiveSteps={Boolean(activeSession && steps.length > 0)}
           granularity={displayedGranularity}
+          hasBorder={Boolean(activeSessionId)}
           onToggleHistory={toggleHistory}
           onOpenFocusTunnel={
             activeSession && activeSessionId && steps.length > 0

@@ -21,6 +21,7 @@ interface AppHeaderProps {
   onToggleSidebar?: () => void;
   showHomeButton?: boolean;
   onHome?: () => void;
+  hasBorder?: boolean;
   // Optional backwards-compatibility
   sessionTitle?: string;
   showNewTaskButton?: boolean;
@@ -50,6 +51,7 @@ export function AppHeader({
   onHome,
   showNewTaskButton,
   onNewTask,
+  hasBorder = true,
 }: AppHeaderProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -72,7 +74,13 @@ export function AppHeader({
   const currentGran = GRANULARITY_CONFIG[granularity];
 
   return (
-    <header className="h-14 border-b border-border-subtle px-4 sm:px-6 flex items-center justify-between shrink-0 bg-canvas/80 backdrop-blur-md z-header">
+    <header
+      className={`h-14 px-4 sm:px-6 flex items-center justify-between shrink-0 z-header transition-colors duration-fast ${
+        hasBorder
+          ? 'border-b border-border-subtle bg-canvas/80 backdrop-blur-md'
+          : 'border-b border-transparent bg-transparent'
+      }`}
+    >
       <div className="flex items-center gap-2 sm:gap-3 min-w-0">
         {/* Home Button (Far Left) */}
         {isHomeVisible && handleHome && (
