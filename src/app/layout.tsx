@@ -30,7 +30,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="h-full flex flex-col font-sans bg-oatmeal-100 text-stone-800 dark:bg-dim-950 dark:text-stone-200">
+      <body className="h-full flex flex-col font-sans bg-canvas text-text-primary">
         {children}
       </body>
     </html>

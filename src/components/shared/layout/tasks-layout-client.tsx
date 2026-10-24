@@ -13,7 +13,7 @@ import {
   getActiveStepIndex,
 } from '@/lib/session-utils';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
-import { useDelayedShrink } from '@/hooks/use-delayed-shrink';
+import { useShrinkStep } from '@/hooks/use-shrink-step';
 import { AppHeader } from '@/components/shared/layout/app-header';
 import { HistoryDrawer } from '@/components/shared/layout/history-drawer';
 import { ThemeToggleFab } from '@/components/shared/theme-toggle-fab';
@@ -130,7 +130,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     isShrinking: isShrinkingFocusStep,
     trigger: handleShrinkFocusStep,
     cancel: cancelShrinkFocusStep,
-  } = useDelayedShrink(shrinkFocusStepNow);
+  } = useShrinkStep(shrinkFocusStepNow);
 
   useEffect(() => {
     cancelShrinkFocusStep();

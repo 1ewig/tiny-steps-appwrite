@@ -4,7 +4,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import type { RefObject } from 'react';
 import { Sparkle, Check, SpinnerGap } from '@phosphor-icons/react';
 import type { Step } from '@/types/task';
-import { useDelayedShrink } from '@/hooks/use-delayed-shrink';
+import { useShrinkStep } from '@/hooks/use-shrink-step';
 import {
   tactileButtonVariants,
   tactileIconVariants,
@@ -123,7 +123,7 @@ function NowCardBody({
   const subSteps = step.subSteps ?? [];
   const hasSubSteps = subSteps.length > 0;
   const canBreakDown = step.canSplit && stepIndex !== -1;
-  const { isShrinking, trigger: triggerBreakDown } = useDelayedShrink(() => {
+  const { isShrinking, trigger: triggerBreakDown } = useShrinkStep(() => {
     onExpandSubSteps();
     onShrinkStep(stepIndex);
   });

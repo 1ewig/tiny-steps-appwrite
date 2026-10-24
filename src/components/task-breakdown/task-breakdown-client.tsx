@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { useHydrated } from '@/hooks/use-hydrated';
-import { useOfflineAssistant } from '@/hooks/use-offline-assistant';
+import { interpretUserIntent } from '@/lib/assistant-engine';
 import {
   getLatestMessageWithSteps,
   getSessionSteps,
@@ -40,7 +40,6 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
     shrinkStep,
   } = useTaskStore();
 
-  const { interpretUserIntent } = useOfflineAssistant();
 
   const currentSession = sessions.find((s) => s.id === sessionId);
   const focusTunnelOpen = focusTunnelSessionId === sessionId;

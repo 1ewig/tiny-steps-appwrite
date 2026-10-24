@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { SHRINK_STEP_LOADER_MS } from '@/lib/task-generation';
 
-export function useDelayedShrink(onShrink: () => void) {
+export function useShrinkStep(onShrink: () => void) {
   const [isShrinking, setIsShrinking] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingCallbackRef = useRef<(() => void) | null>(null);

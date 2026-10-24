@@ -156,8 +156,10 @@ src/
 │
 ├── hooks/
 │   ├── use-start-task.ts              # Start orchestration, minimum dwell, and fallback handling
-│   ├── use-offline-assistant.ts       # React hook adapter for assistant engine
-│   └── use-keyboard-shortcuts.ts      # Global Ctrl+K, Space, and Enter listeners
+│   ├── use-shrink-step.ts             # Micro-step breakdown timer and trigger handling
+│   ├── use-task-card.ts               # Spatial task sequence, out-of-order, and completion derivations
+│   ├── use-keyboard-shortcuts.ts      # Global Ctrl+K, Space, and Enter listeners
+│   └── use-hydrated.ts                # React 19 useSyncExternalStore hydration listener
 │
 ├── store/
 │   └── task-store.ts                  # Persisted Zustand state (multi-session & in-place step updates)
