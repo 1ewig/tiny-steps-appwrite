@@ -2,7 +2,6 @@
 
 import type { ChatMessage } from '@/types/task';
 import { AssistantBubble } from './assistant-bubble';
-import { UserBubble } from './user-bubble';
 import { TypingIndicator } from './typing-indicator';
 
 interface MessageFeedProps {
@@ -18,20 +17,18 @@ export function MessageFeed({
   onToggleStep,
   onShrinkStep,
 }: MessageFeedProps) {
+  const assistantMessages = messages.filter((msg) => msg.role === 'assistant');
+
   return (
     <div className="space-y-6">
-      {messages.map((msg) =>
-        msg.role === 'user' ? (
-          <UserBubble key={msg.id} message={msg} />
-        ) : (
-          <AssistantBubble
-            key={msg.id}
-            message={msg}
-            onToggleStep={(stepId) => onToggleStep(msg.id, stepId)}
-            onShrinkStep={(stepIndex) => onShrinkStep(msg.id, stepIndex)}
-          />
-        )
-      )}
+      {assistantMessages.map((msg) => (
+        <AssistantBubble
+          key={msg.id}
+          message={msg}
+          onToggleStep={(stepId) => onToggleStep(msg.id, stepId)}
+          onShrinkStep={(stepIndex) => onShrinkStep(msg.id, stepIndex)}
+        />
+      ))}
 
       {isTyping && <TypingIndicator />}
     </div>
