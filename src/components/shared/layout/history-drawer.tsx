@@ -189,19 +189,27 @@ export function HistoryDrawer({
 
                   return (
                     <div key={sess.id} className="group relative">
-                      <button
+                      <motion.button
                         type="button"
                         onClick={() => {
                           onSelectSession(sess.id);
                         }}
                         aria-current={isCurrent ? 'true' : undefined}
-                        className={`w-full text-left p-3 pr-10 rounded-xl flex items-start gap-2.5 transition-all cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent active:scale-[0.99] ${
+                        variants={reduceMotion ? undefined : tactileButtonVariants}
+                        initial="rest"
+                        animate="rest"
+                        whileHover={reduceMotion ? undefined : 'hover'}
+                        whileTap={reduceMotion ? undefined : 'tap'}
+                        className={`w-full text-left p-3 pr-10 rounded-xl flex items-start gap-2.5 transition-colors duration-fast cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                           isCurrent
                             ? 'bg-accent-subtle/80 text-accent-text font-semibold shadow-subtle'
                             : 'bg-surface hover:bg-surface-subtle text-text-primary shadow-subtle'
                         }`}
                       >
-                        <div className="mt-0.5 shrink-0">
+                        <motion.div
+                          variants={reduceMotion ? undefined : tactileIconVariants}
+                          className="mt-0.5 shrink-0"
+                        >
                           {totalSteps > 0 ? (
                             <CheckCircle
                               size={16}
@@ -219,7 +227,7 @@ export function HistoryDrawer({
                               className="text-text-tertiary"
                             />
                           )}
-                        </div>
+                        </motion.div>
 
                         <div className="min-w-0 flex-1 space-y-0.5">
                           <p className="text-xs font-medium text-text-primary truncate leading-snug">
@@ -233,17 +241,27 @@ export function HistoryDrawer({
                                 }`}
                           </p>
                         </div>
-                      </button>
+                      </motion.button>
 
-                      <button
+                      <motion.button
                         type="button"
                         onClick={() => onDeleteSession(sess.id)}
-                        className="absolute top-2 right-2 p-1.5 rounded-md opacity-100 sm:opacity-0 sm:group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent hover:bg-danger-subtle text-text-tertiary hover:text-danger-text transition-opacity cursor-pointer"
+                        variants={reduceMotion ? undefined : tactileButtonVariants}
+                        initial="rest"
+                        animate="rest"
+                        whileHover={reduceMotion ? undefined : 'hover'}
+                        whileTap={reduceMotion ? undefined : 'tap'}
+                        className="absolute top-2 right-2 z-10 p-1.5 rounded-md opacity-100 sm:opacity-0 sm:group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent hover:bg-danger-subtle text-text-tertiary hover:text-danger-text transition-opacity cursor-pointer"
                         title="Delete task"
                         aria-label={`Delete ${sess.title || 'task'}`}
                       >
-                        <Trash size={14} weight="regular" />
-                      </button>
+                        <motion.span
+                          variants={reduceMotion ? undefined : tactileIconVariants}
+                          className="flex items-center"
+                        >
+                          <Trash size={14} weight="regular" />
+                        </motion.span>
+                      </motion.button>
                     </div>
                   );
                 })

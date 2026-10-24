@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Sparkle, Check } from '@phosphor-icons/react';
 import type { Step } from '@/types/task';
+import { tactileButtonVariants, tactileIconVariants } from '@/constants/animation';
 
 interface FocusTunnelModalProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ export function FocusTunnelModal({
 }: FocusTunnelModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElementRef = useRef<HTMLElement | null>(null);
+  const reduceMotion = useReducedMotion();
 
   // Preserve the previously focused element while the dialog is open
   useEffect(() => {
@@ -104,17 +106,27 @@ export function FocusTunnelModal({
               <span className="truncate">{sessionTitle || 'Focus'}</span>
             </div>
 
-            <button
+            <motion.button
               onClick={onClose}
               disabled={isBusy}
-              className="p-2 rounded-full text-text-tertiary hover:text-text-primary hover:bg-surface-subtle transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-40 disabled:cursor-not-allowed"
+              variants={reduceMotion ? undefined : tactileButtonVariants}
+              initial="rest"
+              animate="rest"
+              whileHover={isBusy || reduceMotion ? undefined : 'hover'}
+              whileTap={isBusy || reduceMotion ? undefined : 'tap'}
+              className="p-2 rounded-full text-text-tertiary hover:text-text-primary hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-40 disabled:cursor-not-allowed"
               aria-label="Close Focus Tunnel"
               title={isBusy ? 'Preparing your steps' : 'Exit (Esc)'}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+              <motion.span
+                variants={reduceMotion ? undefined : tactileIconVariants}
+                className="flex items-center"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </motion.span>
+            </motion.button>
           </div>
 
           {/* Centered Active Step */}
@@ -158,26 +170,46 @@ export function FocusTunnelModal({
               <>
                 <div className="flex items-center justify-center gap-2">
                   {/* Primary: Done */}
-                  <button
+                  <motion.button
                     data-autofocus
                     onClick={onComplete}
                     disabled={isBusy}
-                    className="h-9 sm:h-10 px-4 sm:px-5 rounded-full bg-accent hover:bg-accent-hover active:scale-95 text-text-inverse font-medium text-xs sm:text-sm shadow-subtle flex items-center gap-1.5 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                    variants={reduceMotion ? undefined : tactileButtonVariants}
+                    initial="rest"
+                    animate="rest"
+                    whileHover={isBusy || reduceMotion ? undefined : 'hover'}
+                    whileTap={isBusy || reduceMotion ? undefined : 'tap'}
+                    className="h-9 sm:h-10 px-4 sm:px-5 rounded-full bg-accent hover:bg-accent-hover text-text-inverse font-medium text-xs sm:text-sm shadow-subtle flex items-center gap-1.5 transition-colors duration-fast cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                   >
-                    <Check size={14} weight="bold" />
+                    <motion.span
+                      variants={reduceMotion ? undefined : tactileIconVariants}
+                      className="flex items-center"
+                    >
+                      <Check size={14} weight="bold" />
+                    </motion.span>
                     <span>Done</span>
-                  </button>
+                  </motion.button>
 
                   {/* Secondary: Shrink */}
                   {activeStep.canSplit && (
-                    <button
+                    <motion.button
                       onClick={onShrink}
                       disabled={isBusy}
-                      className="h-9 sm:h-10 px-3.5 rounded-full bg-surface-subtle/80 hover:bg-surface-subtle text-text-secondary hover:text-text-primary text-xs sm:text-sm font-medium transition-all active:scale-95 flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+                      variants={reduceMotion ? undefined : tactileButtonVariants}
+                      initial="rest"
+                      animate="rest"
+                      whileHover={isBusy || reduceMotion ? undefined : 'hover'}
+                      whileTap={isBusy || reduceMotion ? undefined : 'tap'}
+                      className="h-9 sm:h-10 px-3.5 rounded-full bg-surface-subtle/80 hover:bg-surface-subtle text-text-secondary hover:text-text-primary text-xs sm:text-sm font-medium transition-colors duration-fast flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                      <Sparkle size={13} weight="duotone" className="text-accent" />
+                      <motion.span
+                        variants={reduceMotion ? undefined : tactileIconVariants}
+                        className="flex items-center"
+                      >
+                        <Sparkle size={13} weight="duotone" className="text-accent" />
+                      </motion.span>
                       <span>Shrink</span>
-                    </button>
+                    </motion.button>
                   )}
 
                 </div>
@@ -194,12 +226,17 @@ export function FocusTunnelModal({
                 </div>
               </>
             ) : (
-              <button
+              <motion.button
                 onClick={onClose}
-                className="h-9 sm:h-10 px-5 rounded-full bg-accent hover:bg-accent-hover active:scale-95 text-text-inverse text-xs sm:text-sm font-medium shadow-subtle transition-all"
+                variants={reduceMotion ? undefined : tactileButtonVariants}
+                initial="rest"
+                animate="rest"
+                whileHover={reduceMotion ? undefined : 'hover'}
+                whileTap={reduceMotion ? undefined : 'tap'}
+                className="h-9 sm:h-10 px-5 rounded-full bg-accent hover:bg-accent-hover text-text-inverse text-xs sm:text-sm font-medium shadow-subtle transition-colors duration-fast cursor-pointer"
               >
                 Close
-              </button>
+              </motion.button>
             )}
           </motion.div>
         </motion.div>

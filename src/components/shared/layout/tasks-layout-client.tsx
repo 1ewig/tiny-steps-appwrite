@@ -28,14 +28,12 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
 
   const {
     sessions,
-    granularity,
     peekFuture,
     focusTunnelSessionId,
     isGeneratingTask,
     isHistoryOpen,
     theme,
     deleteSession,
-    setGranularity,
     openFocusTunnel,
     closeFocusTunnel,
     setGeneratingTask,
@@ -98,7 +96,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     return () => clearTimeout(timer);
   }, [isGeneratingTask, setGeneratingTask]);
 
-  const displayedGranularity = hasHydrated ? granularity : 2;
   const displayedTheme = hasHydrated ? theme : 'light';
   const peekEnabled = hasHydrated && peekFuture;
 
@@ -128,7 +125,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
         {/* AppHeader - Fixed, Static & Never Unmounted */}
         <AppHeader
           hasActiveSteps={Boolean(activeSession && steps.length > 0)}
-          granularity={displayedGranularity}
           hasBorder={Boolean(activeSessionId)}
           onToggleHistory={toggleHistory}
           onOpenFocusTunnel={
@@ -136,7 +132,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
               ? () => openFocusTunnel(activeSessionId)
               : undefined
           }
-          onSelectGranularity={activeSessionId ? setGranularity : undefined}
           showHomeButton={Boolean(activeSessionId)}
           onHome={() => {
             closeFocusTunnel();
