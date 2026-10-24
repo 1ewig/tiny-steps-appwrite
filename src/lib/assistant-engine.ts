@@ -46,9 +46,9 @@ export function generateMicroSteps(parentStepText: string): Step[] {
     },
     {
       id: baseTime + 2,
-      text: `Touch: Do the first 20 seconds of "${parentStepText}"`,
+      text: `Touch: Take just the first physical action on "${parentStepText}"`,
       effort: '20 sec',
-      hint: 'Twenty seconds of contact—nothing more.',
+      hint: 'Physical contact—nothing more.',
       completed: false,
       canSplit: false,
     },

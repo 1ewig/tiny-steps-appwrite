@@ -29,7 +29,7 @@ export function TaskCard({
 }: TaskCardProps) {
   const [selectedStepId, setSelectedStepId] = useState<number | null>(null);
   const [showSubSteps, setShowSubSteps] = useState(true);
-  const [isLaterHidden, setIsLaterHidden] = useState(false);
+  const [showCompleted, setShowCompleted] = useState(false);
   const reduceMotion = useReducedMotion();
 
   // Find incomplete and completed steps
@@ -62,10 +62,10 @@ export function TaskCard({
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
-      {/* Empathetic Guidance Banner */}
+      {/* Empathetic Guidance Whisper */}
       {guidanceText && (
-        <div className="text-center max-w-2xl mx-auto py-1">
-          <p className="text-sm sm:text-base text-text-secondary leading-relaxed font-normal">
+        <div className="text-center max-w-xl mx-auto py-1">
+          <p className="text-xs sm:text-sm text-text-tertiary leading-relaxed font-normal">
             {guidanceText}
           </p>
         </div>
@@ -84,10 +84,10 @@ export function TaskCard({
       {/* 3-Column Layout: Now, Next, Later */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
         {/* =================================================================
-            COLUMN 1: NOW (Large Hero Card)
+            COLUMN 1: NOW (Focused Hero Card)
             ================================================================= */}
-        <section className="lg:col-span-6 xl:col-span-5 space-y-3">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-accent px-1">
+        <section className="lg:col-span-6 xl:col-span-5 space-y-2.5">
+          <h2 className="text-2xs font-semibold uppercase tracking-widest text-accent px-1">
             Now
           </h2>
 
@@ -99,23 +99,25 @@ export function TaskCard({
                 animate={{ opacity: 1, y: 0 }}
                 exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
                 transition={{ duration: 0.2 }}
-                className="w-full bg-surface border border-accent/40 rounded-3xl p-6 sm:p-8 shadow-card ring-1 ring-accent/15 space-y-5"
+                className="w-full bg-surface border border-border-subtle rounded-3xl p-6 sm:p-8 shadow-card space-y-5"
               >
-                {/* Main Task Title & Clean Minimal Subtitle */}
-                <div className="space-y-1.5">
-                  <h3 className="text-3xl sm:text-4xl font-bold text-text-primary tracking-tight leading-tight">
+                {/* Main Task Title & Hint */}
+                <div className="space-y-2">
+                  <h3 className="text-2xl sm:text-3xl font-bold text-text-primary tracking-tight leading-snug">
                     {nowStep.text}
                   </h3>
-                  <p className="text-sm text-text-secondary leading-relaxed">
-                    {nowStep.hint
-                      ? `${nowStep.effort && !nowStep.hint.toLowerCase().includes(nowStep.effort.replace('~', '').toLowerCase()) ? `${nowStep.effort.replace('~', '')}. ` : ''}${nowStep.hint}`
-                      : nowStep.effort
-                        ? `About ${nowStep.effort.replace('~', '')}`
-                        : 'A gentle starter action.'}
-                  </p>
+                  {nowStep.hint ? (
+                    <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
+                      {nowStep.hint}
+                    </p>
+                  ) : nowStep.effort ? (
+                    <p className="text-xs text-text-tertiary">
+                      Takes about {nowStep.effort.replace('~', '')}
+                    </p>
+                  ) : null}
                 </div>
 
-                {/* Primary Action Row: Mark as done pill + Minimal text link */}
+                {/* Primary Action Row */}
                 <div className="flex items-center gap-4 pt-1">
                   <motion.button
                     type="button"
@@ -125,7 +127,7 @@ export function TaskCard({
                     animate="rest"
                     whileHover={reduceMotion ? undefined : 'hover'}
                     whileTap={reduceMotion ? undefined : 'tap'}
-                    className="h-10 px-5 rounded-full bg-accent hover:bg-accent-hover text-text-inverse font-semibold text-xs sm:text-sm shadow-subtle flex items-center gap-1.5 transition-colors duration-fast cursor-pointer"
+                    className="h-10 px-6 rounded-full bg-accent hover:bg-accent-hover text-text-inverse font-semibold text-xs sm:text-sm shadow-subtle flex items-center gap-2 transition-colors duration-fast cursor-pointer"
                   >
                     <motion.span variants={reduceMotion ? undefined : tactileIconVariants}>
                       <Check size={14} weight="bold" />
@@ -138,43 +140,43 @@ export function TaskCard({
                     <button
                       type="button"
                       onClick={() => setShowSubSteps(!showSubSteps)}
-                      className="text-xs font-medium text-text-secondary hover:text-text-primary underline underline-offset-4 decoration-border-muted hover:decoration-text-primary transition-colors cursor-pointer"
+                      className="text-xs font-medium text-text-tertiary hover:text-text-primary transition-colors cursor-pointer"
                     >
-                      {showSubSteps ? 'Hide steps' : 'Show steps'}
+                      {showSubSteps ? 'Hide steps' : `Show ${nowStep.subSteps.length} smaller steps`}
                     </button>
                   ) : nowStep.canSplit && nowStepIndex !== -1 ? (
                     <button
                       type="button"
                       onClick={() => onShrinkStep(nowStepIndex)}
-                      className="text-xs font-medium text-text-secondary hover:text-accent underline underline-offset-4 decoration-border-muted hover:decoration-accent transition-colors cursor-pointer flex items-center gap-1"
+                      className="text-xs font-medium text-text-tertiary hover:text-accent transition-colors cursor-pointer flex items-center gap-1.5"
                     >
                       <Sparkle size={13} weight="duotone" className="text-accent" />
-                      <span>Break down</span>
+                      <span>Still too big? Break it down</span>
                     </button>
                   ) : null}
                 </div>
 
-                {/* Unboxed Micro-Steps Section (Matches reference design) */}
+                {/* Unboxed Micro-Steps Section */}
                 {nowStep.subSteps && nowStep.subSteps.length > 0 && showSubSteps && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="pt-5 border-t border-border-subtle space-y-3.5"
+                    className="pt-4 border-t border-border-subtle space-y-3"
                   >
-                    <p className="text-xs font-medium text-text-secondary">
+                    <p className="text-2xs font-medium text-text-tertiary">
                       {nowStep.subSteps.filter((s) => s.completed).length} of{' '}
-                      {nowStep.subSteps.length} steps
+                      {nowStep.subSteps.length} micro-steps done
                     </p>
 
-                    <div className="space-y-3.5">
+                    <div className="space-y-1.5">
                       {nowStep.subSteps.map((sub) => (
                         <div
                           key={sub.id}
-                          className="flex items-start justify-between gap-3 group cursor-pointer"
+                          className="flex items-center justify-between gap-3 p-1.5 rounded-xl hover:bg-surface-subtle/50 transition-colors group cursor-pointer"
                           onClick={() => onToggleSubStep?.(nowStep.id, sub.id)}
                         >
-                          <div className="flex items-start gap-3 min-w-0 flex-1">
+                          <div className="flex items-center gap-2.5 min-w-0 flex-1">
                             <motion.button
                               type="button"
                               onClick={(e) => {
@@ -187,16 +189,16 @@ export function TaskCard({
                               whileHover={reduceMotion ? undefined : 'hover'}
                               whileTap={reduceMotion ? undefined : 'tap'}
                               aria-label={sub.completed ? 'Mark incomplete' : 'Mark complete'}
-                              className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-colors duration-fast ${
+                              className={`w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 transition-colors duration-fast ${
                                 sub.completed
                                   ? 'bg-accent border border-accent text-text-inverse'
                                   : 'border border-border-muted group-hover:border-accent'
                               }`}
                             >
-                              {sub.completed && <Check size={11} weight="bold" />}
+                              {sub.completed && <Check size={10} weight="bold" />}
                             </motion.button>
                             <span
-                              className={`text-sm leading-snug select-none break-words transition-colors ${
+                              className={`text-xs leading-snug select-none break-words transition-colors ${
                                 sub.completed
                                   ? 'line-through text-text-tertiary'
                                   : 'text-text-primary'
@@ -206,7 +208,7 @@ export function TaskCard({
                             </span>
                           </div>
                           {sub.effort && (
-                            <span className="mt-0.5 text-xs text-text-secondary font-mono shrink-0">
+                            <span className="text-2xs text-text-tertiary font-mono shrink-0">
                               {sub.effort}
                             </span>
                           )}
@@ -240,112 +242,120 @@ export function TaskCard({
         </section>
 
         {/* =================================================================
-            COLUMN 2: NEXT (Upcoming Cards with Delayed Hover Reveal)
+            COLUMN 2: NEXT (Gentle Uncluttered Cards with Future Blur)
             ================================================================= */}
-        <section className="lg:col-span-4 xl:col-span-4 space-y-3">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-text-secondary px-1">
-            Next
-          </h2>
+        <section className="lg:col-span-4 xl:col-span-4 space-y-2.5">
+          <div className="flex items-center justify-between px-1">
+            <h2 className="text-2xs font-semibold uppercase tracking-widest text-text-tertiary">
+              Next
+            </h2>
+            {nextSteps.length > 0 && (
+              <span className="text-3xs text-text-tertiary">
+                {nextSteps.length} queued
+              </span>
+            )}
+          </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {nextSteps.length > 0 ? (
               nextSteps.map((st) => (
                 <div
                   key={st.id}
                   onClick={() => setSelectedStepId(st.id)}
-                  className="group rounded-2xl p-4 sm:p-5 bg-surface border border-border-subtle hover:border-accent/40 shadow-subtle hover:shadow-card cursor-pointer transition-all duration-fast future-step-blur"
-                  title="Click to start this task now"
+                  className="group rounded-2xl p-4 bg-surface border border-border-subtle/80 hover:border-accent/40 shadow-subtle hover:shadow-card cursor-pointer transition-all duration-fast future-step-blur"
+                  title="Click to switch to this step"
                 >
-                  <h4 className="text-sm sm:text-base font-semibold text-text-primary group-hover:text-accent transition-colors leading-snug">
-                    {st.text}
-                  </h4>
-                  <div className="flex items-center justify-between text-2xs text-text-tertiary mt-2.5">
-                    <span>{st.effort || '~1 min'} · tap to start now</span>
-                    <span className="opacity-0 group-hover:opacity-100 transition-opacity text-accent font-medium">
-                      Start →
-                    </span>
+                  <div className="flex items-start justify-between gap-3">
+                    <h4 className="text-xs sm:text-sm font-medium text-text-primary group-hover:text-accent transition-colors leading-snug">
+                      {st.text}
+                    </h4>
+                    {st.effort && (
+                      <span className="text-3xs font-mono text-text-tertiary shrink-0 mt-0.5">
+                        {st.effort}
+                      </span>
+                    )}
                   </div>
                 </div>
               ))
             ) : (
-              <div className="rounded-2xl p-5 bg-surface-subtle/30 border border-dashed border-border-subtle text-center">
-                <p className="text-xs text-text-tertiary">No upcoming steps left in line.</p>
+              <div className="p-4 rounded-2xl border border-dashed border-border-subtle/60 text-center">
+                <p className="text-xs text-text-tertiary">You are on the final stretch.</p>
               </div>
             )}
           </div>
         </section>
 
         {/* =================================================================
-            COLUMN 3: LATER & COMPLETED (Option B Strikethrough)
+            COLUMN 3: LATER & COMPLETED (Quiet Whisper & Collapsed Summary)
             ================================================================= */}
-        <section className="lg:col-span-2 xl:col-span-3 space-y-3">
+        <section className="lg:col-span-2 xl:col-span-3 space-y-2.5">
           <div className="flex items-center justify-between px-1">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-text-secondary">
+            <h2 className="text-2xs font-semibold uppercase tracking-widest text-text-tertiary">
               Later
             </h2>
-            <button
-              type="button"
-              onClick={() => setIsLaterHidden(!isLaterHidden)}
-              className="text-2xs font-semibold text-accent hover:text-accent-hover transition-colors cursor-pointer"
-            >
-              {isLaterHidden ? 'Show' : 'Hide'}
-            </button>
           </div>
 
-          <AnimatePresence initial={false}>
-            {!isLaterHidden && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="space-y-4 overflow-hidden"
-              >
-                {/* Pending Later Tasks */}
-                {laterSteps.length > 0 ? (
-                  <ul className="space-y-2">
-                    {laterSteps.map((st) => (
-                      <li key={st.id}>
-                        <button
-                          type="button"
-                          onClick={() => setSelectedStepId(st.id)}
-                          className="w-full text-left text-xs text-text-secondary hover:text-text-primary transition-colors py-1 cursor-pointer truncate block"
-                          title="Click to move to Now"
-                        >
-                          {st.text}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-2xs text-text-tertiary italic">No later tasks queued.</p>
-                )}
+          <div className="space-y-4">
+            {/* Pending Later Tasks */}
+            {laterSteps.length > 0 ? (
+              <ul className="space-y-1.5">
+                {laterSteps.map((st) => (
+                  <li key={st.id}>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedStepId(st.id)}
+                      className="w-full text-left text-xs text-text-tertiary hover:text-text-primary transition-colors py-1 cursor-pointer truncate block"
+                      title="Click to bring this to Now"
+                    >
+                      · {st.text}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-2xs text-text-tertiary/70 italic px-1">Nothing further out.</p>
+            )}
 
-                {/* Completed Tasks (Option B: Strikethrough List) */}
-                {completedSteps.length > 0 && (
-                  <div className="pt-3 border-t border-border-subtle space-y-2">
-                    <p className="text-2xs uppercase tracking-wider font-semibold text-text-tertiary">
-                      Completed ({completedSteps.length})
-                    </p>
-                    <ul className="space-y-1.5">
+            {/* Completed Tasks — Collapsed Pill Summary */}
+            {completedSteps.length > 0 && (
+              <div className="pt-3 border-t border-border-subtle/60 space-y-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCompleted(!showCompleted)}
+                  className="text-2xs font-medium text-text-tertiary hover:text-text-secondary flex items-center gap-1.5 transition-colors cursor-pointer select-none"
+                >
+                  <Check size={11} weight="bold" className="text-accent shrink-0" />
+                  <span>{completedSteps.length} finished</span>
+                  <span className="text-3xs opacity-60">({showCompleted ? 'hide' : 'view'})</span>
+                </button>
+
+                <AnimatePresence>
+                  {showCompleted && (
+                    <motion.ul
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="space-y-1.5 pt-1 overflow-hidden"
+                    >
                       {completedSteps.map((st) => (
                         <li key={st.id}>
                           <button
                             type="button"
                             onClick={() => onToggleStep(st.id)}
-                            className="w-full text-left text-xs line-through text-text-tertiary hover:text-text-secondary flex items-center gap-1.5 transition-colors cursor-pointer"
+                            className="w-full text-left text-xs line-through text-text-tertiary hover:text-text-secondary flex items-center gap-1.5 transition-colors cursor-pointer truncate"
                             title="Click to restore"
                           >
-                            <Check size={11} weight="bold" className="text-accent shrink-0" />
+                            <Check size={10} weight="bold" className="text-accent/60 shrink-0" />
                             <span className="truncate">{st.text}</span>
                           </button>
                         </li>
                       ))}
-                    </ul>
-                  </div>
-                )}
-              </motion.div>
+                    </motion.ul>
+                  )}
+                </AnimatePresence>
+              </div>
             )}
-          </AnimatePresence>
+          </div>
         </section>
       </div>
     </div>
