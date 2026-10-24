@@ -246,6 +246,58 @@ export const taskWorkspaceStaggerVariants = staggerContainerVariants;
 export const startScreenStaggerVariants = staggerRelaxedVariants;
 
 /**
+ * Now Card Micro-Steps Accordion
+ * Animates height/opacity without margin or padding on the animated element,
+ * so the collapse interpolates cleanly from 0 with no layout snap.
+ * Children stagger in on expand and reverse-stagger out on collapse.
+ */
+export const subStepsAccordionVariants: Variants = {
+  collapsed: {
+    height: 0,
+    opacity: 0,
+    transition: {
+      height: { duration: 0.28, ease: [0.32, 0.72, 0, 1] },
+      opacity: { duration: 0.18, ease: 'easeOut' },
+      staggerChildren: 0.02,
+      staggerDirection: -1,
+    },
+  },
+  expanded: {
+    height: 'auto',
+    opacity: 1,
+    transition: {
+      height: { duration: 0.36, ease: [0.32, 0.72, 0, 1] },
+      opacity: { duration: 0.24, ease: 'easeOut', delay: 0.04 },
+      staggerChildren: 0.045,
+      delayChildren: 0.06,
+    },
+  },
+};
+
+export const subStepItemVariants: Variants = {
+  collapsed: {
+    opacity: 0,
+    y: -6,
+    filter: 'blur(4px)',
+    transition: {
+      duration: 0.16,
+      ease: 'easeIn',
+    },
+  },
+  expanded: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transition: {
+      type: 'spring',
+      stiffness: 420,
+      damping: 30,
+      mass: 0.7,
+    },
+  },
+};
+
+/**
  * Slide-over Drawer Variants (Right Side)
  */
 export const drawerSlideVariants: Variants = {
