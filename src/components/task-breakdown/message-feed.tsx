@@ -17,18 +17,21 @@ export function MessageFeed({
   onToggleStep,
   onShrinkStep,
 }: MessageFeedProps) {
-  const assistantMessages = messages.filter((msg) => msg.role === 'assistant');
+  // Always render strictly the single living card
+  const livingCard =
+    [...messages].reverse().find((m) => m.role === 'assistant' && m.steps && m.steps.length > 0) ||
+    messages.find((m) => m.role === 'assistant');
 
   return (
     <div className="space-y-6">
-      {assistantMessages.map((msg) => (
+      {livingCard && (
         <AssistantBubble
-          key={msg.id}
-          message={msg}
-          onToggleStep={(stepId) => onToggleStep(msg.id, stepId)}
-          onShrinkStep={(stepIndex) => onShrinkStep(msg.id, stepIndex)}
+          key={livingCard.id}
+          message={livingCard}
+          onToggleStep={(stepId) => onToggleStep(livingCard.id, stepId)}
+          onShrinkStep={(stepIndex) => onShrinkStep(livingCard.id, stepIndex)}
         />
-      ))}
+      )}
 
       {isTyping && <TypingIndicator />}
     </div>

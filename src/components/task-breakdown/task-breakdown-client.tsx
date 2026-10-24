@@ -61,11 +61,6 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
   const handleSendMessage = (text: string) => {
     if (!currentSession) return;
 
-    addMessage(currentSession.id, {
-      role: 'user',
-      text,
-    });
-
     setIsTyping(true);
 
     if (typingTimerRef.current) {
@@ -81,19 +76,16 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
       if (latestMessageWithSteps) {
         if (intent.type === 'complete_step') {
           toggleStepCompletion(currentSession.id, latestMessageWithSteps.id, intent.targetStepId);
-          addMessage(currentSession.id, {
-            role: 'assistant',
+          updateAssistantMessage(currentSession.id, latestMessageWithSteps.id, {
             text: intent.dialogue,
           });
         } else if (intent.type === 'shrink_step') {
           shrinkStep(currentSession.id, latestMessageWithSteps.id, intent.targetStepIndex, intent.microSteps);
-          addMessage(currentSession.id, {
-            role: 'assistant',
+          updateAssistantMessage(currentSession.id, latestMessageWithSteps.id, {
             text: intent.dialogue,
           });
         } else if (intent.type === 'all_complete') {
-          addMessage(currentSession.id, {
-            role: 'assistant',
+          updateAssistantMessage(currentSession.id, latestMessageWithSteps.id, {
             text: intent.dialogue,
           });
         } else if (intent.type === 'new_task') {
@@ -113,15 +105,10 @@ export function TaskBreakdownClient({ sessionId }: TaskBreakdownClientProps) {
             setSessionTitle(currentSession.id, intent.title);
           }
 
-          // Keep the living plan message text, update only its steps (Single Living Task Card rule)
+          // Single Living Task Card: Mutate existing card text and steps in-place
           updateAssistantMessage(currentSession.id, latestMessageWithSteps.id, {
-            steps: combinedSteps,
-          });
-
-          // Append a separate "Plan updated" message without steps
-          addMessage(currentSession.id, {
-            role: 'assistant',
             text: dialogue,
+            steps: combinedSteps,
           });
         }
       } else {
