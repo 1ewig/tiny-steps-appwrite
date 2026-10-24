@@ -50,12 +50,13 @@ export function LaterCard({
                 <motion.button
                   type="button"
                   onClick={() => onSelectStep(st.id)}
+                  aria-label={`Bring ${st.text} to Now`}
                   variants={reduceMotion ? undefined : tactileButtonVariants}
                   initial="rest"
                   animate="rest"
                   whileHover={reduceMotion ? undefined : 'hover'}
                   whileTap={reduceMotion ? undefined : 'tap'}
-                  className="relative w-full text-left text-xs text-text-tertiary hover:text-text-primary hover:z-10 flex items-center transition-colors py-1 cursor-pointer truncate"
+                  className="relative w-full text-left text-xs text-text-tertiary hover:text-text-primary hover:z-10 flex items-center transition-colors py-1 cursor-pointer truncate rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   title="Click to bring this to Now"
                 >
                   <span className="text-2xs font-mono text-text-tertiary/70 mr-1.5 shrink-0 select-none">
@@ -81,7 +82,7 @@ export function LaterCard({
               animate="rest"
               whileHover={reduceMotion ? undefined : 'hover'}
               whileTap={reduceMotion ? undefined : 'tap'}
-              className="relative text-2xs font-medium text-text-tertiary hover:text-text-secondary flex items-center gap-1.5 hover:z-10 transition-colors cursor-pointer select-none"
+              className="relative text-2xs font-medium text-text-tertiary hover:text-text-secondary flex items-center gap-1.5 hover:z-10 transition-colors cursor-pointer select-none rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               <motion.span
                 variants={reduceMotion ? undefined : tactileIconVariants}
@@ -106,12 +107,13 @@ export function LaterCard({
                       <motion.button
                         type="button"
                         onClick={() => onToggleStep(st.id)}
+                        aria-label={`Restore ${st.text}`}
                         variants={reduceMotion ? undefined : tactileButtonVariants}
                         initial="rest"
                         animate="rest"
                         whileHover={reduceMotion ? undefined : 'hover'}
                         whileTap={reduceMotion ? undefined : 'tap'}
-                        className="relative w-full text-left text-xs line-through text-text-tertiary hover:text-text-secondary hover:z-10 flex items-center gap-1.5 transition-colors cursor-pointer truncate"
+                        className="relative w-full text-left text-xs line-through text-text-tertiary hover:text-text-secondary hover:z-10 flex items-center gap-1.5 transition-colors cursor-pointer truncate rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                         title="Click to restore"
                       >
                         <motion.span

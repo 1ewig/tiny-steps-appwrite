@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import type { Step } from '@/types/task';
 import { useTaskCard } from '@/hooks/use-task-card';
@@ -26,6 +27,8 @@ export function TaskCard({
   onToggleSubStep,
 }: TaskCardProps) {
   const reduceMotion = useReducedMotion();
+  const nowSectionRef = useRef<HTMLElement | null>(null);
+  const pendingScrollRef = useRef(false);
   const {
     nowStep,
     nextSteps,
@@ -46,6 +49,29 @@ export function TaskCard({
     expandSubSteps,
     toggleCompleted,
   } = useTaskCard({ steps, onToggleStep });
+
+  useEffect(() => {
+    if (!pendingScrollRef.current) return;
+    pendingScrollRef.current = false;
+
+    const section = nowSectionRef.current;
+    if (!section) return;
+
+    const frame = requestAnimationFrame(() => {
+      section.scrollIntoView({
+        behavior: reduceMotion ? 'auto' : 'smooth',
+        block: 'start',
+      });
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [nowStep?.id, reduceMotion]);
+
+  const handleSelectStep = (stepId: number) => {
+    if (stepId === nowStep?.id) return;
+    pendingScrollRef.current = true;
+    selectStep(stepId);
+  };
 
   return (
     <motion.div
@@ -86,6 +112,7 @@ export function TaskCard({
           isOutOfOrder={isOutOfOrder}
           naturalFirstStepNumber={naturalFirstStepNumber}
           onResetOrder={resetOrder}
+          sectionRef={nowSectionRef}
           showSubSteps={showSubSteps}
           onToggleSubSteps={toggleSubSteps}
           onExpandSubSteps={expandSubSteps}
@@ -97,7 +124,7 @@ export function TaskCard({
         <NextCard
           steps={nextSteps}
           getStepNumber={getStepNumber}
-          onSelectStep={selectStep}
+          onSelectStep={handleSelectStep}
         />
 
         <LaterCard
@@ -106,7 +133,7 @@ export function TaskCard({
           showCompleted={showCompleted}
           getStepNumber={getStepNumber}
           onToggleCompleted={toggleCompleted}
-          onSelectStep={selectStep}
+          onSelectStep={handleSelectStep}
           onToggleStep={onToggleStep}
         />
       </div>

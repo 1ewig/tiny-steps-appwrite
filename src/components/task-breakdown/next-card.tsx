@@ -30,33 +30,35 @@ export function NextCard({ steps, getStepNumber, onSelectStep }: NextCardProps) 
       <div className="space-y-2.5">
         {steps.length > 0 ? (
           steps.map((st) => (
-            <motion.div
+            <motion.button
               key={st.id}
+              type="button"
               onClick={() => onSelectStep(st.id)}
+              aria-label={`Bring ${st.text} to Now`}
               variants={reduceMotion ? undefined : tactileButtonVariants}
               initial="rest"
               animate="rest"
               whileHover={reduceMotion ? undefined : 'hover'}
               whileTap={reduceMotion ? undefined : 'tap'}
-              className="group relative rounded-2xl p-4 bg-surface shadow-subtle hover:shadow-card hover:z-10 cursor-pointer transition-shadow duration-fast future-step-blur"
+              className="group relative w-full text-left rounded-2xl p-4 bg-surface shadow-subtle hover:shadow-card hover:z-10 cursor-pointer transition-shadow duration-fast future-step-blur focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               title="Click to switch to this step"
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-start gap-2.5 min-w-0">
+              <span className="flex items-start justify-between gap-3">
+                <span className="flex items-start gap-2.5 min-w-0">
                   <span className="text-2xs font-mono text-text-tertiary/70 bg-surface-subtle px-1.5 py-0.5 rounded-md shrink-0 mt-0.5 select-none">
                     {getStepNumber(st.id)}
                   </span>
-                  <h4 className="text-xs sm:text-sm font-medium text-text-primary group-hover:text-accent transition-colors leading-snug">
+                  <span className="block text-xs sm:text-sm font-medium text-text-primary group-hover:text-accent transition-colors leading-snug">
                     {st.text}
-                  </h4>
-                </div>
+                  </span>
+                </span>
                 {st.effort && (
                   <span className="text-2xs font-mono text-text-tertiary shrink-0 mt-0.5">
                     {st.effort}
                   </span>
                 )}
-              </div>
-            </motion.div>
+              </span>
+            </motion.button>
           ))
         ) : (
           <div className="p-4 rounded-2xl border border-dashed border-border-subtle/60 text-center">

@@ -17,7 +17,7 @@ export function useTaskCard({ steps, onToggleStep }: UseTaskCardOptions) {
     return new Map(steps.map((s, idx) => [s.id, idx + 1]));
   }, [steps]);
 
-  const getStepNumber = (stepId: number) => stepNumberMap.get(stepId) ?? 1;
+  const getStepNumber = (stepId: number) => stepNumberMap.get(stepId) ?? 0;
 
   const incompleteSteps = steps.filter((s) => !s.completed);
   const completedSteps = steps.filter((s) => s.completed);
