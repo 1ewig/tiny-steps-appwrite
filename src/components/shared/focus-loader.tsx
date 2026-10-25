@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { PhoneCall, ChatCircleDots, ArrowLeft } from '@phosphor-icons/react';
+import { ArrowLeft } from '@phosphor-icons/react';
 import {
   CALM_EASE,
   tactileButtonVariants,
@@ -165,12 +165,6 @@ function FocusLoaderContent({
               exit="exit"
               className="w-full max-w-xl mx-auto flex flex-col items-center text-center space-y-6"
             >
-              {isCrisis && (
-                <div className="w-12 h-12 rounded-full bg-accent-subtle flex items-center justify-center text-accent">
-                  <PhoneCall size={24} weight="bold" />
-                </div>
-              )}
-
               <div className="space-y-3 max-w-lg">
                 <h2 className="text-2xl sm:text-3xl font-semibold text-text-primary tracking-tight">
                   {isCrisis ? 'Support Notice' : 'A gentle pause'}
@@ -179,25 +173,6 @@ function FocusLoaderContent({
                   {noticeMessage}
                 </p>
               </div>
-
-              {isCrisis && (
-                <div className="flex flex-col sm:flex-row gap-3 w-full justify-center pt-2">
-                  <a
-                    href="tel:988"
-                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-accent text-text-inverse text-sm font-medium hover:bg-accent-hover transition-colors shadow-subtle"
-                  >
-                    <PhoneCall size={16} weight="bold" />
-                    <span>Call or text 988</span>
-                  </a>
-                  <a
-                    href="sms:741741"
-                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-surface-subtle text-text-primary text-sm font-medium hover:bg-border-subtle transition-colors"
-                  >
-                    <ChatCircleDots size={16} weight="bold" />
-                    <span>Text HOME to 741741</span>
-                  </a>
-                </div>
-              )}
 
               <div className="pt-2 flex flex-col items-center space-y-2">
                 <motion.button
