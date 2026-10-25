@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { generateText, Output } from 'ai';
-import { getAIGatewayModel } from '@/lib/ai/gateway';
+import { getAIGatewayModel, getAIReasoningEffort } from '@/lib/ai/gateway';
 import { ShrinkStepSchema } from '@/lib/ai/schemas';
 import { getShrinkStepPrompt } from '@/lib/ai/prompts';
 
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
       output: Output.object({ schema: ShrinkStepSchema }),
       system,
       prompt,
-      reasoning: 'high',
+      reasoning: getAIReasoningEffort(),
     });
 
     console.log(

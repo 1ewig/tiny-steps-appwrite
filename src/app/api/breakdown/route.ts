@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { generateText, Output } from 'ai';
-import { getAIGatewayModel } from '@/lib/ai/gateway';
+import { getAIGatewayModel, getAIReasoningEffort } from '@/lib/ai/gateway';
 import { TaskBreakdownSchema } from '@/lib/ai/schemas';
 import { getBreakdownPrompt } from '@/lib/ai/prompts';
 import type { GranularityLevel } from '@/types/task';
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
       output: Output.object({ schema: TaskBreakdownSchema }),
       system,
       prompt,
-      reasoning: 'high',
+      reasoning: getAIReasoningEffort(),
     });
 
     if (output.status === 'refused') {

@@ -1,6 +1,6 @@
 import { createGateway } from '@ai-sdk/gateway';
 
-const DEFAULT_MODEL = 'minimax/minimax-m3.1-flash';
+const DEFAULT_MODEL = 'google/gemini-2.5-flash-lite';
 
 export function getAIGatewayModel() {
   const apiKey = process.env.AI_GATEWAY_API_KEY?.trim();
@@ -17,6 +17,14 @@ export function getAIGatewayModel() {
   });
 
   return gw(modelId);
+}
+
+export function getAIReasoningEffort(): 'low' | 'high' | undefined {
+  const effort = process.env.AI_REASONING_EFFORT?.trim().toLowerCase();
+  if (effort === 'low' || effort === 'high') {
+    return effort;
+  }
+  return 'low';
 }
 
 export function isAIGatewayConfigured(): boolean {
