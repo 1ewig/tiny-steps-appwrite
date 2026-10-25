@@ -108,6 +108,14 @@ const TEST_CASES: TestCase[] = [
     expectedStatus: 'accepted',
     checks: { minSteps: 3, maxSteps: 5 },
   },
+  {
+    id: 'acc-decision-competition',
+    name: 'Decision Task (Developer competition project choice)',
+    prompt: 'I need help choosing a project for a developer competition',
+    energyLevel: 2,
+    expectedStatus: 'accepted',
+    checks: { minSteps: 3, maxSteps: 5 },
+  },
 ];
 
 interface TestResult {
@@ -229,6 +237,10 @@ function evaluateOutput(tc: TestCase, output: any, latencyMs: number): TestResul
         instructionRulePass = false;
         violations.push(`Step ${i + 1} instruction contains "so that" or "in order to"`);
       }
+      if (/open\s+(a\s+)?(new\s+)?(blank\s+)?document|close\s+the\s+document\s+tab|locate\s+writing\s+app/i.test(step.title + ' ' + step.instruction)) {
+        customCheckPass = false;
+        violations.push(`Infantilizing meta-step detected: "${step.title}" - "${step.instruction}"`);
+      }
     }
 
     // Custom check: Review step before paying/submitting
@@ -333,7 +345,7 @@ async function runModelBenchmark(modelId: string, reasoning: 'low' | 'high'): Pr
 }
 
 async function main() {
-  const models = ['minimax/minimax-m3.1-flash'];
+  const models = ['google/gemini-2.5-flash-lite'];
   const reasoningLevels: Array<'low'> = ['low'];
 
   const allSummaries: RunSummary[] = [];
