@@ -363,17 +363,25 @@ export function FocusTunnelModal({
                 </div>
               </>
             ) : (
-              <motion.button
-                onClick={onClose}
-                variants={reduceMotion ? undefined : tactileButtonVariants}
-                initial="rest"
-                animate="rest"
-                whileHover={reduceMotion ? undefined : 'hover'}
-                whileTap={reduceMotion ? undefined : 'tap'}
-                className="h-9 sm:h-10 px-5 rounded-full bg-accent hover:bg-accent-hover text-text-inverse text-xs sm:text-sm font-medium shadow-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-              >
-                Close
-              </motion.button>
+              <>
+                <motion.button
+                  onClick={onClose}
+                  variants={reduceMotion ? undefined : tactileButtonVariants}
+                  initial="rest"
+                  animate="rest"
+                  whileHover={reduceMotion ? undefined : 'hover'}
+                  whileTap={reduceMotion ? undefined : 'tap'}
+                  className="h-9 sm:h-10 px-5 rounded-full bg-accent hover:bg-accent-hover text-text-inverse text-xs sm:text-sm font-medium shadow-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                >
+                  Close
+                </motion.button>
+
+                <div className="text-2xs text-text-tertiary opacity-70 flex items-center gap-2 select-none">
+                  <span>
+                    <kbd className="font-mono text-text-secondary">Esc</kbd> exit
+                  </span>
+                </div>
+              </>
             )}
           </motion.footer>
         </motion.div>
