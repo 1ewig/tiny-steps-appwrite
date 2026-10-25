@@ -228,18 +228,13 @@ export function FocusTunnelModal({
                       </div>
                     )
                   ) : (
-                    <div className="space-y-4 max-w-md">
-                      <div className="w-12 h-12 rounded-2xl bg-accent-subtle text-accent flex items-center justify-center orb-pulse mx-auto">
-                        <Sparkle size={28} weight="duotone" className="text-accent" />
-                      </div>
-                      <div className="space-y-1.5">
-                        <h1 className="text-2xl sm:text-3xl font-bold text-text-primary leading-tight">
-                          All steps complete.
-                        </h1>
-                        <p className="text-text-secondary text-sm sm:text-base leading-relaxed">
-                          You turned initial friction into momentum.
-                        </p>
-                      </div>
+                    <div className="space-y-2 max-w-md mx-auto text-center">
+                      <h1 className="text-2xl sm:text-3xl font-bold text-text-primary leading-tight">
+                        All steps complete.
+                      </h1>
+                      <p className="text-text-secondary text-sm sm:text-base leading-relaxed">
+                        You turned initial friction into momentum.
+                      </p>
                     </div>
                   )}
                 </motion.div>
