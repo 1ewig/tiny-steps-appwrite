@@ -37,7 +37,7 @@ export const TaskBreakdownSchema = z.object({
     .describe('If accepted: calm assurance under 25 words validating weight with zero cheerleading. If refused: warm, non-judgmental redirection explaining Tiny Steps is for helping you take action on things you want to do.'),
   steps: z
     .array(TaskStepSchema)
-    .describe('Sequence of 3 to 5 steps if accepted; empty array [] if refused'),
+    .describe('Adaptive sequence of 2 to 6 steps if accepted (matching energy level guidelines); empty array [] if refused'),
 });
 
 export type TaskBreakdownOutput = z.infer<typeof TaskBreakdownSchema>;

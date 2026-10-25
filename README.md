@@ -41,9 +41,9 @@ Action does not follow motivation; **motivation follows microscopic physical mom
 
 ### 3. 🎚️ Elastic Sensitivity Modes
 Users experience task resistance differently depending on their daily energy:
-* **A little stuck**: Clear, manageable 2–5 minute chunks (`Plant` icon).
-* **Overwhelmed (Default)**: Small, gentle 1-minute steps with warm reassuring tone (`Leaf` icon).
-* **Full paralysis**: Absurdly tiny 5–30 second micro-actions (*"Exhale slowly. You only have to do 10 seconds of motion right now"*, `PottedPlant` icon).
+* **A little stuck**: 3–6 adaptive steps for manageable momentum (`Plant` icon). Accommodates natural beginnings, middles, and complete closures without artificial truncation.
+* **Overwhelmed (Default)**: 3–5 gentle steps with warm reassuring tone (`Leaf` icon). Balanced starter slice with zero artificial filler.
+* **Full paralysis**: 2–4 absurdly tiny micro-actions (*"Exhale slowly. You only have to do 10 seconds of motion right now"*, `PottedPlant` icon). Strictly capped at 4 steps to break the physical freeze without threat.
 
 ### 4. ✨ On-Demand Step Shrinking ("Still too big?")
 If any step triggers hesitation or fear, click **"Break it down"** to split it dynamically into 3 bite-sized pieces following the **Prep ➔ Touch ➔ Finish** formula:

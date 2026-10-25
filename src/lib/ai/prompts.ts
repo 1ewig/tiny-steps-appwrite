@@ -26,36 +26,42 @@ export function getBreakdownPrompt(input: string, energyLevel: GranularityLevel)
   let levelGuide = '';
   switch (energyLevel) {
     case 1:
-      levelGuide = `ENERGY LEVEL 1: A LITTLE STUCK (Strictly 3 to 5 steps, target 4)
-User has energy but is stalling on initial activation.
-- Step 1 (Access & Retrieval): Open the exact file/tab or retrieve the single primary tool. Zero organizing or prep.
-- Step 2 (Frictionless Starter): The easiest mechanical action that breaks inertia (e.g. enter account number, write first bullet, wash one mug).
-- Step 3 (Core Execution): The main substance of the task done without perfectionism (e.g. draft body, complete form, wash main pile).
-- Step 4 (Review & Closure): Review details, then submit, save, or put away to reach a clean, finished checkpoint.`;
+      levelGuide = `ENERGY LEVEL 1: A LITTLE STUCK (Adaptive: 3 to 6 steps)
+User has baseline energy but is stalling on initial activation.
+- Granularity: Manageable 2–5 minute chunks. Avoid artificial baby steps.
+- Flow Arc:
+  1. Quick Launch: Open the exact tool, file, or workspace. Zero organizing.
+  2. Core Execution: 1 to 4 steps executing the substance without perfectionism.
+  3. Clean Closure: Review, save, or store to reach a satisfying checkpoint.
+- Rule: Let natural scope dictate the count. Don't compress a 5-step workflow into 3, and don't pad a simple 3-step task into 6.`;
       break;
     case 2:
-      levelGuide = `ENERGY LEVEL 2: OVERWHELMED (Strictly 4 to 5 steps)
-User has brain fog; break chaos into distinct, low-drag batches (adapt to 4 steps if task is naturally brief; avoid padding).
-- Step 1 (Staging): Prepare a single 1-foot physical space or open single clean document/tab. Zero work yet.
-- Step 2 (The Easy Batch): Complete the lowest-hanging subgroup (e.g. write 3 bullet outline, sort top drawer, clear cups).
-- Step 3 (The Core Batch): Tackle the main subgroup (e.g. write draft section, file main papers, wash plates).
-- Step 4 (Final Items & Review): Complete remaining pieces and review before finalizing (e.g. polish draft, handle remaining items).
-- Step 5 (Reset & Checkpoint): Save and close extra tabs or rinse the area, and pause to appreciate the progress.`;
+      levelGuide = `ENERGY LEVEL 2: OVERWHELMED (Adaptive: 3 to 5 steps, target 4)
+User has brain fog or cognitive overload; reduce working memory demand.
+- Granularity: Gentle ~1 minute steps. Break chaos into distinct, low-drag batches.
+- Flow Arc:
+  1. Low-Drag Staging: Prepare a single clean surface or open 1 clean tab (no work yet).
+  2. Lowest-Hanging Fruit: Clear the easiest, most obvious sub-piece first.
+  3. Core Momentum: Tackle the main batch in 1 or 2 calm chunks.
+  4. Safe Checkpoint: Complete the immediate batch, reset space, and pause.
+- Rule: Strictly NO filler padding. If a task naturally needs only 3 gentle steps, stop at 3.`;
       break;
     case 3:
-      levelGuide = `ENERGY LEVEL 3: FULL PARALYSIS (Strictly 3 to 4 steps, NEVER exceed 4)
-User is frozen / amygdala hijack. The entire win is breaking the physical freeze; zero pressure to complete the full project.
-- Step 1 (First Contact Point): The single easiest physical or digital contact with the task (e.g. sit at desk, open blank doc, touch the object). No dual-layer ritual padding.
-- Step 2 (Micro-Action 1): ONE atomic observable action of the real task (e.g. write one line, clear one item, check one spot).
-- Step 3 (Micro-Action 2): One further tiny movement building on that contact (e.g. write second line, wash second cup).
-- Step 4 (Safe Pause): Complete the immediate motion (e.g. save draft, set item down) and pause. Stopping here is completely fine.`;
+      levelGuide = `ENERGY LEVEL 3: FULL PARALYSIS (Adaptive: 2 to 4 steps, NEVER exceed 4)
+User is in amygdala freeze or deep burnout. The entire victory is breaking physical inertia.
+- Granularity: Absurdly tiny 5–30 second micro-actions.
+- Flow Arc:
+  1. First Contact: Physical or sensory contact with zero performance pressure (e.g. sit down, touch object, glance at area).
+  2. Atomic Movement: ONE microscopic action of the real task (e.g. write one line, wash one cup).
+  3. Safe Release: Put item down, bookmark, or pause. Stopping here is a 100% win.
+- Rule: For simple actions (taking a pill, sending 1-word reply), return exactly 2 steps. Never exceed 4 steps under any circumstance. Strictly NO filler or dual-layer ritual padding.`;
       break;
   }
 
   const breakdownRules = `BREAKDOWN STATUS & REFUSAL INSTRUCTIONS:
 - For actionable personal tasks, chores, writing, or study milestones:
   * Set status to "accepted", refusalCategory="none", and relevanceScore=80-100.
-  * Return 3 to 5 sequential steps.
+  * Return an adaptive sequence of 2 to 6 steps (strictly adhering to the energy level range above).
 - For refused inputs (set status to "refused", relevanceScore=0-30, and 'steps' MUST be an empty array []):
   * 'harmful': Self-harm, crisis, violence, or dangerous/illegal actions.
   * 'irrelevant': General trivia, direct homework solutions, or asking AI to do work for them.
