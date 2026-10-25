@@ -30,6 +30,7 @@ export async function POST(req: Request) {
       output: Output.object({ schema: AssistantIntentSchema }),
       system,
       prompt,
+      reasoning: 'low',
     });
 
     return NextResponse.json(output);

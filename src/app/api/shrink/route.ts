@@ -29,6 +29,7 @@ export async function POST(req: Request) {
       output: Output.object({ schema: ShrinkStepSchema }),
       system,
       prompt,
+      reasoning: 'low',
     });
 
     return NextResponse.json(output);
