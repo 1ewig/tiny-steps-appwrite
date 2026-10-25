@@ -168,13 +168,14 @@ function evaluateOutput(tc: TestCase, output: any, latencyMs: number): TestResul
     }
   }
 
-  // 3. Acknowledgment rule checks: under 25 words, no time estimates, no pipes/cheerleading
+  // 3. Acknowledgment rule checks: under 25 words (or 35 if citing 988/741741), no time estimates, no pipes/cheerleading
   let dialogueRulePass = true;
   const ackText = output.acknowledgment || output.dialogue || '';
   const dWords = wordCount(ackText);
-  if (dWords > 25) {
+  const maxWords = /988|741741/i.test(ackText) ? 35 : 25;
+  if (dWords > maxWords) {
     dialogueRulePass = false;
-    violations.push(`Acknowledgment too long: ${dWords} words (max 25)`);
+    violations.push(`Acknowledgment too long: ${dWords} words (max ${maxWords})`);
   }
   if (/\b\d+\s*(minutes?|mins?|seconds?|secs?|hours?)\b/i.test(ackText)) {
     dialogueRulePass = false;

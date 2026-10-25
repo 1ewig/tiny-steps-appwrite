@@ -141,7 +141,7 @@ export function interpretUserIntent(
     lower.includes('end it all') ||
     lower.includes("can't go on")
   ) {
-    const ack = 'Please know you are not alone and your life matters. Support is free and confidential: text HOME to 741741 or call/text 988 anytime (24/7).';
+    const ack = 'Tiny Steps is an everyday task decomposition tool and is not equipped for crisis or mental health support. For free, confidential help, call or text 988 or text HOME to 741741.';
     return {
       type: 'crisis',
       acknowledgment: ack,
@@ -160,7 +160,7 @@ export function interpretUserIntent(
       lower === 'k' ||
       lower === 'ok')
   ) {
-    const ack = 'Incredible work! Notice how taking that one microscopic action did not break you. Take a brief breath. Here is your next step:';
+    const ack = 'Step completed. Here is your next step:';
     return {
       type: 'complete_step',
       targetStepId: nextIncomplete.id,
@@ -182,7 +182,7 @@ export function interpretUserIntent(
       lower.includes('all done') ||
       lower.includes('complete'))
   ) {
-    const ack = 'You did it! Every single tiny step is complete. Take a deep breath, unclench your jaw, and celebrate turning something heavy into momentum.';
+    const ack = 'All steps complete. You turned initial friction into momentum.';
     return {
       type: 'all_complete',
       acknowledgment: ack,
@@ -203,7 +203,7 @@ export function interpretUserIntent(
       lower.includes('cannot') ||
       lower.includes("can't"))
   ) {
-    const ack = 'No problem at all! If a step makes you hesitate, that is just your brain saying it is still too large. I shrank it into tiny bite-sized pieces for you:';
+    const ack = 'Here is a smaller breakdown of this step to keep momentum going:';
     return {
       type: 'shrink_step',
       targetStepIndex: nextIncompleteIdx,

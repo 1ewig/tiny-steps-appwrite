@@ -29,19 +29,19 @@ const ENERGY_OPTIONS: EnergyOption[] = [
     level: 1,
     icon: Plant,
     label: 'A little stuck',
-    description: 'Clear, manageable ~2–5 min chunks for moderate energy.',
+    description: 'Direct, manageable chunks for baseline energy.',
   },
   {
     level: 2,
     icon: Leaf,
     label: 'Overwhelmed',
-    description: 'Gentle ~1 min pieces with calm reassurance. Zero pressure.',
+    description: 'Low-friction starter steps to break through mental fog.',
   },
   {
     level: 3,
     icon: PottedPlant,
     label: 'Full paralysis',
-    description: 'Absurdly tiny 5–30 second micro-actions (e.g. "touch one item").',
+    description: 'Ultra-small initial actions to break inertia with zero pressure.',
   },
 ];
 

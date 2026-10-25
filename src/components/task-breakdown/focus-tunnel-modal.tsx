@@ -234,10 +234,10 @@ export function FocusTunnelModal({
                       </div>
                       <div className="space-y-1.5">
                         <h1 className="text-2xl sm:text-3xl font-bold text-text-primary leading-tight">
-                          You made it through.
+                          All steps complete.
                         </h1>
                         <p className="text-text-secondary text-sm sm:text-base leading-relaxed">
-                          Take a breath and unclench your jaw. You turned something heavy into momentum.
+                          You turned initial friction into momentum.
                         </p>
                       </div>
                     </div>

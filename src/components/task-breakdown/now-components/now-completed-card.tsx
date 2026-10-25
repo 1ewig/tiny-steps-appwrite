@@ -20,10 +20,10 @@ export function NowCompletedCard({ reduceMotion }: NowCompletedCardProps) {
       </div>
       <div className="space-y-1.5 max-w-sm mx-auto">
         <h3 className="text-xl sm:text-2xl font-bold text-text-primary">
-          You made it through.
+          All steps complete.
         </h3>
         <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
-          Take a breath and unclench your jaw. You turned something heavy into momentum.
+          You turned initial friction into momentum.
         </p>
       </div>
     </motion.article>

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { PhoneCall, ChatCircleDots, ArrowLeft, Heart } from '@phosphor-icons/react';
+import { PhoneCall, ChatCircleDots, ArrowLeft } from '@phosphor-icons/react';
 import {
   CALM_EASE,
   tactileButtonVariants,
@@ -167,13 +167,13 @@ function FocusLoaderContent({
             >
               {isCrisis && (
                 <div className="w-12 h-12 rounded-full bg-accent-subtle flex items-center justify-center text-accent">
-                  <Heart size={24} weight="fill" />
+                  <PhoneCall size={24} weight="bold" />
                 </div>
               )}
 
               <div className="space-y-3 max-w-lg">
                 <h2 className="text-2xl sm:text-3xl font-semibold text-text-primary tracking-tight">
-                  {isCrisis ? "We're here with you" : 'A gentle pause'}
+                  {isCrisis ? 'Support Notice' : 'A gentle pause'}
                 </h2>
                 <p className="text-base sm:text-lg text-text-secondary leading-relaxed">
                   {noticeMessage}

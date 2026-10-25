@@ -17,86 +17,76 @@ export const ENERGY_LEVEL_TEMPLATES: Record<GranularityLevel, LevelTemplate> = {
   1: {
     name: 'A little stuck',
     acknowledgment: (task) =>
-      `Let's make clean work of "${task}". We don't have to finish the whole mountain—let's just clear the initial friction.`,
+      `Let's decompress "${task}" into clean, direct steps.`,
     steps: [
       {
-        text: () => 'Gather only the single core item needed',
+        text: () => 'Open the primary file, tool, or workspace needed',
         effort: 'Setup',
-        hint: "Only the essentials. Don't set up the whole workspace.",
+        hint: 'Direct launch with zero extra organizing.',
       },
       {
-        text: () => 'Start on the simplest mechanical piece first',
+        text: () => 'Execute the simplest starter piece first',
         effort: 'Starter',
-        hint: 'Pick the most boring, obvious piece.',
+        hint: 'Pick the most obvious piece to build momentum.',
       },
       {
-        text: () => 'Chip away at an imperfect draft',
-        effort: 'Draft',
-        hint: 'Rough draft, rough attempt, anything.',
+        text: () => 'Draft the core substance without perfectionism',
+        effort: 'Core',
+        hint: 'Get an imperfect version in place.',
       },
       {
-        text: () => 'Reach a safe stopping point and bookmark',
-        effort: 'Bookmark',
-        hint: "Bookmark it and leave it. That's a complete win.",
+        text: () => 'Review and save a clean checkpoint',
+        effort: 'Checkpoint',
+        hint: 'Reach a solid stopping point.',
       },
     ],
   },
   2: {
     name: 'Overwhelmed',
     acknowledgment: (task) =>
-      `I hear you. "${task}" feels heavy right now. Let's not look at the summit—let's just place one foot on level ground.`,
+      `Let's decompress "${task}" into low-friction steps.`,
     steps: [
       {
-        text: () => 'Sit comfortably and let your shoulders drop',
-        effort: 'Grounding',
-        hint: 'Let your shoulders drop away from your ears. No work yet.',
+        text: () => 'Clear the lowest-hanging barrier to starting',
+        effort: 'Entry',
+        hint: 'The single easiest step to break inertia.',
       },
       {
-        text: () => 'Open the exact room or app needed',
-        effort: 'Stage',
-        hint: 'Opening the space is the whole step—not doing the work.',
-      },
-      {
-        text: () => 'Set up only the very first item',
-        effort: 'Ready',
-        hint: 'Just the first piece. Nothing more.',
-      },
-      {
-        text: () => 'Take one gentle action with zero panic',
+        text: () => 'Complete the first mechanical piece',
         effort: 'Momentum',
-        hint: 'A gentle starter action, imperfect is fine.',
+        hint: 'A quick starter chunk to get rolling.',
       },
       {
-        text: () => 'Check in with yourself and choose pace',
+        text: () => 'Tackle the main section in one focused push',
+        effort: 'Primary',
+        hint: 'Work through the primary task calmly.',
+      },
+      {
+        text: () => 'Save your progress at a solid checkpoint',
         effort: 'Checkpoint',
-        hint: 'Stop here or keep rolling—both are completely valid.',
+        hint: 'Stop here or keep going as needed.',
       },
     ],
   },
   3: {
     name: 'Full paralysis',
     acknowledgment: (task) =>
-      `Breathe. You are safe. You do not have to finish "${task}" today. Doing just 1% of this is a 100% victory.`,
+      `Let's break "${task}" into ultra-small momentum actions.`,
     steps: [
       {
-        text: () => 'Put feet flat and glance toward area',
-        effort: 'Orient',
-        hint: 'Looking is enough. Zero work expected from you right now.',
+        text: () => 'Make the easiest possible contact with the task',
+        effort: 'Contact',
+        hint: 'Zero performance pressure.',
       },
       {
-        text: () => 'Touch one item with your fingers',
-        effort: 'Touch',
-        hint: 'Just one light physical contact. Do not open or start it yet.',
-      },
-      {
-        text: () => 'Complete just this single microscopic piece',
+        text: () => 'Complete one tiny observable action of the work',
         effort: 'Micro-action',
-        hint: 'One sentence, one dish, or one word. Then you are free to stop.',
+        hint: 'One line, one item, or one piece.',
       },
       {
-        text: () => 'Stop right here and rest completely',
-        effort: 'Complete',
-        hint: 'You broke the freeze. Celebrate turning something heavy into momentum.',
+        text: () => 'Pause right here with momentum established',
+        effort: 'Checkpoint',
+        hint: 'Stopping here is a full win.',
       },
     ],
   },
