@@ -45,8 +45,13 @@ export function NextCard({ steps, getStepNumber, onSelectStep }: NextCardProps) 
                   <span className="text-2xs font-mono text-text-tertiary/70 bg-surface-subtle px-1.5 py-0.5 rounded-md shrink-0 mt-0.5 select-none">
                     {getStepNumber(st.id)}
                   </span>
-                  <span className="block text-xs sm:text-sm font-medium text-text-primary group-hover:text-accent transition-colors leading-snug">
-                    {st.text}
+                  <span className="block text-xs sm:text-sm text-text-primary group-hover:text-accent transition-colors leading-snug">
+                    <span className="block font-semibold">{st.title || st.text}</span>
+                    {st.instruction && (
+                      <span className="block text-2xs sm:text-xs text-text-secondary mt-0.5 font-normal">
+                        {st.instruction}
+                      </span>
+                    )}
                   </span>
                 </span>
                 {st.effort && (

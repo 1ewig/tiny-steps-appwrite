@@ -114,7 +114,12 @@ export function NowMicroSteps({
                               : 'text-text-primary'
                           }`}
                         >
-                          {sub.text}
+                          <span className="font-medium">{sub.title || sub.text}</span>
+                          {sub.instruction && (
+                            <span className="block text-2xs text-text-secondary font-normal mt-0.5">
+                              {sub.instruction}
+                            </span>
+                          )}
                         </span>
                       </div>
                       {sub.effort && (

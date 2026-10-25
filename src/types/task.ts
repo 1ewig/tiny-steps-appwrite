@@ -4,6 +4,8 @@ export type GranularityLevel = EnergyLevel; // Backward-compatibility alias
 export interface Step {
   id: number;
   text: string;
+  title?: string;
+  instruction?: string;
   effort?: string;
   hint?: string;
   completed: boolean;

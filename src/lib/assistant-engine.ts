@@ -35,10 +35,13 @@ export type AssistantIntent =
  */
 export function generateMicroSteps(parentStepText: string): Step[] {
   const baseTime = Date.now();
+  const cleanParent = parentStepText.length > 28 ? parentStepText.substring(0, 25) + '...' : parentStepText;
   return [
     {
       id: baseTime + 1,
-      text: `Prep: Just look at what you need to "${parentStepText.toLowerCase()}"`,
+      title: 'Prep: Look without doing',
+      instruction: `Glance at what you need to "${cleanParent.toLowerCase()}".`,
+      text: 'Prep: Look without doing',
       effort: '10 sec',
       hint: "Look, don't do. Ten seconds.",
       completed: false,
@@ -46,7 +49,9 @@ export function generateMicroSteps(parentStepText: string): Step[] {
     },
     {
       id: baseTime + 2,
-      text: `Touch: Take just the first physical action on "${parentStepText}"`,
+      title: 'Touch: First physical contact',
+      instruction: `Make light physical contact with just one item.`,
+      text: 'Touch: First physical contact',
       effort: '20 sec',
       hint: 'Physical contact—nothing more.',
       completed: false,
@@ -54,7 +59,9 @@ export function generateMicroSteps(parentStepText: string): Step[] {
     },
     {
       id: baseTime + 3,
-      text: `Finish: Complete just that piece cleanly`,
+      title: 'Finish: Complete just this piece',
+      instruction: `Wrap up just that piece cleanly and stop.`,
+      text: 'Finish: Complete just this piece',
       effort: '30 sec',
       hint: 'Finish just this piece, then stop.',
       completed: false,
@@ -74,14 +81,18 @@ export function decomposeTask(input: string, level: GranularityLevel): Breakdown
   return {
     title: actionName,
     dialogue: template.dialogue(actionName),
-    steps: template.steps.map((s, i) => ({
-      id: Date.now() + i,
-      text: s.text(actionName),
-      effort: s.effort,
-      hint: s.hint,
-      completed: false,
-      canSplit: true,
-    })),
+    steps: template.steps.map((s, i) => {
+      const stepText = s.text(actionName);
+      return {
+        id: Date.now() + i,
+        title: stepText,
+        text: stepText,
+        effort: s.effort,
+        hint: s.hint,
+        completed: false,
+        canSplit: true,
+      };
+    }),
   };
 }
 

@@ -132,10 +132,15 @@ function NowCardBody({
     <>
       <div className="space-y-2">
         <h3 className="text-2xl sm:text-3xl font-bold text-text-primary tracking-tight leading-snug">
-          {step.text}
+          {step.title || step.text}
         </h3>
+        {step.instruction && (
+          <p className="text-sm sm:text-base text-text-secondary leading-relaxed">
+            {step.instruction}
+          </p>
+        )}
         {step.hint ? (
-          <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
+          <p className="text-xs sm:text-sm text-text-tertiary leading-relaxed italic">
             {step.hint}
           </p>
         ) : step.effort ? (

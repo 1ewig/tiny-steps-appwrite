@@ -50,7 +50,7 @@ export function LaterCard({
                 <motion.button
                   type="button"
                   onClick={() => onSelectStep(st.id)}
-                  aria-label={`Bring ${st.text} to Now`}
+                  aria-label={`Bring ${st.title || st.text} to Now`}
                   variants={reduceMotion ? undefined : tactileButtonVariants}
                   initial="rest"
                   animate="rest"
@@ -62,7 +62,7 @@ export function LaterCard({
                   <span className="text-2xs font-mono text-text-tertiary/70 mr-1.5 shrink-0 select-none">
                     {getStepNumber(st.id)}.
                   </span>
-                  <span className="truncate">{st.text}</span>
+                  <span className="truncate">{st.title || st.text}</span>
                 </motion.button>
               </li>
             ))}

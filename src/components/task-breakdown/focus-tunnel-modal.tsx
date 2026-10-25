@@ -205,10 +205,15 @@ export function FocusTunnelModal({
                       <div className="space-y-3 max-w-4xl w-full mx-auto">
                         {/* Spotlight Tiny Step Text */}
                         <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-text-primary leading-snug sm:leading-tight tracking-tight text-center max-w-4xl mx-auto">
-                          {currentSubStep.text}
+                          {currentSubStep.title || currentSubStep.text}
                         </h1>
+                        {currentSubStep.instruction && (
+                          <p className="text-sm sm:text-lg text-text-secondary leading-relaxed max-w-xl mx-auto font-medium">
+                            {currentSubStep.instruction}
+                          </p>
+                        )}
                         {currentSubStep.hint && (
-                          <p className="text-xs sm:text-sm text-text-secondary leading-relaxed max-w-xl mx-auto">
+                          <p className="text-xs sm:text-sm text-text-tertiary leading-relaxed max-w-xl mx-auto italic">
                             {currentSubStep.hint}
                           </p>
                         )}
@@ -216,10 +221,15 @@ export function FocusTunnelModal({
                     ) : (
                       <div className="space-y-3 max-w-4xl w-full mx-auto">
                         <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-text-primary leading-snug sm:leading-tight tracking-tight text-center max-w-4xl mx-auto">
-                          {activeStep.text}
+                          {activeStep.title || activeStep.text}
                         </h1>
+                        {activeStep.instruction && (
+                          <p className="text-sm sm:text-lg text-text-secondary leading-relaxed max-w-xl mx-auto font-medium">
+                            {activeStep.instruction}
+                          </p>
+                        )}
                         {activeStep.hint ? (
-                          <p className="text-xs sm:text-sm text-text-secondary leading-relaxed max-w-xl mx-auto">
+                          <p className="text-xs sm:text-sm text-text-tertiary leading-relaxed max-w-xl mx-auto italic">
                             {activeStep.hint}
                           </p>
                         ) : activeStep.effort ? (
