@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import type { Step } from '@/types/task';
+import type { Step, EnergyLevel } from '@/types/task';
 import { useTaskCard } from '@/hooks/use-task-card';
 import { taskWorkspaceStaggerVariants, unblurFadeInVariants } from '@/constants/animation';
 import { NowCard } from './now-card';
@@ -12,6 +12,7 @@ import { LaterCard } from './later-card';
 interface TaskCardProps {
   guidanceText?: string;
   steps: Step[];
+  energyLevel?: EnergyLevel;
   isAdjusting?: boolean;
   onToggleStep: (stepId: number) => void;
   onShrinkStep: (stepIndex: number) => Promise<void> | void;
@@ -21,6 +22,7 @@ interface TaskCardProps {
 export function TaskCard({
   guidanceText,
   steps,
+  energyLevel,
   isAdjusting = false,
   onToggleStep,
   onShrinkStep,
@@ -48,7 +50,7 @@ export function TaskCard({
     toggleSubSteps,
     expandSubSteps,
     toggleCompleted,
-  } = useTaskCard({ steps, onToggleStep });
+  } = useTaskCard({ steps, energyLevel, onToggleStep });
 
   useEffect(() => {
     if (!pendingScrollRef.current) return;

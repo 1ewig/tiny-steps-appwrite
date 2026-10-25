@@ -68,7 +68,9 @@ export function LaterCard({
             ))}
           </ul>
         ) : (
-          <p className="text-2xs text-text-tertiary/70 italic px-1">Nothing further out.</p>
+          <div className="py-2.5 px-3 rounded-xl bg-surface/50 border border-border-subtle/50 text-center select-none">
+            <p className="text-2xs text-text-tertiary">Home stretch — no pending backlog.</p>
+          </div>
         )}
 
         {/* Completed Tasks — Collapsed Pill Summary */}

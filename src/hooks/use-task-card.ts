@@ -1,14 +1,15 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import type { Step } from '@/types/task';
+import type { Step, EnergyLevel } from '@/types/task';
 
 interface UseTaskCardOptions {
   steps: Step[];
+  energyLevel?: EnergyLevel;
   onToggleStep: (stepId: number) => void;
 }
 
-export function useTaskCard({ steps, onToggleStep }: UseTaskCardOptions) {
+export function useTaskCard({ steps, energyLevel = 2, onToggleStep }: UseTaskCardOptions) {
   const [selectedStepId, setSelectedStepId] = useState<number | null>(null);
   const [showSubSteps, setShowSubSteps] = useState(true);
   const [showCompleted, setShowCompleted] = useState(false);
@@ -30,11 +31,14 @@ export function useTaskCard({ steps, onToggleStep }: UseTaskCardOptions) {
     incompleteSteps.find((s) => s.id === selectedStepId) ??
     naturalFirstStep;
 
-  // Next steps: up to 3 upcoming incomplete steps after "Now"
-  const nextSteps = incompleteSteps.filter((s) => s.id !== nowStep?.id).slice(0, 3);
+  // Cognitive Horizon: Next capacity scales with energy sensitivity
+  // Level 3 (Paralysis): exactly 1 upcoming step to prevent scan anxiety.
+  // Levels 1 & 2: up to 2 upcoming steps.
+  const nextCapacity = energyLevel === 3 ? 1 : 2;
 
-  // Later steps: remaining incomplete steps beyond Next
-  const laterSteps = incompleteSteps.filter((s) => s.id !== nowStep?.id).slice(3);
+  const remainingSteps = incompleteSteps.filter((s) => s.id !== nowStep?.id);
+  const nextSteps = remainingSteps.slice(0, nextCapacity);
+  const laterSteps = remainingSteps.slice(nextCapacity);
 
   const nowStepIndex = nowStep ? steps.findIndex((s) => s.id === nowStep.id) : -1;
   const nowStepNumber = nowStep ? getStepNumber(nowStep.id) : null;
