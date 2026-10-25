@@ -131,14 +131,16 @@ export function FocusTunnelModal({
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-modal bg-canvas/95 backdrop-blur-md flex flex-col items-center justify-between p-3.5 sm:p-5 md:p-6 select-none overflow-y-auto focus:outline-none"
         >
-          {/* Top Bar: Session Name, Step Indicator & Minimal Close */}
-          <div className="w-full flex items-center justify-between z-10 shrink-0">
-            <div className="flex items-center gap-2 text-xs font-medium text-text-secondary max-w-[70vw] sm:max-w-md truncate">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse shrink-0" />
-              <span className="truncate">{sessionTitle || 'Focus'}</span>
+          {/* Header: Session Name, Step Indicator Below, Minimal Close */}
+          <header className="w-full flex items-start justify-between z-10 shrink-0">
+            <div className="flex flex-col gap-0.5 max-w-[70vw] sm:max-w-md">
+              <div className="flex items-center gap-2 text-xs font-medium text-text-secondary truncate">
+                <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse shrink-0" />
+                <span className="truncate">{sessionTitle || 'Focus'}</span>
+              </div>
               {activeStepNumber && totalStepsCount && (
-                <span className="text-2xs font-mono text-text-tertiary">
-                  · Step {activeStepNumber} of {totalStepsCount}
+                <span className="text-2xs font-mono text-text-tertiary pl-3.5">
+                  Step {activeStepNumber} of {totalStepsCount}
                 </span>
               )}
             </div>
@@ -162,27 +164,27 @@ export function FocusTunnelModal({
                 <X size={18} weight="bold" />
               </motion.span>
             </motion.button>
-          </div>
+          </header>
 
-          {/* Top Context Anchor: Original Parent Step (When Shrunk) */}
-          <AnimatePresence>
-            {hasSubSteps && currentSubStep && (
-              <motion.div
-                initial={reduceMotion ? false : { opacity: 0, y: -6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={reduceMotion ? undefined : { opacity: 0, y: -6 }}
-                transition={{ duration: 0.22, ease: CALM_EASE }}
-                className="pt-4 pb-1 shrink-0 z-10 text-center max-w-3xl lg:max-w-4xl mx-auto px-4"
-              >
-                <p className="text-sm sm:text-base md:text-lg font-medium text-text-secondary truncate">
-                  {activeStep?.text}
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Body: Centered Active Step / Micro-Step Spotlight with Overlapping Blur Morph */}
+          <main className="flex-1 flex flex-col items-center justify-center text-center px-4 sm:px-6 py-8 max-w-4xl lg:max-w-5xl mx-auto w-full my-auto">
+            {/* Context Anchor: Original Parent Step (When Shrunk) */}
+            <AnimatePresence>
+              {hasSubSteps && currentSubStep && (
+                <motion.div
+                  initial={reduceMotion ? false : { opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={reduceMotion ? undefined : { opacity: 0, y: -6 }}
+                  transition={{ duration: 0.22, ease: CALM_EASE }}
+                  className="pb-3 shrink-0 z-10 text-center max-w-3xl lg:max-w-4xl mx-auto px-4"
+                >
+                  <p className="text-sm sm:text-base md:text-lg font-medium text-text-secondary truncate">
+                    {activeStep?.text}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-          {/* Centered Active Step / Micro-Step Spotlight with Overlapping Blur Morph */}
-          <div className="flex-1 flex flex-col items-center justify-center text-center px-4 sm:px-6 py-8 max-w-4xl lg:max-w-5xl mx-auto w-full my-auto">
             <div className="grid grid-cols-1 grid-rows-1 place-items-center w-full max-w-4xl mx-auto min-h-[140px] sm:min-h-[180px] md:min-h-[200px]">
               <AnimatePresence initial={false}>
                 <motion.div
@@ -262,10 +264,10 @@ export function FocusTunnelModal({
                 ))}
               </div>
             )}
-          </div>
+          </main>
 
-          {/* Bottom Action Area */}
-          <motion.div
+          {/* Footer: Action Area & Shortcuts */}
+          <motion.footer
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 6 }}
@@ -378,7 +380,7 @@ export function FocusTunnelModal({
                 Close
               </motion.button>
             )}
-          </motion.div>
+          </motion.footer>
         </motion.div>
       )}
     </AnimatePresence>
