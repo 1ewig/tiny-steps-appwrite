@@ -139,11 +139,6 @@ function NowCardBody({
             {step.instruction}
           </p>
         )}
-        {step.hint && (
-          <p className="text-xs sm:text-sm text-text-tertiary leading-relaxed italic">
-            {step.hint}
-          </p>
-        )}
       </div>
 
       <div className="mt-5 flex items-center gap-4 pt-1">

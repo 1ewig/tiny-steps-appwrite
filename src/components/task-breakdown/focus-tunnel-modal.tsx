@@ -212,11 +212,6 @@ export function FocusTunnelModal({
                             {currentSubStep.instruction}
                           </p>
                         )}
-                        {currentSubStep.hint && (
-                          <p className="text-xs sm:text-sm text-text-tertiary leading-relaxed max-w-xl mx-auto italic">
-                            {currentSubStep.hint}
-                          </p>
-                        )}
                       </div>
                     ) : (
                       <div className="space-y-3 max-w-4xl w-full mx-auto">
@@ -226,11 +221,6 @@ export function FocusTunnelModal({
                         {activeStep.instruction && (
                           <p className="text-sm sm:text-lg text-text-secondary leading-relaxed max-w-xl mx-auto font-medium">
                             {activeStep.instruction}
-                          </p>
-                        )}
-                        {activeStep.hint && (
-                          <p className="text-xs sm:text-sm text-text-tertiary leading-relaxed max-w-xl mx-auto italic">
-                            {activeStep.hint}
                           </p>
                         )}
                       </div>

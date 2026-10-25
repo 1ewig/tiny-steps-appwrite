@@ -10,11 +10,6 @@ export const TaskStepSchema = z.object({
     .max(100)
     .optional()
     .describe('1 short concrete sentence of physical context, max 12 words. Example: "Peek inside the bathroom or closet, then close it."'),
-  hint: z
-    .string()
-    .max(140)
-    .optional()
-    .describe('One brief, complete calming whisper sentence (under 15 words) e.g. "Looking is enough, no need to touch."'),
 });
 
 export const TaskBreakdownSchema = z.object({

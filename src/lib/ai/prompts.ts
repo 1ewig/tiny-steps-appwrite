@@ -19,9 +19,8 @@ CRITICAL ANTI-OVERWHELM FORMATTING RULES (STRICT):
 2. 'instruction': At most ONE short concrete sentence (under 12 words) giving physical clarity.
    - Good: "Peek inside the bathroom or closet, then close it."
    - Good: "Listen in silence for a moment."
-3. NO TIME ESTIMATES: Do NOT include countdowns, seconds, minutes, or time durations anywhere. Steps are measured purely by physical simplicity, not clock time.
-4. 'hint': A single, complete short whisper sentence under 12 words e.g. "Looking is enough, no need to touch."
-5. 'dialogue': Keep it warm and validating, but STRICTLY 2 TO 3 SHORT SENTENCES (under 40 words total). Never write essays or long paragraphs.`;
+3. NO TIME ESTIMATES: Do NOT include countdowns, seconds, minutes, or durations anywhere.
+4. 'dialogue': Keep it warm and validating, but STRICTLY 2 TO 3 SHORT SENTENCES (under 40 words total). Never write essays or long paragraphs.`;
 
 export function getBreakdownPrompt(input: string, energyLevel: GranularityLevel): { system: string; prompt: string } {
   let energyGuidance = '';
@@ -56,7 +55,7 @@ ${energyGuidance}
 Remember:
 - 'title' must be 3-7 words only. No paragraphs!
 - 'instruction' is 1 short sentence max (under 12 words).
-- Zero time estimates or countdowns.
+- Zero time estimates.
 - 'dialogue' must be 2-3 short sentences max.`,
     prompt: `Task to break down: "${input}"`,
   };
@@ -72,7 +71,7 @@ Shrink this step into exactly 3 microscopic sub-steps following the Prep ➔ Tou
 2. Touch: Take just the first physical contact or motion.
 3. Finish: Complete just that one tiny piece cleanly and stop.
 
-Provide a 1-sentence reassuring dialogue. Keep 'hint' strictly as a short whisper sentence under 10 words without repeating dialogue. Strictly follow the 3-7 word title constraint! Zero time estimates or clock durations.`,
+Provide a 1-sentence reassuring dialogue. Strictly follow the 3-7 word title constraint! Zero time estimates.`,
     prompt: `Overall Task: "${taskTitle}"
 Step that felt too big: "${stepText}"`,
   };
