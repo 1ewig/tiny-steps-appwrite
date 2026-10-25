@@ -90,9 +90,9 @@ export function getShrinkStepPrompt(
   nextStepText?: string
 ): { system: string; prompt: string } {
   const context = `Overall Goal: "${taskTitle}"
-Previous Step Completed: "${previousStepText || 'None (this is step 1)'}"
+Previous Step: "${previousStepText || 'None (this is the first step)'}"
 Step Causing Resistance: "${stepText}"
-Next Step Ahead: "${nextStepText || 'None (this is the final step)'}"`;
+Next Step: "${nextStepText || 'None (this is the last step)'}"`;
 
   return {
     system: `${SYSTEM_PERSONA}
@@ -100,8 +100,10 @@ Next Step Ahead: "${nextStepText || 'None (this is the final step)'}"`;
 The user feels resistance on a specific step.
 Replace it with 2 to 4 smaller sub-steps that dissolve the hesitation:
 - Shrink the SCOPE or DECISION COMPLEXITY—never reduce it to trivial computer mechanics (like launching apps or clicking menus).
-- Sub-step 1 is the easiest possible entry point into the real task.
-- The final sub-step completes that piece cleanly.
+- Sub-step 1 is the easiest possible entry point into the real task, starting from the state the previous step left behind without repeating its work.
+- The final sub-step finishes the original step as a self-contained result, so the next step can begin with no cleanup.
+- Do not absorb the next step's work, add transition filler, or name the neighboring steps.
+- If Previous Step or Next Step is "None", enter or end cleanly within this step's own scope.
 - Titles must be 3-7 words. Instructions must be a single sentence under 12 words.
 - Provide a brief reassuring acknowledgment under 25 words. Zero cheerleading. Zero time estimates.`,
     prompt: context,
