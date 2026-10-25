@@ -87,17 +87,6 @@ If any step triggers hesitation or resistance, click **"Break it down"** to spli
 * **100% Offline-Safe**: If unauthenticated or offline, seamlessly falls back to the deterministic local engine with zero UI errors or broken states.
 * State persists safely to `localStorage` with automated migration guards.
 
-### 10. 📊 Automated Model Benchmark Suite
-* Built-in multi-model benchmarking script ([`scripts/benchmark-models.ts`](scripts/benchmark-models.ts)).
-* Evaluates 10 rigorous safety and decomposition test cases:
-  * Crisis / self-harm straight-up refusal accuracy
-  * Academic cheating rejection
-  * Irrelevant input / joke handling
-  * Energy sensitivity step caps (Paralysis ≤ 4 steps)
-  * Irreversible action safety review step enforcement
-  * Complex decision task decomposition (e.g., developer competition ideation)
-  * Word count compliance and latency benchmarks
-
 ---
 
 ## 🕘 Recent Updates
@@ -136,12 +125,8 @@ If any step triggers hesitation or resistance, click **"Break it down"** to spli
 ## 📂 Project Structure
 
 ```text
-tiny-steps/
-├── scripts/
-│   └── benchmark-models.ts            # Multi-model gateway benchmark suite (10 test cases)
-│
-├── src/
-│   ├── app/
+src/
+├── app/
 │   │   ├── api/
 │   │   │   ├── breakdown/route.ts     # Task decomposition endpoint (structured JSON output)
 │   │   │   ├── shrink/route.ts        # Step breakdown endpoint (3 micro-actions)
@@ -249,20 +234,14 @@ bun run dev
 ```
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### 4. Automated Gateway Benchmarking
-Run the 10-case validation suite against live models:
-```bash
-bun scripts/benchmark-models.ts
-```
-
-### 5. Native Typechecking & Fast Linting
+### 4. Native Typechecking & Fast Linting
 Validate TypeScript and Oxlint rules in sub-second multi-core passes:
 ```bash
 bun run check  # Multi-threaded native typecheck (~250ms)
 bun run lint   # Oxlint static analysis (~30ms)
 ```
 
-### 6. Production Build
+### 5. Production Build
 Create an optimized production bundle:
 ```bash
 bun run build
