@@ -25,6 +25,7 @@ export interface Task {
   createdAt: number;
   updatedAt: number;
   steps: Step[];
+  introSeen?: boolean;
 }
 
 // Backward-compatibility aliases during transition
@@ -55,6 +56,7 @@ export interface TaskState {
     updates: { title?: string; guidance?: string; steps?: Step[] }
   ) => void;
   deleteTask: (taskId: string) => void;
+  markIntroSeen: (taskId: string) => void;
   setGranularity: (level: EnergyLevel) => void;
   togglePeek: () => void;
   openFocusTunnel: (taskId: string) => void;

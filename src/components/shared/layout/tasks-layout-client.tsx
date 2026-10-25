@@ -31,6 +31,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     isHistoryOpen,
     theme,
     deleteTask,
+    markIntroSeen,
     openFocusTunnel,
     closeFocusTunnel,
     setGeneratingTask,
@@ -70,6 +71,13 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
   const activeStepNumber = activeStep
     ? steps.findIndex((s) => s.id === activeStep.id) + 1
     : null;
+
+  const showIntro = Boolean(
+    focusTunnelOpen &&
+      activeTask?.introSeen === false &&
+      activeTask.guidance &&
+      activeStep
+  );
 
   const handleCompleteFocusStep = () => {
     if (!activeStep || !activeTask) return;
@@ -176,7 +184,8 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     },
     onCompleteFocusStep: handleCompleteFocusStep,
     onShrinkFocusStep: handleShrinkFocusStep,
-    isFocusTunnelActive: focusTunnelOpen && !isGeneratingTask && !isShrinkingFocusStep,
+    isFocusTunnelActive:
+      focusTunnelOpen && !showIntro && !isGeneratingTask && !isShrinkingFocusStep,
     onToggleHistory: toggleHistory,
     onCloseHistory: closeHistory,
     isHistoryOpen,
@@ -250,6 +259,11 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
         isOpen={focusTunnelOpen}
         isBusy={isGeneratingTask}
         isShrinking={isShrinkingFocusStep}
+        showIntro={showIntro}
+        introText={showIntro ? activeTask?.guidance : undefined}
+        onBegin={() => {
+          if (activeTask) markIntroSeen(activeTask.id);
+        }}
         activeStep={activeStep}
         activeStepNumber={activeStepNumber}
         totalStepsCount={totalStepsCount}

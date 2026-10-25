@@ -15,6 +15,9 @@ interface FocusTunnelModalProps {
   isOpen: boolean;
   isBusy?: boolean;
   isShrinking?: boolean;
+  showIntro?: boolean;
+  introText?: string;
+  onBegin?: () => void;
   activeStep: Step | null;
   activeStepNumber?: number | null;
   totalStepsCount?: number;
@@ -29,6 +32,9 @@ export function FocusTunnelModal({
   isOpen,
   isBusy = false,
   isShrinking = false,
+  showIntro = false,
+  introText,
+  onBegin,
   activeStep,
   activeStepNumber,
   totalStepsCount,
@@ -50,6 +56,7 @@ export function FocusTunnelModal({
       }
     : opticalMorphVariants;
 
+  const isIntro = Boolean(showIntro && introText);
   const subSteps = activeStep?.subSteps ?? [];
   const hasSubSteps = subSteps.length > 0;
   const incompleteSubSteps = subSteps.filter((s) => !s.completed);
@@ -78,7 +85,7 @@ export function FocusTunnelModal({
     }, 50);
 
     return () => clearTimeout(timer);
-  }, [isOpen, isBusy]);
+  }, [isOpen, isBusy, isIntro]);
 
   // Key handling: Escape and Tab trapping
   useEffect(() => {
@@ -87,6 +94,12 @@ export function FocusTunnelModal({
       if (e.key === 'Escape') {
         e.preventDefault();
         onClose();
+        return;
+      }
+
+      if (isIntro && (e.code === 'Space' || e.key === 'Enter')) {
+        e.preventDefault();
+        onBegin?.();
         return;
       }
 
@@ -115,7 +128,7 @@ export function FocusTunnelModal({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, isBusy, onClose]);
+  }, [isOpen, isBusy, isIntro, onBegin, onClose]);
 
   return (
     <AnimatePresence>
@@ -138,7 +151,7 @@ export function FocusTunnelModal({
                 <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse shrink-0" />
                 <span className="truncate">{sessionTitle || 'Focus'}</span>
               </div>
-              {activeStepNumber && totalStepsCount && (
+              {!isIntro && activeStepNumber && totalStepsCount && (
                 <span className="text-2xs font-mono text-text-tertiary pl-3.5">
                   Step {activeStepNumber} of {totalStepsCount}
                 </span>
@@ -170,7 +183,7 @@ export function FocusTunnelModal({
           <main className="flex-1 flex flex-col items-center justify-center text-center px-4 sm:px-6 py-8 max-w-4xl lg:max-w-5xl mx-auto w-full my-auto">
             {/* Context Anchor: Original Parent Step (When Shrunk) */}
             <AnimatePresence>
-              {hasSubSteps && currentSubStep && (
+              {!isIntro && hasSubSteps && currentSubStep && (
                 <motion.div
                   initial={reduceMotion ? false : { opacity: 0, y: -6 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -189,11 +202,13 @@ export function FocusTunnelModal({
               <AnimatePresence initial={false}>
                 <motion.div
                   key={
-                    activeStep
-                      ? hasSubSteps && currentSubStep
-                        ? `sub_${activeStep.id}_${currentSubStep.id}`
-                        : `step_${activeStep.id}`
-                      : 'completed'
+                    isIntro
+                      ? 'intro'
+                      : activeStep
+                        ? hasSubSteps && currentSubStep
+                          ? `sub_${activeStep.id}_${currentSubStep.id}`
+                          : `step_${activeStep.id}`
+                        : 'completed'
                   }
                   variants={morphVariants}
                   initial="initial"
@@ -202,7 +217,16 @@ export function FocusTunnelModal({
                   style={{ willChange: reduceMotion ? undefined : 'filter, opacity, transform' }}
                   className="col-start-1 row-start-1 w-full flex flex-col items-center justify-center text-center px-2"
                 >
-                  {activeStep ? (
+                  {isIntro ? (
+                    <div className="space-y-3 max-w-4xl w-full mx-auto">
+                      <p className="text-2xs font-medium uppercase tracking-wide text-text-tertiary">
+                        Before you start
+                      </p>
+                      <p className="text-2xl sm:text-4xl md:text-5xl font-medium text-text-primary leading-snug sm:leading-tight tracking-tight text-center max-w-4xl mx-auto">
+                        {introText}
+                      </p>
+                    </div>
+                  ) : activeStep ? (
                     hasSubSteps && currentSubStep ? (
                       <div className="space-y-3 max-w-4xl w-full mx-auto">
                         {/* Spotlight Tiny Step Text */}
@@ -232,7 +256,7 @@ export function FocusTunnelModal({
                       <h1 className="text-2xl sm:text-3xl font-bold text-text-primary leading-tight">
                         All steps complete.
                       </h1>
-                      <p className="text-text-secondary text-sm sm:text-base leading-relaxed">
+                      <p className="text-sm sm:text-lg text-text-secondary leading-relaxed">
                         You turned initial friction into momentum.
                       </p>
                     </div>
@@ -242,7 +266,7 @@ export function FocusTunnelModal({
             </div>
 
             {/* Micro-step Stepping Stone Dots (Persistently anchored with smooth width transition) */}
-            {activeStep && hasSubSteps && currentSubStep && (
+            {!isIntro && activeStep && hasSubSteps && currentSubStep && (
               <div className="flex items-center justify-center gap-2 pt-4 select-none">
                 {subSteps.map((sub, idx) => (
                   <span
@@ -268,7 +292,32 @@ export function FocusTunnelModal({
             exit={{ opacity: 0, y: 6 }}
             className="w-full flex flex-col items-center gap-3 pb-1 shrink-0"
           >
-            {activeStep ? (
+            {isIntro ? (
+              <>
+                <motion.button
+                  onClick={onBegin}
+                  disabled={isBusy}
+                  variants={reduceMotion ? undefined : tactileButtonVariants}
+                  initial="rest"
+                  animate="rest"
+                  whileHover={isBusy || reduceMotion ? undefined : 'hover'}
+                  whileTap={isBusy || reduceMotion ? undefined : 'tap'}
+                  className="h-10 sm:h-11 px-5 sm:px-6 rounded-full bg-accent hover:bg-accent-hover text-text-inverse font-medium text-xs sm:text-sm shadow-subtle flex items-center gap-2 transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <span>Start step 1</span>
+                </motion.button>
+
+                <div className="text-2xs text-text-tertiary opacity-70 flex items-center gap-2 select-none">
+                  <span>
+                    <kbd className="font-mono text-text-secondary">Enter</kbd> begin
+                  </span>
+                  <span aria-hidden="true">·</span>
+                  <span>
+                    <kbd className="font-mono text-text-secondary">Esc</kbd> exit
+                  </span>
+                </div>
+              </>
+            ) : activeStep ? (
               <>
                 <div className="flex flex-wrap items-center justify-center gap-2.5">
                   {/* Primary: Done */}

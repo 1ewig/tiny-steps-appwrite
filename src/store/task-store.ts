@@ -35,6 +35,7 @@ export const useTaskStore = create<TaskState>()(
           createdAt: Date.now(),
           updatedAt: Date.now(),
           steps,
+          introSeen: false,
         };
 
         set((state) => ({
@@ -72,6 +73,14 @@ export const useTaskStore = create<TaskState>()(
           tasks: state.tasks.filter((t) => t.id !== taskId),
           focusTunnelTaskId:
             state.focusTunnelTaskId === taskId ? null : state.focusTunnelTaskId,
+        }));
+      },
+
+      markIntroSeen: (taskId: string) => {
+        set((state) => ({
+          tasks: state.tasks.map((t) =>
+            t.id === taskId && t.introSeen !== true ? { ...t, introSeen: true } : t
+          ),
         }));
       },
 
