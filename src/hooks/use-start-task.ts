@@ -70,6 +70,13 @@ export function useStartTask() {
         await sleep(MIN_BREAKDOWN_LOADER_MS - elapsed);
       }
 
+      if (breakdown.isRefused) {
+        setGeneratingTask(false);
+        setError(breakdown.dialogue);
+        setRestoreText(trimmed);
+        return;
+      }
+
       const newTaskId = createTask({
         title: breakdown.title,
         prompt: trimmed,

@@ -10,6 +10,8 @@ export async function POST(req: Request) {
     const body = await req.json();
     const stepText = typeof body.stepText === 'string' ? body.stepText.trim() : '';
     const taskTitle = typeof body.taskTitle === 'string' ? body.taskTitle.trim() : 'Task';
+    const previousStepText = typeof body.previousStepText === 'string' ? body.previousStepText.trim() : undefined;
+    const nextStepText = typeof body.nextStepText === 'string' ? body.nextStepText.trim() : undefined;
 
     if (!stepText) {
       return NextResponse.json({ error: 'Step text is required' }, { status: 400 });
@@ -25,7 +27,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { system, prompt } = getShrinkStepPrompt(stepText, taskTitle);
+    const { system, prompt } = getShrinkStepPrompt(stepText, taskTitle, previousStepText, nextStepText);
 
     const { output } = await generateText({
       model,

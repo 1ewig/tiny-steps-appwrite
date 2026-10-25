@@ -38,9 +38,15 @@ export async function POST(req: Request) {
       reasoning: 'low',
     });
 
-    console.log(
-      `[API:Breakdown] END (${Date.now() - startTime}ms) - Title: "${output.title}" | Steps count: ${output.steps.length}`
-    );
+    if (output.status === 'refused') {
+      console.log(
+        `[API:Breakdown] REFUSED (${Date.now() - startTime}ms) - Score: ${output.relevanceScore}/100 | Category: ${output.refusalCategory} | Reason: "${output.refusalReason}"`
+      );
+    } else {
+      console.log(
+        `[API:Breakdown] ACCEPTED (${Date.now() - startTime}ms) - Score: ${output.relevanceScore}/100 | Title: "${output.title}" | Steps count: ${output.steps.length}`
+      );
+    }
 
     return NextResponse.json(output);
   } catch (error: any) {

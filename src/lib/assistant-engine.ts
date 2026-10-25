@@ -5,6 +5,9 @@ export interface BreakdownResult {
   dialogue: string;
   title: string;
   steps: Step[];
+  isRefused?: boolean;
+  refusalCategory?: string;
+  refusalReason?: string;
 }
 
 export type AssistantIntent =
@@ -28,6 +31,14 @@ export type AssistantIntent =
       title: string;
       dialogue: string;
       steps: Step[];
+    }
+  | {
+      type: 'off_topic';
+      dialogue: string;
+    }
+  | {
+      type: 'crisis';
+      dialogue: string;
     };
 
 /**
@@ -100,6 +111,21 @@ export function interpretUserIntent(
   const lower = input.trim().toLowerCase();
   const nextIncomplete = activeSteps.find((s) => !s.completed);
   const nextIncompleteIdx = nextIncomplete ? activeSteps.findIndex((s) => s.id === nextIncomplete.id) : -1;
+
+  // Crisis check
+  if (
+    lower.includes('suicide') ||
+    lower.includes('kill myself') ||
+    lower.includes('want to die') ||
+    lower.includes('end it all') ||
+    lower.includes("can't go on")
+  ) {
+    return {
+      type: 'crisis',
+      dialogue:
+        'Please know you are not alone and your life matters. Support is free and confidential: text HOME to 741741 or call/text 988 anytime (24/7).',
+    };
+  }
 
   // 1. Step Completion Intent
   if (

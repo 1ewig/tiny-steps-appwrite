@@ -88,9 +88,24 @@ export function TaskCard({
           variants={reduceMotion ? undefined : unblurFadeInVariants}
           className="max-w-2xl mx-auto text-center px-4"
         >
-          <p className="text-sm sm:text-base text-text-secondary leading-relaxed font-normal">
-            {guidanceText}
-          </p>
+          {guidanceText.includes('988') || guidanceText.includes('741741') ? (
+            <div className="p-4 rounded-2xl bg-surface border border-accent/30 shadow-subtle text-left space-y-2">
+              <p className="text-sm sm:text-base text-text-primary leading-relaxed font-medium">
+                {guidanceText}
+              </p>
+              <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-text-secondary">
+                <span className="font-semibold text-accent">Lifeline: 988</span>
+                <span>·</span>
+                <span className="font-semibold text-accent">Crisis Text Line: 741741</span>
+                <span>·</span>
+                <span>Free, confidential, 24/7</span>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm sm:text-base text-text-secondary leading-relaxed font-normal">
+              {guidanceText}
+            </p>
+          )}
         </motion.div>
       )}
 

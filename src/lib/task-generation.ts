@@ -43,6 +43,21 @@ export async function generateTaskBreakdown(
     }
 
     const data = await res.json();
+    if (data.status === 'refused') {
+      const result: BreakdownResult = {
+        title: data.title || 'Gentle Redirection',
+        dialogue: data.dialogue,
+        steps: [],
+        isRefused: true,
+        refusalCategory: data.refusalCategory,
+        refusalReason: data.refusalReason,
+      };
+      console.log(
+        `[Breakdown] REFUSED (${Date.now() - startTime}ms) - Category: ${data.refusalCategory} | Reason: "${data.refusalReason}"`
+      );
+      return result;
+    }
+
     if (!data.steps || !Array.isArray(data.steps) || data.steps.length === 0) {
       throw new Error('Invalid breakdown response structure');
     }
@@ -62,7 +77,7 @@ export async function generateTaskBreakdown(
       }
     );
 
-    const result = {
+    const result: BreakdownResult = {
       title: data.title || text.substring(0, 30),
       dialogue: data.dialogue,
       steps: formattedSteps,
@@ -83,12 +98,14 @@ export async function generateTaskBreakdown(
 }
 
 /**
- * Shrinks an overwhelming step into 3 tailored micro-actions using the LLM,
- * falling back to the Prep -> Touch -> Finish offline formula.
+ * Shrinks an overwhelming step into 2 to 4 tailored micro-actions using the LLM,
+ * with surrounding step context to dissolve the specific stall point.
  */
 export async function shrinkStepWithAI(
   stepText: string,
   taskTitle: string = 'Task',
+  previousStepText?: string,
+  nextStepText?: string,
   signal?: AbortSignal
 ): Promise<{ dialogue: string; microSteps: Step[] }> {
   if (signal?.aborted) {
@@ -102,7 +119,7 @@ export async function shrinkStepWithAI(
     const res = await fetch('/api/shrink', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ stepText, taskTitle }),
+      body: JSON.stringify({ stepText, taskTitle, previousStepText, nextStepText }),
       signal,
     });
 
@@ -270,6 +287,22 @@ export async function interpretUserIntentWithAI(
         title: data.title || taskTitle,
         dialogue: data.dialogue,
         steps: formattedSteps,
+      };
+    }
+
+    if (data.type === 'crisis') {
+      console.log(`[Tweak] END (${Date.now() - startTime}ms) - Intent: crisis`);
+      return {
+        type: 'crisis',
+        dialogue: data.dialogue,
+      };
+    }
+
+    if (data.type === 'off_topic') {
+      console.log(`[Tweak] END (${Date.now() - startTime}ms) - Intent: off_topic`);
+      return {
+        type: 'off_topic',
+        dialogue: data.dialogue,
       };
     }
 

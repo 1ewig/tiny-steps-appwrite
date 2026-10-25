@@ -59,8 +59,14 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
 
       if (intent.type === 'complete_step') {
         toggleStepCompletion(currentTask.id, intent.targetStepId);
+        if (intent.dialogue) {
+          updateTask(currentTask.id, { guidance: intent.dialogue });
+        }
       } else if (intent.type === 'shrink_step') {
         shrinkStep(currentTask.id, intent.targetStepIndex, intent.microSteps);
+        if (intent.dialogue) {
+          updateTask(currentTask.id, { guidance: intent.dialogue });
+        }
       } else if (intent.type === 'new_task') {
         const existingCompleted = steps.filter((s) => s.completed);
         const combinedSteps = [
@@ -68,10 +74,16 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
           ...intent.steps.map((st, i) => ({ ...st, id: Date.now() + i, completed: false })),
         ];
 
-        // Single Living Task Card: Mutate existing card steps and title in-place without overwriting guidance
+        // Single Living Task Card: Mutate existing card steps and title in-place
         updateTask(currentTask.id, {
           title: intent.title || currentTask.title,
           steps: combinedSteps,
+          guidance: intent.dialogue || currentTask.guidance,
+        });
+      } else if (intent.dialogue) {
+        // Handles 'crisis', 'off_topic', 'all_complete', and general encouragement
+        updateTask(currentTask.id, {
+          guidance: intent.dialogue,
         });
       }
     } catch (err) {
@@ -129,9 +141,13 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
             onShrinkStep={async (stepIdx) => {
               const targetStep = steps[stepIdx];
               if (!targetStep) return;
+              const prevStep = steps[stepIdx - 1]?.text;
+              const nextStep = steps[stepIdx + 1]?.text;
               const { microSteps } = await shrinkStepWithAI(
                 targetStep.text,
-                currentTask.title
+                currentTask.title,
+                prevStep,
+                nextStep
               );
               shrinkStep(currentTask.id, stepIdx, microSteps);
             }}
