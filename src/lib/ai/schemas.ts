@@ -8,8 +8,7 @@ export const TaskStepSchema = z.object({
   instruction: z
     .string()
     .max(250)
-    .optional()
-    .describe('SINGLE SHORT FINISHED SENTENCE: Maximum 12 words (approx 35 to 65 characters) giving physical clarity. Must end with a period. Strictly NO run-on clauses with "so that" or "in order to".'),
+    .describe('MANDATORY TACTILE CONTEXT: Exactly 1 short concrete physical sentence (under 12 words, approx 35 to 65 characters) giving physical clarity. Must end with a period. Strictly NO run-on clauses with "so that" or "in order to".'),
 });
 
 export const TaskBreakdownSchema = z.object({

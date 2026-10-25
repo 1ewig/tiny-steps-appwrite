@@ -54,7 +54,7 @@ export async function generateTaskBreakdown(
         return {
           id: baseTime + i,
           title,
-          instruction: s.instruction?.trim(),
+          instruction: s.instruction?.trim() || 'Take a calm breath and take just this one physical step.',
           text: title,
           completed: false,
           canSplit: true,
@@ -122,7 +122,7 @@ export async function shrinkStepWithAI(
         return {
           id: baseTime + i + 1,
           title,
-          instruction: s.instruction?.trim(),
+          instruction: s.instruction?.trim() || 'Focus gently on just this physical motion.',
           text: title,
           completed: false,
           canSplit: false,
@@ -253,7 +253,7 @@ export async function interpretUserIntentWithAI(
               return {
                 id: baseTime + i,
                 title,
-                instruction: s.instruction?.trim(),
+                instruction: s.instruction?.trim() || 'Take a calm breath and take just this one physical step.',
                 text: title,
                 completed: false,
                 canSplit: true,

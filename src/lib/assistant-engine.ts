@@ -80,6 +80,7 @@ export function decomposeTask(input: string, level: GranularityLevel): Breakdown
       return {
         id: Date.now() + i,
         title: stepText,
+        instruction: 'Take a calm breath and take just this one physical step.',
         text: stepText,
         completed: false,
         canSplit: true,

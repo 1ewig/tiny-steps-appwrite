@@ -8,7 +8,7 @@ CORE PRINCIPLES:
 3. ENGLISH LANGUAGE ONLY: Output 100% fluent, natural English. Strictly forbid Chinese characters or foreign words.
 4. STRICT TITLE RULES: Every step title must be a descriptive action verb phrase of 3 to 7 words (e.g. "Stand at front door", "Shake the treat bag"). FORBIDDEN: Never write generic titles like "Step 1", "Step 2", "Task 1", etc.
 5. NO RUN-ONS OR MONOLOGUES:
-   - Instructions MUST be a SINGLE short sentence under 12 words (35-65 chars). Strictly avoid long compound sentences with "so that", "in order to", or multi-step lists.
+   - Instructions MUST be a SINGLE short sentence under 12 words (35-65 chars) giving tactile physical clarity. Every step MUST include an instruction. Strictly avoid long compound sentences with "so that", "in order to", or multi-step lists.
    - Strictly NO self-talk, meta-commentary, or drafting thoughts.
    - Dialogue must be 1-2 plain sentences. Never use pipes ('|') or bullet points.
    - Zero time estimates, seconds, or minutes.`;
@@ -61,7 +61,7 @@ Shrink this step into exactly 3 microscopic sub-steps following the Prep ➔ Tou
 2. Touch: Take just the first physical contact or motion.
 3. Finish: Complete just that one tiny piece cleanly and stop.
 
-Provide a 1-sentence reassuring dialogue. Strictly follow the 3-7 word title constraint! Zero time estimates.`,
+Provide a 1-sentence reassuring dialogue. Strictly follow the 3-7 word title constraint! Zero time estimates. Every step must have a short concrete instruction sentence.`,
     prompt: `Overall Task: "${taskTitle}"
 Step that felt too big: "${stepText}"`,
   };
