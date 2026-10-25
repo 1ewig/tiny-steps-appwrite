@@ -17,17 +17,20 @@ export function getBreakdownPrompt(input: string, energyLevel: GranularityLevel)
   let levelGuide = '';
   switch (energyLevel) {
     case 1:
-      levelGuide = `ENERGY LEVEL 1: A LITTLE STUCK (3-4 steps)
+      levelGuide = `ENERGY LEVEL 1: A LITTLE STUCK (Strictly 3 to 5 steps, target 4)
+- Step Count: Min 3, Max 5 steps.
 - Progression: Tool retrieval -> Core mechanical action -> Finish & confirm.
 - End State: The user's task is 100% complete.`;
       break;
     case 2:
-      levelGuide = `ENERGY LEVEL 2: OVERWHELMED (4-5 steps)
+      levelGuide = `ENERGY LEVEL 2: OVERWHELMED (Strictly 4 to 5 steps)
+- Step Count: Min 4, Max 5 steps.
 - Progression: Spatial setup -> 2-3 manageable batch actions -> Clean completion.
 - End State: A substantial, clean milestone or complete resolution of the task.`;
       break;
     case 3:
-      levelGuide = `ENERGY LEVEL 3: FULL PARALYSIS (3-4 steps)
+      levelGuide = `ENERGY LEVEL 3: FULL PARALYSIS (Strictly 3 to 4 steps, NEVER more than 4)
+- Step Count: Min 3, Max 4 steps (never exceed 4 steps to avoid triggering list anxiety).
 - Step 1: Effortless spatial/somatic initiation directly at the task location (e.g. stand at door, look at screen).
 - Steps 2-4: Ultra-gentle physical actions that actually carry out the search, cleaning, or task in bite-sized increments.
 - End State: Meaningful progress toward or completion of the immediate urgent goal.`;
