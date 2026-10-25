@@ -139,15 +139,11 @@ function NowCardBody({
             {step.instruction}
           </p>
         )}
-        {step.hint ? (
+        {step.hint && (
           <p className="text-xs sm:text-sm text-text-tertiary leading-relaxed italic">
             {step.hint}
           </p>
-        ) : step.effort ? (
-          <p className="text-xs text-text-tertiary">
-            Takes about {step.effort.replace('~', '')}
-          </p>
-        ) : null}
+        )}
       </div>
 
       <div className="mt-5 flex items-center gap-4 pt-1">

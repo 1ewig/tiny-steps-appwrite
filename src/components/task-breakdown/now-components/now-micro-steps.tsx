@@ -122,11 +122,6 @@ export function NowMicroSteps({
                           )}
                         </span>
                       </div>
-                      {sub.effort && (
-                        <span className="text-2xs text-text-tertiary font-mono shrink-0">
-                          {sub.effort}
-                        </span>
-                      )}
                     </motion.div>
                   </motion.div>
                 ))}

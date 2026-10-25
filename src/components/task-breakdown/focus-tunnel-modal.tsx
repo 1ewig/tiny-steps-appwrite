@@ -228,15 +228,11 @@ export function FocusTunnelModal({
                             {activeStep.instruction}
                           </p>
                         )}
-                        {activeStep.hint ? (
+                        {activeStep.hint && (
                           <p className="text-xs sm:text-sm text-text-tertiary leading-relaxed max-w-xl mx-auto italic">
                             {activeStep.hint}
                           </p>
-                        ) : activeStep.effort ? (
-                          <p className="text-xs text-text-tertiary">
-                            Takes about {activeStep.effort.replace('~', '')}
-                          </p>
-                        ) : null}
+                        )}
                       </div>
                     )
                   ) : (

@@ -10,10 +10,6 @@ export const TaskStepSchema = z.object({
     .max(100)
     .optional()
     .describe('1 short concrete sentence of physical context, max 12 words. Example: "Peek inside the bathroom or closet, then close it."'),
-  effort: z
-    .string()
-    .max(20)
-    .describe('Estimated time e.g. "10 sec", "30 sec", "~1 min"'),
   hint: z
     .string()
     .max(140)

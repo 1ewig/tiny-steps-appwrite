@@ -54,11 +54,6 @@ export function NextCard({ steps, getStepNumber, onSelectStep }: NextCardProps) 
                     )}
                   </span>
                 </span>
-                {st.effort && (
-                  <span className="text-2xs font-mono text-text-tertiary shrink-0 mt-0.5">
-                    {st.effort}
-                  </span>
-                )}
               </span>
             </motion.button>
           ))

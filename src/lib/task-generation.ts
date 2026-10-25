@@ -46,14 +46,13 @@ export async function generateTaskBreakdown(
 
     const baseTime = Date.now();
     const formattedSteps: Step[] = data.steps.map(
-      (s: { title?: string; text?: string; instruction?: string; effort?: string; hint?: string }, i: number) => {
+      (s: { title?: string; text?: string; instruction?: string; hint?: string }, i: number) => {
         const title = s.title?.trim() || s.text?.trim() || 'Next tiny action';
         return {
           id: baseTime + i,
           title,
           instruction: s.instruction?.trim(),
           text: title,
-          effort: s.effort || '~1 min',
           hint: s.hint?.trim(),
           completed: false,
           canSplit: true,
@@ -107,14 +106,13 @@ export async function shrinkStepWithAI(
 
     const baseTime = Date.now();
     const microSteps: Step[] = data.microSteps.map(
-      (s: { title?: string; text?: string; instruction?: string; effort?: string; hint?: string }, i: number) => {
+      (s: { title?: string; text?: string; instruction?: string; hint?: string }, i: number) => {
         const title = s.title?.trim() || s.text?.trim() || 'Micro action';
         return {
           id: baseTime + i + 1,
           title,
           instruction: s.instruction?.trim(),
           text: title,
-          effort: s.effort || '15 sec',
           hint: s.hint?.trim(),
           completed: false,
           canSplit: false,
@@ -193,14 +191,13 @@ export async function interpretUserIntentWithAI(
       if (targetStepIndex !== -1) {
         const microSteps: Step[] = Array.isArray(data.microSteps) && data.microSteps.length > 0
           ? data.microSteps.map(
-              (s: { title?: string; text?: string; instruction?: string; effort?: string; hint?: string }, i: number) => {
+              (s: { title?: string; text?: string; instruction?: string; hint?: string }, i: number) => {
                 const title = s.title?.trim() || s.text?.trim() || 'Micro action';
                 return {
                   id: baseTime + i + 1,
                   title,
                   instruction: s.instruction?.trim(),
                   text: title,
-                  effort: s.effort || '15 sec',
                   hint: s.hint?.trim(),
                   completed: false,
                   canSplit: false,
@@ -228,14 +225,13 @@ export async function interpretUserIntentWithAI(
     if (data.type === 'tweak_steps' || data.type === 'new_task') {
       const formattedSteps: Step[] = Array.isArray(data.steps)
         ? data.steps.map(
-            (s: { title?: string; text?: string; instruction?: string; effort?: string; hint?: string }, i: number) => {
+            (s: { title?: string; text?: string; instruction?: string; hint?: string }, i: number) => {
               const title = s.title?.trim() || s.text?.trim() || 'Next tiny action';
               return {
                 id: baseTime + i,
                 title,
                 instruction: s.instruction?.trim(),
                 text: title,
-                effort: s.effort || '~1 min',
                 hint: s.hint?.trim(),
                 completed: false,
                 canSplit: true,
