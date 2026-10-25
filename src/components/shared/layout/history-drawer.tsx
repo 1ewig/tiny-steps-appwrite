@@ -129,7 +129,7 @@ export function HistoryDrawer({
               </div>
 
               {/* Middle: Saved Tasks List */}
-              <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-5">
+              <div className="flex-1 overflow-y-auto overscroll-contain px-2.5 sm:px-3 py-4 sm:py-5">
                 <AnimatePresence initial={false}>
                   {validTasks.length === 0 ? (
                     <motion.div
@@ -193,14 +193,18 @@ export function HistoryDrawer({
                           }}
                           className="overflow-hidden"
                         >
-                          {/* Spacing lives inside the animated height container so it collapses smoothly with the card */}
-                          <div className="pt-0.5 pb-2.5">
+                          {/* Spacing lives inside the animated height container so it collapses smoothly with the card and provides clearance for hover lift/scale */}
+                          <div className="pt-1 pb-2 px-1.5 sm:px-2">
                             <motion.div
-                              whileHover={reduceMotion ? undefined : { y: -1 }}
-                              className={`w-full rounded-xl transition-colors duration-fast select-none border shadow-subtle flex items-center justify-between p-3 sm:p-3.5 gap-2.5 ${
+                              variants={reduceMotion ? undefined : tactileButtonVariants}
+                              initial="rest"
+                              animate="rest"
+                              whileHover={reduceMotion ? undefined : 'hover'}
+                              whileTap={reduceMotion ? undefined : 'tap'}
+                              className={`group w-full rounded-xl transition-colors duration-fast select-none shadow-subtle flex items-center justify-between p-3 sm:p-3.5 gap-2.5 ${
                                 isCurrent
-                                  ? 'bg-accent-subtle/80 text-accent-text border-accent/25'
-                                  : 'bg-surface hover:bg-surface-subtle/90 text-text-primary border-border-subtle hover:border-border-muted'
+                                  ? 'bg-accent-subtle/80 text-accent-text'
+                                  : 'bg-surface hover:bg-surface-subtle/90 text-text-primary'
                               }`}
                             >
                               {/* Main interactive area for selecting the task */}
@@ -211,7 +215,10 @@ export function HistoryDrawer({
                                 className="min-w-0 flex-1 text-left flex items-start gap-2.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-lg"
                               >
                                 {/* Step Status Icon */}
-                                <div className="mt-0.5 shrink-0 text-text-tertiary">
+                                <motion.div
+                                  variants={reduceMotion ? undefined : tactileIconVariants}
+                                  className="mt-0.5 shrink-0 text-text-tertiary flex items-center justify-center"
+                                >
                                   {totalSteps > 0 ? (
                                     <CheckCircle
                                       size={17}
@@ -228,7 +235,7 @@ export function HistoryDrawer({
                                       weight="regular"
                                     />
                                   )}
-                                </div>
+                                </motion.div>
 
                                 {/* Task Title & Details */}
                                 <div className="min-w-0 flex-1 space-y-1">
@@ -293,19 +300,6 @@ export function HistoryDrawer({
                 </AnimatePresence>
               </div>
 
-              {/* Bottom Drawer Footer */}
-              <div className="p-3.5 sm:p-4 border-t border-border-subtle bg-canvas/50 flex items-center justify-between text-2xs text-text-tertiary select-none">
-                <span className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent/70 shrink-0" />
-                  <span>100% offline & saved locally</span>
-                </span>
-                <span className="flex items-center gap-1 text-text-secondary">
-                  <kbd className="font-mono text-2xs px-1.5 py-0.5 rounded bg-surface border border-border-subtle shadow-subtle">
-                    Esc
-                  </kbd>
-                  <span className="text-text-tertiary">to close</span>
-                </span>
-              </div>
             </motion.aside>
           </>
         )}
