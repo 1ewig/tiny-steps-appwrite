@@ -5,6 +5,7 @@ import { AssistantIntentSchema } from '@/lib/ai/schemas';
 import { getAssistantInteractionPrompt } from '@/lib/ai/prompts';
 
 export async function POST(req: Request) {
+  const startTime = Date.now();
   try {
     const body = await req.json();
     const message = typeof body.message === 'string' ? body.message.trim() : '';
@@ -14,6 +15,10 @@ export async function POST(req: Request) {
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
+
+    console.log(
+      `[API:Assistant/Tweak] START - Message: "${message}" | Task Title: "${taskTitle}" | Active Steps: ${activeSteps.length}`
+    );
 
     const model = getAIGatewayModel();
     if (!model) {
@@ -33,9 +38,13 @@ export async function POST(req: Request) {
       reasoning: 'low',
     });
 
+    console.log(
+      `[API:Assistant/Tweak] END (${Date.now() - startTime}ms) - Intent Type: "${output.type}"`
+    );
+
     return NextResponse.json(output);
   } catch (error: any) {
-    console.error('API /api/assistant error:', error);
+    console.error(`[API:Assistant/Tweak] ERROR (${Date.now() - startTime}ms):`, error);
     return NextResponse.json(
       {
         error: error?.message || 'Failed to process assistant intent',

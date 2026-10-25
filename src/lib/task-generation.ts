@@ -27,6 +27,9 @@ export async function generateTaskBreakdown(
     throw new DOMException('Aborted', 'AbortError');
   }
 
+  const startTime = Date.now();
+  console.log(`[Breakdown] START - Prompt: "${text}" | Energy Level: ${granularity}`);
+
   try {
     const res = await fetch('/api/breakdown', {
       method: 'POST',
@@ -59,16 +62,22 @@ export async function generateTaskBreakdown(
       }
     );
 
-    return {
+    const result = {
       title: data.title || text.substring(0, 30),
       dialogue: data.dialogue,
       steps: formattedSteps,
     };
+
+    console.log(
+      `[Breakdown] END (${Date.now() - startTime}ms) - Title: "${result.title}" | Steps: ${result.steps.length}`
+    );
+
+    return result;
   } catch (error) {
     if (signal?.aborted) {
       throw error;
     }
-    console.warn('LLM breakdown failed or unavailable; falling back to offline engine:', error);
+    console.warn(`[Breakdown] Offline Fallback (${Date.now() - startTime}ms):`, error);
     return decomposeTask(text, granularity);
   }
 }
@@ -85,6 +94,9 @@ export async function shrinkStepWithAI(
   if (signal?.aborted) {
     throw new DOMException('Aborted', 'AbortError');
   }
+
+  const startTime = Date.now();
+  console.log(`[Shrink] START - Step: "${stepText}" | Task Title: "${taskTitle}"`);
 
   try {
     const res = await fetch('/api/shrink', {
@@ -118,17 +130,23 @@ export async function shrinkStepWithAI(
       }
     );
 
-    return {
+    const result = {
       dialogue:
         data.dialogue ||
         'No problem at all! If a step makes you hesitate, that is just your brain saying it is still too large. I shrank it into tiny bite-sized pieces for you:',
       microSteps,
     };
+
+    console.log(
+      `[Shrink] END (${Date.now() - startTime}ms) - Micro-steps: ${result.microSteps.length}`
+    );
+
+    return result;
   } catch (error) {
     if (signal?.aborted) {
       throw error;
     }
-    console.warn('LLM shrink failed or unavailable; falling back to offline micro-steps:', error);
+    console.warn(`[Shrink] Offline Fallback (${Date.now() - startTime}ms):`, error);
     return {
       dialogue:
         'No problem at all! If a step makes you hesitate, that is just your brain saying it is still too large. I shrank it into tiny bite-sized pieces for you:',
@@ -151,6 +169,9 @@ export async function interpretUserIntentWithAI(
   if (signal?.aborted) {
     throw new DOMException('Aborted', 'AbortError');
   }
+
+  const startTime = Date.now();
+  console.log(`[Tweak] START - Message: "${input}" | Task Title: "${taskTitle}"`);
 
   try {
     const res = await fetch('/api/assistant', {
@@ -175,6 +196,7 @@ export async function interpretUserIntentWithAI(
       const nextIncomplete = activeSteps.find((s) => !s.completed);
       const targetStepId = typeof data.targetStepId === 'number' ? data.targetStepId : nextIncomplete?.id;
       if (targetStepId !== undefined) {
+        console.log(`[Tweak] END (${Date.now() - startTime}ms) - Intent: complete_step (Step #${targetStepId})`);
         return {
           type: 'complete_step',
           targetStepId,
@@ -203,6 +225,9 @@ export async function interpretUserIntentWithAI(
             )
           : generateMicroSteps(activeSteps[targetStepIndex]?.text || 'this step');
 
+        console.log(
+          `[Tweak] END (${Date.now() - startTime}ms) - Intent: shrink_step (Micro-steps: ${microSteps.length})`
+        );
         return {
           type: 'shrink_step',
           targetStepIndex,
@@ -213,6 +238,7 @@ export async function interpretUserIntentWithAI(
     }
 
     if (data.type === 'all_complete') {
+      console.log(`[Tweak] END (${Date.now() - startTime}ms) - Intent: all_complete`);
       return {
         type: 'all_complete',
         dialogue: data.dialogue,
@@ -236,6 +262,9 @@ export async function interpretUserIntentWithAI(
           )
         : [];
 
+      console.log(
+        `[Tweak] END (${Date.now() - startTime}ms) - Intent: ${data.type} (Adjusted steps: ${formattedSteps.length})`
+      );
       return {
         type: 'new_task',
         title: data.title || taskTitle,
@@ -245,6 +274,7 @@ export async function interpretUserIntentWithAI(
     }
 
     // Default or encouragement: return dialogue as advice
+    console.log(`[Tweak] END (${Date.now() - startTime}ms) - Intent: encouragement`);
     return {
       type: 'all_complete',
       dialogue: data.dialogue,
@@ -253,7 +283,7 @@ export async function interpretUserIntentWithAI(
     if (signal?.aborted) {
       throw error;
     }
-    console.warn('LLM assistant failed or unavailable; falling back to offline intent engine:', error);
+    console.warn(`[Tweak] Offline Fallback (${Date.now() - startTime}ms):`, error);
     return interpretUserIntent(input, activeSteps, level);
   }
 }

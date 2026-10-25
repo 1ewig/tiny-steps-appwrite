@@ -6,6 +6,7 @@ import { getBreakdownPrompt } from '@/lib/ai/prompts';
 import type { GranularityLevel } from '@/types/task';
 
 export async function POST(req: Request) {
+  const startTime = Date.now();
   try {
     const body = await req.json();
     const promptText = typeof body.prompt === 'string' ? body.prompt.trim() : '';
@@ -16,6 +17,8 @@ export async function POST(req: Request) {
     if (!promptText) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
     }
+
+    console.log(`[API:Breakdown] START - Prompt: "${promptText}" | Energy Level: ${energyLevel}`);
 
     const model = getAIGatewayModel();
     if (!model) {
@@ -35,9 +38,13 @@ export async function POST(req: Request) {
       reasoning: 'low',
     });
 
+    console.log(
+      `[API:Breakdown] END (${Date.now() - startTime}ms) - Title: "${output.title}" | Steps count: ${output.steps.length}`
+    );
+
     return NextResponse.json(output);
   } catch (error: any) {
-    console.error('API /api/breakdown error:', error);
+    console.error(`[API:Breakdown] ERROR (${Date.now() - startTime}ms):`, error);
     return NextResponse.json(
       {
         error: error?.message || 'Failed to decompose task',
