@@ -20,7 +20,7 @@ CRITICAL ANTI-OVERWHELM FORMATTING RULES (STRICT):
    - Good: "Peek inside the bathroom or closet, then close it."
    - Good: "Listen in silence for a moment."
 3. NO TIME ESTIMATES: Do NOT include countdowns, seconds, minutes, or durations anywhere.
-4. 'dialogue': Keep it warm and validating, but STRICTLY 2 TO 3 SHORT SENTENCES (under 40 words total). Never write essays or long paragraphs.`;
+4. 'dialogue': STRICTLY 1 TO 2 SHORT SENTENCES (under 20 words total). Tone should be calm assurance—reassure the user, validate that it feels heavy, and give explicit permission to only take it one tiny step at a time with zero pressure. Never write cheerleading, advice, or paragraphs.`;
 
 export function getBreakdownPrompt(input: string, energyLevel: GranularityLevel): { system: string; prompt: string } {
   let energyGuidance = '';
@@ -56,7 +56,7 @@ Remember:
 - 'title' must be 3-7 words only. No paragraphs!
 - 'instruction' is 1 short sentence max (under 12 words).
 - Zero time estimates.
-- 'dialogue' must be 2-3 short sentences max.`,
+- 'dialogue' must be calm assurance in 1-2 short sentences max (under 20 words).`,
     prompt: `Task to break down: "${input}"`,
   };
 }

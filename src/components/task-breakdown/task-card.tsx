@@ -84,7 +84,7 @@ export function TaskCard({
       {guidanceText && (
         <motion.div
           variants={reduceMotion ? undefined : unblurFadeInVariants}
-          className="max-w-2xl mx-auto text-center px-5 py-3.5 sm:py-4 rounded-2xl bg-surface/80 border border-border-subtle/60 shadow-subtle backdrop-blur-sm"
+          className="max-w-2xl mx-auto text-center px-4"
         >
           <p className="text-sm sm:text-base text-text-secondary leading-relaxed font-normal">
             {guidanceText}

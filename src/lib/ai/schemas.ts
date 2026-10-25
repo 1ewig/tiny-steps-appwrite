@@ -14,7 +14,7 @@ export const TaskStepSchema = z.object({
 
 export const TaskBreakdownSchema = z.object({
   title: z.string().max(40).describe('A gentle 2-5 word summary of the task. E.g. "Find the Cat"'),
-  dialogue: z.string().max(250).describe('Empathetic, zero-shame validation acknowledging the difficulty in 2-3 brief sentences. Max 40 words. Do NOT write an essay.'),
+  dialogue: z.string().max(160).describe('Calm, grounded assurance in 1-2 brief sentences (under 20 words total). Reassure the user, validate that it feels heavy, and give permission to take just one tiny step with zero pressure.'),
   steps: z
     .array(TaskStepSchema)
     .min(3)

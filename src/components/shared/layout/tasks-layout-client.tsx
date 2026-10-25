@@ -39,7 +39,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     toggleStepCompletion,
     toggleSubStepCompletion,
     shrinkStep,
-    updateTask,
   } = useTaskStore();
 
   const activeTaskId = routeTaskId;
@@ -112,12 +111,11 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
       activeTask &&
       activeStep.canSplit
     ) {
-      const { dialogue, microSteps } = await shrinkStepWithAI(
+      const { microSteps } = await shrinkStepWithAI(
         activeStep.text,
         activeTask.title
       );
       shrinkStep(activeTask.id, activeStepIndex, microSteps);
-      updateTask(activeTask.id, { guidance: dialogue });
     }
   };
 

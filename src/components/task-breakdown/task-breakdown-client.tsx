@@ -59,35 +59,18 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
 
       if (intent.type === 'complete_step') {
         toggleStepCompletion(currentTask.id, intent.targetStepId);
-        updateTask(currentTask.id, {
-          guidance: intent.dialogue,
-        });
       } else if (intent.type === 'shrink_step') {
         shrinkStep(currentTask.id, intent.targetStepIndex, intent.microSteps);
-        updateTask(currentTask.id, {
-          guidance: intent.dialogue,
-        });
-      } else if (intent.type === 'all_complete') {
-        updateTask(currentTask.id, {
-          guidance: intent.dialogue,
-        });
       } else if (intent.type === 'new_task') {
         const existingCompleted = steps.filter((s) => s.completed);
         const combinedSteps = [
           ...existingCompleted,
           ...intent.steps.map((st, i) => ({ ...st, id: Date.now() + i, completed: false })),
         ];
-        const dialogue =
-          existingCompleted.length > 0
-            ? `${intent.dialogue}\n\nI kept your ${existingCompleted.length} completed step${
-                existingCompleted.length > 1 ? 's' : ''
-              } and adjusted the rest.`
-            : intent.dialogue;
 
-        // Single Living Task Card: Mutate existing card guidance and steps in-place
+        // Single Living Task Card: Mutate existing card steps and title in-place without overwriting guidance
         updateTask(currentTask.id, {
           title: intent.title || currentTask.title,
-          guidance: dialogue,
           steps: combinedSteps,
         });
       }
@@ -145,14 +128,11 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
             onShrinkStep={async (stepIdx) => {
               const targetStep = steps[stepIdx];
               if (!targetStep) return;
-              const { dialogue, microSteps } = await shrinkStepWithAI(
+              const { microSteps } = await shrinkStepWithAI(
                 targetStep.text,
                 currentTask.title
               );
               shrinkStep(currentTask.id, stepIdx, microSteps);
-              updateTask(currentTask.id, {
-                guidance: dialogue,
-              });
             }}
             onToggleSubStep={(parentStepId, subStepId) => {
               toggleSubStepCompletion(
