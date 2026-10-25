@@ -154,7 +154,7 @@ function FocusLoaderContent({
         {noticeMessage ? 'Gentle guidance message' : 'Preparing your tiny steps.'}
       </span>
 
-      <div className="relative w-full max-w-xl flex items-center justify-center">
+      <div className="relative w-full max-w-4xl mx-auto flex items-center justify-center">
         <AnimatePresence mode="wait">
           {noticeMessage ? (
             <motion.div
@@ -163,43 +163,52 @@ function FocusLoaderContent({
               initial="initial"
               animate="animate"
               exit="exit"
-              className="w-full max-w-xl mx-auto flex flex-col items-center text-center space-y-6"
+              className="w-full max-w-4xl mx-auto flex flex-col items-center text-center space-y-6"
             >
-              <div className="space-y-3 max-w-lg">
-                <h2 className="text-2xl sm:text-3xl font-semibold text-text-primary tracking-tight">
+              <div className="space-y-3 max-w-4xl w-full mx-auto">
+                <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-text-primary leading-snug sm:leading-tight tracking-tight text-center max-w-4xl mx-auto">
                   {isCrisis ? 'Support Notice' : 'A gentle pause'}
-                </h2>
-                <p className="text-base sm:text-lg text-text-secondary leading-relaxed">
+                </h1>
+                <p className="text-sm sm:text-lg text-text-secondary leading-relaxed max-w-xl mx-auto font-medium">
                   {noticeMessage}
                 </p>
               </div>
 
-              <div className="pt-2 flex flex-col items-center space-y-2.5">
-                {isCrisis && (
-                  <a
-                    href="https://findahelpline.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent hover:bg-accent-hover text-sm font-medium text-text-inverse transition-colors cursor-pointer shadow-subtle"
+              <div className="pt-2 flex flex-col items-center space-y-2">
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <motion.button
+                    ref={dismissButtonRef}
+                    type="button"
+                    onClick={onDismissNotice}
+                    variants={reduceMotion ? undefined : tactileButtonVariants}
+                    initial="rest"
+                    animate="rest"
+                    whileHover={reduceMotion ? undefined : 'hover'}
+                    whileTap={reduceMotion ? undefined : 'tap'}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-surface-subtle hover:bg-border-subtle text-sm font-medium text-text-primary transition-colors duration-fast cursor-pointer shadow-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   >
-                    <span>Find A Helpline (Worldwide)</span>
-                    <ArrowSquareOut size={16} weight="bold" />
-                  </a>
-                )}
-                <motion.button
-                  ref={dismissButtonRef}
-                  type="button"
-                  onClick={onDismissNotice}
-                  variants={reduceMotion ? undefined : tactileButtonVariants}
-                  initial="rest"
-                  animate="rest"
-                  whileHover={reduceMotion ? undefined : 'hover'}
-                  whileTap={reduceMotion ? undefined : 'tap'}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-surface-subtle hover:bg-border-subtle text-sm font-medium text-text-primary transition-colors cursor-pointer"
-                >
-                  <ArrowLeft size={16} weight="bold" />
-                  <span>Back to my words</span>
-                </motion.button>
+                    <ArrowLeft size={16} weight="bold" />
+                    <span>Back to my words</span>
+                  </motion.button>
+
+                  {isCrisis && (
+                    <motion.a
+                      href="https://findahelpline.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      variants={reduceMotion ? undefined : tactileButtonVariants}
+                      initial="rest"
+                      animate="rest"
+                      whileHover={reduceMotion ? undefined : 'hover'}
+                      whileTap={reduceMotion ? undefined : 'tap'}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent hover:bg-accent-hover text-sm font-medium text-text-inverse transition-colors duration-fast cursor-pointer shadow-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    >
+                      <span>Find A Helpline (Worldwide)</span>
+                      <ArrowSquareOut size={16} weight="bold" />
+                    </motion.a>
+                  )}
+                </div>
+
                 <span className="text-xs text-text-tertiary">
                   Press Esc or Enter to return
                 </span>
