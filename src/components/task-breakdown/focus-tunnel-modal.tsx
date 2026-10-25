@@ -64,6 +64,8 @@ export function FocusTunnelModal({
   const currentSubStepIndex = currentSubStep
     ? subSteps.findIndex((s) => s.id === currentSubStep.id)
     : -1;
+  const showAnchor = !isIntro && hasSubSteps && Boolean(currentSubStep);
+  const showDots = !isIntro && Boolean(activeStep) && hasSubSteps;
 
   // Preserve the previously focused element while the dialog is open
   useEffect(() => {
@@ -182,25 +184,29 @@ export function FocusTunnelModal({
           {/* Body: Centered Active Step / Micro-Step Spotlight with Overlapping Blur Morph */}
           <main className="flex-1 flex flex-col items-center justify-center text-center px-4 sm:px-6 py-8 max-w-4xl lg:max-w-5xl mx-auto w-full my-auto">
             {/* Context Anchor: Original Parent Step (When Shrunk) */}
-            <AnimatePresence>
-              {!isIntro && hasSubSteps && currentSubStep && (
-                <motion.div
-                  initial={reduceMotion ? false : { opacity: 0, y: -6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={reduceMotion ? undefined : { opacity: 0, y: -6 }}
-                  transition={{ duration: 0.22, ease: CALM_EASE }}
-                  className="pb-3 shrink-0 z-10 text-center max-w-3xl lg:max-w-4xl mx-auto px-4"
-                >
+            <div
+              aria-hidden={!showAnchor}
+              className={`grid shrink-0 z-10 w-full transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.2,0.9,0.3,1)] motion-reduce:transition-none ${
+                showAnchor ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+              }`}
+            >
+              <div className="overflow-hidden">
+                <div className="pb-3 text-center max-w-3xl lg:max-w-4xl mx-auto px-4">
                   <p className="text-sm sm:text-base md:text-lg font-medium text-text-secondary truncate">
                     {activeStep?.text}
                   </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                </div>
+              </div>
+            </div>
 
-            <div className="grid grid-cols-1 grid-rows-1 place-items-center w-full max-w-4xl mx-auto min-h-[140px] sm:min-h-[180px] md:min-h-[200px]">
-              <AnimatePresence initial={false}>
+            <motion.div
+              layout
+              transition={{ layout: { duration: reduceMotion ? 0 : 0.35, ease: CALM_EASE } }}
+              className="relative grid grid-cols-1 grid-rows-1 place-items-center w-full max-w-4xl mx-auto min-h-[140px] sm:min-h-[180px] md:min-h-[200px]"
+            >
+              <AnimatePresence initial={false} mode="popLayout">
                 <motion.div
+                  layout
                   key={
                     isIntro
                       ? 'intro'
@@ -258,26 +264,33 @@ export function FocusTunnelModal({
                   )}
                 </motion.div>
               </AnimatePresence>
-            </div>
+            </motion.div>
 
             {/* Micro-step Stepping Stone Dots (Persistently anchored with smooth width transition) */}
-            {!isIntro && activeStep && hasSubSteps && currentSubStep && (
-              <div className="flex items-center justify-center gap-2 pt-4 select-none">
-                {subSteps.map((sub, idx) => (
-                  <span
-                    key={sub.id}
-                    className={`h-1.5 rounded-full transition-all duration-300 ${
-                      sub.completed
-                        ? 'w-4 bg-accent'
-                        : idx === currentSubStepIndex
-                        ? 'w-7 bg-accent shadow-sm'
-                        : 'w-2 bg-border-muted/80'
-                    }`}
-                    title={`Step ${idx + 1}: ${sub.text}`}
-                  />
-                ))}
+            <div
+              aria-hidden={!showDots}
+              className={`grid w-full transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.2,0.9,0.3,1)] motion-reduce:transition-none ${
+                showDots ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+              }`}
+            >
+              <div className="overflow-hidden">
+                <div className="flex items-center justify-center gap-2 pt-4 select-none">
+                  {subSteps.map((sub, idx) => (
+                    <span
+                      key={sub.id}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${
+                        sub.completed
+                          ? 'w-4 bg-accent'
+                          : idx === currentSubStepIndex
+                          ? 'w-7 bg-accent shadow-sm'
+                          : 'w-2 bg-border-muted/80'
+                      }`}
+                      title={`Step ${idx + 1}: ${sub.text}`}
+                    />
+                  ))}
+                </div>
               </div>
-            )}
+            </div>
           </main>
 
           {/* Footer: Action Area & Shortcuts */}
@@ -314,7 +327,7 @@ export function FocusTunnelModal({
               </>
             ) : activeStep ? (
               <>
-                <div className="flex flex-wrap items-center justify-center gap-2.5">
+                <div className="flex flex-wrap items-center justify-center gap-2.5 min-h-10 sm:min-h-11">
                   {/* Primary: Done */}
                   <motion.button
                     onClick={onComplete}

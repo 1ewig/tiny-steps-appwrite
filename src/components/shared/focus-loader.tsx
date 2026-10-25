@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { ArrowLeft } from '@phosphor-icons/react';
+import { ArrowLeft, ArrowSquareOut } from '@phosphor-icons/react';
 import {
   CALM_EASE,
   tactileButtonVariants,
@@ -56,7 +56,7 @@ function FocusLoaderContent({
   const dismissButtonRef = useRef<HTMLButtonElement>(null);
 
   const isCrisis = noticeMessage
-    ? /988|741741|crisis|lifeline|suicide|self-harm/i.test(noticeMessage)
+    ? /findahelpline|helpline|crisis|lifeline|suicide|self-harm|988|741741/i.test(noticeMessage)
     : false;
 
   // Handle keyboard dismissal when notice is active
@@ -174,7 +174,18 @@ function FocusLoaderContent({
                 </p>
               </div>
 
-              <div className="pt-2 flex flex-col items-center space-y-2">
+              <div className="pt-2 flex flex-col items-center space-y-2.5">
+                {isCrisis && (
+                  <a
+                    href="https://findahelpline.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent hover:bg-accent-hover text-sm font-medium text-text-inverse transition-colors cursor-pointer shadow-subtle"
+                  >
+                    <span>Find A Helpline (Worldwide)</span>
+                    <ArrowSquareOut size={16} weight="bold" />
+                  </a>
+                )}
                 <motion.button
                   ref={dismissButtonRef}
                   type="button"

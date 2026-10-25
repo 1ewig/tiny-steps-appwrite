@@ -141,7 +141,7 @@ export function interpretUserIntent(
     lower.includes('end it all') ||
     lower.includes("can't go on")
   ) {
-    const ack = 'Tiny Steps is an everyday task decomposition tool and is not equipped for crisis or mental health support. For free, confidential help, call or text 988 or text HOME to 741741.';
+    const ack = 'Tiny Steps is an everyday task decomposition tool and is not equipped for crisis or mental health support. For free, confidential support worldwide, please visit https://findahelpline.com';
     return {
       type: 'crisis',
       acknowledgment: ack,

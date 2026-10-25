@@ -16,8 +16,8 @@ export const TaskBreakdownSchema = z.object({
     .enum(['accepted', 'refused'])
     .describe('Whether this is an actionable task ("accepted") or needs gentle redirection ("refused")'),
   refusalCategory: z
-    .enum(['none', 'harmful', 'irrelevant', 'joke', 'gibberish'])
-    .describe('Internal category if refused, or "none" if accepted'),
+    .enum(['none', 'self_harm', 'harmful', 'irrelevant', 'joke', 'gibberish'])
+    .describe('Internal category if refused: "self_harm" for self-harm/suicide/crisis, "harmful" for violence/weapons/illegal acts, or "none" if accepted'),
   refusalReason: z
     .string()
     .optional()
@@ -63,7 +63,7 @@ export const AssistantIntentSchema = z.object({
   acknowledgment: z
     .string()
     .max(300)
-    .describe('Warm, empathetic response acknowledging the user (1-2 short sentences max, under 25 words). If crisis, offer human care and lifeline (988). If off_topic, ask one short gentle question to refocus.'),
+    .describe('Warm, empathetic response acknowledging the user (1-2 short sentences max, under 35 words). If self-harm or crisis, offer human care and universal lifeline (https://findahelpline.com). If off_topic, ask one short gentle question to refocus.'),
   targetStepId: z.number().optional().describe('Target step ID if completing a step'),
   targetStepIndex: z.number().optional().describe('Target step index if shrinking a step'),
   microSteps: z.array(TaskStepSchema).optional().describe('Micro-steps if type is shrink_step'),
