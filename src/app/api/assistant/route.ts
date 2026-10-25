@@ -35,7 +35,7 @@ export async function POST(req: Request) {
       output: Output.object({ schema: AssistantIntentSchema }),
       system,
       prompt,
-      reasoning: 'low',
+      reasoning: 'high',
     });
 
     console.log(

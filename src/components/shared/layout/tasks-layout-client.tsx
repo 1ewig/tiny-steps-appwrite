@@ -27,12 +27,14 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     peekFuture,
     focusTunnelTaskId,
     isGeneratingTask,
+    generationNotice,
     isHistoryOpen,
     theme,
     deleteTask,
     openFocusTunnel,
     closeFocusTunnel,
     setGeneratingTask,
+    setGenerationNotice,
     toggleTheme,
     closeHistory,
     toggleHistory,
@@ -258,7 +260,14 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
         onShrink={handleShrinkFocusStep}
       />
 
-      <FocusLoader isVisible={isGeneratingTask} />
+      <FocusLoader
+        isVisible={isGeneratingTask || Boolean(generationNotice)}
+        noticeMessage={generationNotice}
+        onDismissNotice={() => {
+          setGenerationNotice(null);
+          setGeneratingTask(false);
+        }}
+      />
     </div>
   );
 }

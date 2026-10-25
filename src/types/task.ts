@@ -37,6 +37,7 @@ export interface TaskState {
   peekFuture: boolean;
   focusTunnelTaskId: string | null;
   isGeneratingTask: boolean;
+  generationNotice: string | null;
   isHistoryOpen: boolean;
   theme: 'light' | 'dark';
 
@@ -59,6 +60,7 @@ export interface TaskState {
   openFocusTunnel: (taskId: string) => void;
   closeFocusTunnel: () => void;
   setGeneratingTask: (isGenerating: boolean) => void;
+  setGenerationNotice: (notice: string | null) => void;
   openHistory: () => void;
   closeHistory: () => void;
   toggleHistory: () => void;

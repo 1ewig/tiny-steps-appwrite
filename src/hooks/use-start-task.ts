@@ -29,6 +29,7 @@ export function useStartTask() {
     createTask,
     openFocusTunnel,
     setGeneratingTask,
+    setGenerationNotice,
   } = useTaskStore();
 
   const startTask = async (text: string) => {
@@ -38,6 +39,7 @@ export function useStartTask() {
     inFlightRef.current = true;
     setError(null);
     setRestoreText(null);
+    setGenerationNotice(null);
     setGeneratingTask(true);
 
     try {
@@ -71,8 +73,7 @@ export function useStartTask() {
       }
 
       if (breakdown.isRefused) {
-        setGeneratingTask(false);
-        setError(breakdown.dialogue);
+        setGenerationNotice(breakdown.dialogue);
         setRestoreText(trimmed);
         return;
       }
@@ -90,6 +91,7 @@ export function useStartTask() {
     } catch (err) {
       console.error(err);
       setGeneratingTask(false);
+      setGenerationNotice(null);
       setError(ERROR_MESSAGE);
       setRestoreText(trimmed);
     } finally {

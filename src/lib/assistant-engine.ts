@@ -33,6 +33,16 @@ export type AssistantIntent =
       steps: Step[];
     }
   | {
+      type: 'tweak_steps';
+      title?: string;
+      dialogue: string;
+      steps: Step[];
+    }
+  | {
+      type: 'encouragement';
+      dialogue: string;
+    }
+  | {
       type: 'off_topic';
       dialogue: string;
     }

@@ -11,6 +11,7 @@ export const useTaskStore = create<TaskState>()(
       peekFuture: false,
       focusTunnelTaskId: null,
       isGeneratingTask: false,
+      generationNotice: null,
       isHistoryOpen: false,
       theme: 'light',
 
@@ -92,6 +93,10 @@ export const useTaskStore = create<TaskState>()(
 
       setGeneratingTask: (isGenerating: boolean) => {
         set({ isGeneratingTask: isGenerating });
+      },
+
+      setGenerationNotice: (notice: string | null) => {
+        set({ generationNotice: notice });
       },
 
       openHistory: () => {
