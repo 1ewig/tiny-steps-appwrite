@@ -73,10 +73,11 @@ If any step triggers hesitation or fear, click **"Break it down"** to split it d
 * Zero harsh alert reds, countdown clocks, or aggressive urgency triggers.
 * 100% tokenized design system (`globals.css`) with `@media (prefers-reduced-motion)` accessibility support.
 
-### 9. 🔒 100% Offline & Private
-* Requires **no API keys** and sends **no personal data** to external servers out of the box.
+### 9. 🤖 Live LLM via Vercel AI Gateway & Offline Resilience
+* Powered by the **Vercel AI SDK** (`ai` v7) and **Vercel AI Gateway** (`@ai-sdk/gateway` v4) with default model `minimax/minimax-m3.1-flash` (ultra-fast, empathetic).
+* Fully configurable via `.env.local` (`AI_GATEWAY_API_KEY`, `AI_MODEL`).
+* **100% Offline-Safe**: If unauthenticated or offline, seamlessly falls back to the deterministic local engine with zero UI errors or broken states.
 * State persists safely to `localStorage` with automated migration guards.
-* Built-in async seam ready for LLM integration (e.g. Vercel AI Gateway).
 
 ---
 

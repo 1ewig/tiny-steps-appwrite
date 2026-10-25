@@ -14,7 +14,7 @@ interface TaskCardProps {
   steps: Step[];
   isAdjusting?: boolean;
   onToggleStep: (stepId: number) => void;
-  onShrinkStep: (stepIndex: number) => void;
+  onShrinkStep: (stepIndex: number) => Promise<void> | void;
   onToggleSubStep?: (parentStepId: number, subStepId: number) => void;
 }
 

@@ -3,39 +3,41 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { SHRINK_STEP_LOADER_MS } from '@/lib/task-generation';
 
-export function useShrinkStep(onShrink: () => void) {
+export function useShrinkStep(onShrink: () => Promise<void> | void) {
   const [isShrinking, setIsShrinking] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const pendingCallbackRef = useRef<(() => void) | null>(null);
+  const inFlightRef = useRef(false);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const cancel = useCallback(() => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-    pendingCallbackRef.current = null;
+    inFlightRef.current = false;
     setIsShrinking(false);
   }, []);
 
-  useEffect(() => cancel, [cancel]);
-
-  const trigger = useCallback(() => {
-    if (timerRef.current) return;
-
-    pendingCallbackRef.current = onShrink;
+  const trigger = useCallback(async () => {
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
     setIsShrinking(true);
 
-    timerRef.current = setTimeout(() => {
-      timerRef.current = null;
-      const callback = pendingCallbackRef.current;
-      pendingCallbackRef.current = null;
-
-      try {
-        callback?.();
-      } finally {
+    const startedAt = Date.now();
+    try {
+      await Promise.resolve(onShrink());
+    } finally {
+      const elapsed = Date.now() - startedAt;
+      if (elapsed < SHRINK_STEP_LOADER_MS) {
+        await new Promise((res) => setTimeout(res, SHRINK_STEP_LOADER_MS - elapsed));
+      }
+      if (mountedRef.current) {
         setIsShrinking(false);
       }
-    }, SHRINK_STEP_LOADER_MS);
+      inFlightRef.current = false;
+    }
   }, [onShrink]);
 
   return { isShrinking, trigger, cancel };

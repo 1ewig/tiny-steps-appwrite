@@ -4,8 +4,7 @@ import { useEffect } from 'react';
 import { useRouter, useParams, usePathname } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { useHydrated } from '@/hooks/use-hydrated';
-import { generateMicroSteps } from '@/lib/assistant-engine';
-import { MAX_BREAKDOWN_WAIT_MS } from '@/lib/task-generation';
+import { shrinkStepWithAI, MAX_BREAKDOWN_WAIT_MS } from '@/lib/task-generation';
 import { getActiveStep, getActiveStepIndex } from '@/lib/task-utils';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { useShrinkStep } from '@/hooks/use-shrink-step';
@@ -40,6 +39,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     toggleStepCompletion,
     toggleSubStepCompletion,
     shrinkStep,
+    updateTask,
   } = useTaskStore();
 
   const activeTaskId = routeTaskId;
@@ -105,15 +105,19 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     );
   };
 
-  const shrinkFocusStepNow = () => {
+  const shrinkFocusStepNow = async () => {
     if (
       activeStepIndex !== -1 &&
       activeStep &&
       activeTask &&
       activeStep.canSplit
     ) {
-      const subSteps = generateMicroSteps(activeStep.text);
-      shrinkStep(activeTask.id, activeStepIndex, subSteps);
+      const { dialogue, microSteps } = await shrinkStepWithAI(
+        activeStep.text,
+        activeTask.title
+      );
+      shrinkStep(activeTask.id, activeStepIndex, microSteps);
+      updateTask(activeTask.id, { guidance: dialogue });
     }
   };
 

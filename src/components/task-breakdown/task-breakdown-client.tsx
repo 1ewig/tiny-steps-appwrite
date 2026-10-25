@@ -1,10 +1,13 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { useHydrated } from '@/hooks/use-hydrated';
-import { interpretUserIntent } from '@/lib/assistant-engine';
+import {
+  interpretUserIntentWithAI,
+  shrinkStepWithAI,
+} from '@/lib/task-generation';
 import { TaskCard } from '@/components/task-breakdown/task-card';
 import { PeekToggle } from '@/components/task-breakdown/peek-toggle';
 import { ChatInput } from '@/components/shared/chat-input';
@@ -19,7 +22,6 @@ interface TaskBreakdownClientProps {
 export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientProps) {
   const router = useRouter();
   const [isTyping, setIsTyping] = useState(false);
-  const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const activeId = taskId || sessionId || '';
   const hasHydrated = useHydrated();
@@ -39,32 +41,21 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
   const currentTask = tasks.find((t) => t.id === activeId);
   const focusTunnelOpen = focusTunnelTaskId === activeId;
 
-  // Cleanup typing timer on unmount
-  useEffect(() => {
-    return () => {
-      if (typingTimerRef.current) {
-        clearTimeout(typingTimerRef.current);
-      }
-    };
-  }, []);
-
   const steps = currentTask?.steps ?? [];
 
   // Handle User Message Submission (Tweaking / Venting on the Living Card)
-  const handleSendMessage = (text: string) => {
-    if (!currentTask) return;
+  const handleSendMessage = async (text: string) => {
+    if (!currentTask || isTyping) return;
 
     setIsTyping(true);
 
-    if (typingTimerRef.current) {
-      clearTimeout(typingTimerRef.current);
-    }
-
-    typingTimerRef.current = setTimeout(() => {
-      typingTimerRef.current = null;
-      setIsTyping(false);
-
-      const intent = interpretUserIntent(text, steps, granularity);
+    try {
+      const intent = await interpretUserIntentWithAI(
+        text,
+        currentTask.title,
+        steps,
+        granularity
+      );
 
       if (intent.type === 'complete_step') {
         toggleStepCompletion(currentTask.id, intent.targetStepId);
@@ -100,7 +91,11 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
           steps: combinedSteps,
         });
       }
-    }, 600);
+    } catch (err) {
+      console.error('Failed to interpret intent:', err);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   // While localStorage is rehydrating, show gentle quiet animated cairn instead of flashing "not found"
@@ -147,8 +142,17 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
             onToggleStep={(stepId) => {
               toggleStepCompletion(currentTask.id, stepId);
             }}
-            onShrinkStep={(stepIdx) => {
-              shrinkStep(currentTask.id, stepIdx);
+            onShrinkStep={async (stepIdx) => {
+              const targetStep = steps[stepIdx];
+              if (!targetStep) return;
+              const { dialogue, microSteps } = await shrinkStepWithAI(
+                targetStep.text,
+                currentTask.title
+              );
+              shrinkStep(currentTask.id, stepIdx, microSteps);
+              updateTask(currentTask.id, {
+                guidance: dialogue,
+              });
             }}
             onToggleSubStep={(parentStepId, subStepId) => {
               toggleSubStepCompletion(

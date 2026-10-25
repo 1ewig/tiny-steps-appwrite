@@ -30,7 +30,7 @@ interface NowCardProps {
   onToggleSubSteps: () => void;
   onExpandSubSteps: () => void;
   onMarkDone: () => void;
-  onShrinkStep: (stepIndex: number) => void;
+  onShrinkStep: (stepIndex: number) => Promise<void> | void;
   onToggleSubStep?: (parentStepId: number, subStepId: number) => void;
 }
 
@@ -105,7 +105,7 @@ interface NowCardBodyProps {
   onToggleSubSteps: () => void;
   onExpandSubSteps: () => void;
   onMarkDone: () => void;
-  onShrinkStep: (stepIndex: number) => void;
+  onShrinkStep: (stepIndex: number) => Promise<void> | void;
   onToggleSubStep?: (parentStepId: number, subStepId: number) => void;
 }
 
@@ -123,9 +123,9 @@ function NowCardBody({
   const subSteps = step.subSteps ?? [];
   const hasSubSteps = subSteps.length > 0;
   const canBreakDown = step.canSplit && stepIndex !== -1;
-  const { isShrinking, trigger: triggerBreakDown } = useShrinkStep(() => {
+  const { isShrinking, trigger: triggerBreakDown } = useShrinkStep(async () => {
     onExpandSubSteps();
-    onShrinkStep(stepIndex);
+    await onShrinkStep(stepIndex);
   });
 
   return (
