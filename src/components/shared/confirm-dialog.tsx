@@ -147,7 +147,7 @@ export function ConfirmDialog({
               initial="initial"
               animate="animate"
               exit="exit"
-              className="pointer-events-auto w-full max-w-sm sm:max-w-md bg-surface border border-border-subtle rounded-2xl p-5 sm:p-6 shadow-modal space-y-4 focus:outline-none"
+              className="pointer-events-auto w-full max-w-sm sm:max-w-md bg-surface rounded-2xl p-5 sm:p-6 shadow-modal space-y-4 outline-none focus:outline-none"
             >
               {/* Header with sensory icon and close X */}
               <div className="flex items-start justify-between gap-3">

@@ -58,9 +58,9 @@ export function NextCard({ steps, getStepNumber, onSelectStep }: NextCardProps) 
             </motion.button>
           ))
         ) : (
-          <div className="p-4 rounded-2xl border border-dashed border-border-subtle/60 text-center">
-            <p className="text-xs text-text-tertiary">You are on the final stretch.</p>
-          </div>
+          <p className="text-xs text-text-tertiary px-1">
+            You are on the final stretch.
+          </p>
         )}
       </div>
     </motion.section>
