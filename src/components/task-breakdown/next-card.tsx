@@ -37,7 +37,7 @@ export function NextCard({ steps, getStepNumber, onSelectStep }: NextCardProps) 
               animate="rest"
               whileHover={reduceMotion ? undefined : 'hover'}
               whileTap={reduceMotion ? undefined : 'tap'}
-              className="group relative w-full text-left rounded-2xl p-4 bg-surface shadow-subtle hover:shadow-card hover:z-10 cursor-pointer transition-shadow duration-fast future-step-blur focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="group relative w-full text-left rounded-2xl p-4 bg-surface shadow-subtle hover:shadow-card hover:z-10 cursor-pointer future-step-blur focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               title="Click to switch to this step"
             >
               <span className="flex items-start justify-between gap-3">

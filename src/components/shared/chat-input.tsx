@@ -84,7 +84,7 @@ export function ChatInput({
       {/* Dynamic input container: pill for single-line, rounded-2xl for multiline */}
       <div
         onClick={() => textareaRef.current?.focus()}
-        className={`bg-surface/95 backdrop-blur-md shadow-capsule px-4 transition-shadow duration-200 flex gap-2.5 cursor-text ${
+        className={`bg-surface/95 backdrop-blur-md shadow-capsule px-4 flex gap-2.5 cursor-text ${
           isMultiline
             ? 'rounded-2xl py-3 items-end'
             : 'rounded-full py-2 sm:py-2.5 items-center'
