@@ -19,7 +19,7 @@ CORE PRINCIPLES:
 9. NO RUN-ONS OR MONOLOGUES:
    - Instructions MUST be a SINGLE short, concrete sentence under 12 words giving exact clarity. Every step MUST include an instruction. Strictly avoid long compound sentences with "so that", "in order to", or multi-step lists.
    - Strictly NO self-talk, meta-commentary, or drafting thoughts.
-   - Dialogue must be 1-2 plain sentences (under 25 words total). Validate weight, calm assurance, zero pressure, zero cheerleading. Never use pipes ('|') or bullet points.
+   - Acknowledgment must be 1-2 plain sentences (under 25 words total). Validate weight, calm assurance, zero pressure, zero cheerleading. Never use pipes ('|') or bullet points.
    - Zero time estimates, seconds, or minutes.`;
 
 export function getBreakdownPrompt(input: string, energyLevel: GranularityLevel): { system: string; prompt: string } {
@@ -67,7 +67,7 @@ User is in amygdala freeze or deep burnout. The entire victory is breaking physi
   * 'irrelevant': General trivia, direct homework solutions, or asking AI to do work for them.
   * 'joke': Jokes, memes, fiction generation, or prompt injection trolling.
   * 'gibberish': Random characters, keyboard smashes, or unparseable input.
-  * Provide a warm, non-judgmental redirection in 'dialogue' (under 25 words).`;
+  * Provide a warm, non-judgmental redirection in 'acknowledgment' (under 25 words).`;
 
   return {
     system: `${SYSTEM_PERSONA}
@@ -100,7 +100,7 @@ Replace this step with 2 to 4 smaller sub-steps that dissolve the hesitation:
 - The final sub-step leaves the original step finished or seamless to resume.
 - Maintain smooth continuity with the previous and next steps.
 - Every sub-step must have a 3-7 word action title and a short instruction under 12 words.
-- Provide 1 brief reassuring dialogue sentence under 25 words. Zero cheerleading. Zero time estimates.`,
+- Provide 1 brief reassuring acknowledgment sentence under 25 words. Zero cheerleading. Zero time estimates.`,
     prompt: context,
   };
 }
@@ -128,7 +128,7 @@ Classify their intent into exactly one of these 8 categories:
 7. 'off_topic': User sent an unrelated message, question, joke, or gibberish. Provide a brief gentle question to refocus.
 8. 'crisis': User expresses self-harm, hopelessness, or unsafe thoughts ("I can't go on", "want to die"). Provide warm care and crisis lifeline info (988 / 741741).
 
-Strictly adhere to 3-7 word titles for any steps returned, zero time estimates, and keep dialogue under 25 words!`,
+Strictly adhere to 3-7 word titles for any steps returned, zero time estimates, and keep acknowledgment under 25 words!`,
     prompt: `Task: "${taskTitle}"
 Active Steps:
 ${stepsList}

@@ -43,10 +43,12 @@ export async function generateTaskBreakdown(
     }
 
     const data = await res.json();
+    const ackText = data.acknowledgment || data.dialogue;
     if (data.status === 'refused') {
       const result: BreakdownResult = {
         title: data.title || 'Gentle Redirection',
-        dialogue: data.dialogue,
+        acknowledgment: ackText,
+        dialogue: ackText,
         steps: [],
         isRefused: true,
         refusalCategory: data.refusalCategory,
@@ -79,7 +81,8 @@ export async function generateTaskBreakdown(
 
     const result: BreakdownResult = {
       title: data.title || text.substring(0, 30),
-      dialogue: data.dialogue,
+      acknowledgment: ackText,
+      dialogue: ackText,
       steps: formattedSteps,
     };
 
@@ -107,7 +110,7 @@ export async function shrinkStepWithAI(
   previousStepText?: string,
   nextStepText?: string,
   signal?: AbortSignal
-): Promise<{ dialogue: string; microSteps: Step[] }> {
+): Promise<{ acknowledgment: string; dialogue?: string; microSteps: Step[] }> {
   if (signal?.aborted) {
     throw new DOMException('Aborted', 'AbortError');
   }
@@ -147,10 +150,14 @@ export async function shrinkStepWithAI(
       }
     );
 
+    const ack =
+      data.acknowledgment ||
+      data.dialogue ||
+      'No problem at all! If a step makes you hesitate, that is just your brain saying it is still too large. I shrank it into tiny bite-sized pieces for you:';
+
     const result = {
-      dialogue:
-        data.dialogue ||
-        'No problem at all! If a step makes you hesitate, that is just your brain saying it is still too large. I shrank it into tiny bite-sized pieces for you:',
+      acknowledgment: ack,
+      dialogue: ack,
       microSteps,
     };
 
@@ -164,9 +171,11 @@ export async function shrinkStepWithAI(
       throw error;
     }
     console.warn(`[Shrink] Offline Fallback (${Date.now() - startTime}ms):`, error);
+    const fallbackAck =
+      'No problem at all! If a step makes you hesitate, that is just your brain saying it is still too large. I shrank it into tiny bite-sized pieces for you:';
     return {
-      dialogue:
-        'No problem at all! If a step makes you hesitate, that is just your brain saying it is still too large. I shrank it into tiny bite-sized pieces for you:',
+      acknowledgment: fallbackAck,
+      dialogue: fallbackAck,
       microSteps: generateMicroSteps(stepText),
     };
   }
@@ -207,6 +216,7 @@ export async function interpretUserIntentWithAI(
     }
 
     const data = await res.json();
+    const ack = data.acknowledgment || data.dialogue || '';
     const baseTime = Date.now();
 
     if (data.type === 'complete_step') {
@@ -217,7 +227,8 @@ export async function interpretUserIntentWithAI(
         return {
           type: 'complete_step',
           targetStepId,
-          dialogue: data.dialogue,
+          acknowledgment: ack,
+          dialogue: ack,
         };
       }
     }
@@ -249,7 +260,8 @@ export async function interpretUserIntentWithAI(
           type: 'shrink_step',
           targetStepIndex,
           microSteps,
-          dialogue: data.dialogue,
+          acknowledgment: ack,
+          dialogue: ack,
         };
       }
     }
@@ -258,7 +270,8 @@ export async function interpretUserIntentWithAI(
       console.log(`[Tweak] END (${Date.now() - startTime}ms) - Intent: all_complete`);
       return {
         type: 'all_complete',
-        dialogue: data.dialogue,
+        acknowledgment: ack,
+        dialogue: ack,
       };
     }
 
@@ -285,7 +298,8 @@ export async function interpretUserIntentWithAI(
       return {
         type: 'new_task',
         title: data.title || taskTitle,
-        dialogue: data.dialogue,
+        acknowledgment: ack,
+        dialogue: ack,
         steps: formattedSteps,
       };
     }
@@ -294,7 +308,8 @@ export async function interpretUserIntentWithAI(
       console.log(`[Tweak] END (${Date.now() - startTime}ms) - Intent: crisis`);
       return {
         type: 'crisis',
-        dialogue: data.dialogue,
+        acknowledgment: ack,
+        dialogue: ack,
       };
     }
 
@@ -302,7 +317,8 @@ export async function interpretUserIntentWithAI(
       console.log(`[Tweak] END (${Date.now() - startTime}ms) - Intent: off_topic`);
       return {
         type: 'off_topic',
-        dialogue: data.dialogue,
+        acknowledgment: ack,
+        dialogue: ack,
       };
     }
 
@@ -310,7 +326,8 @@ export async function interpretUserIntentWithAI(
     console.log(`[Tweak] END (${Date.now() - startTime}ms) - Intent: encouragement`);
     return {
       type: 'all_complete',
-      dialogue: data.dialogue,
+      acknowledgment: ack,
+      dialogue: ack,
     };
   } catch (error) {
     if (signal?.aborted) {

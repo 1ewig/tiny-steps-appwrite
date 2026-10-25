@@ -31,7 +31,7 @@ export const TaskBreakdownSchema = z.object({
     .string()
     .max(100)
     .describe('User overall mission title: 2 to 5 words (e.g. "Find Your Lost Cat", "Pay Electric Bill"). Never name it after step 1.'),
-  dialogue: z
+  acknowledgment: z
     .string()
     .max(300)
     .describe('If accepted: calm assurance under 25 words validating weight with zero cheerleading. If refused: warm, non-judgmental redirection explaining Tiny Steps is for helping you take action on things you want to do.'),
@@ -43,7 +43,7 @@ export const TaskBreakdownSchema = z.object({
 export type TaskBreakdownOutput = z.infer<typeof TaskBreakdownSchema>;
 
 export const ShrinkStepSchema = z.object({
-  dialogue: z
+  acknowledgment: z
     .string()
     .max(300)
     .describe('Gentle reassurance that wanting smaller steps is completely normal and healthy (1-2 brief sentences under 25 words).'),
@@ -60,10 +60,10 @@ export const AssistantIntentSchema = z.object({
   type: z
     .enum(['complete_step', 'shrink_step', 'all_complete', 'new_task', 'tweak_steps', 'encouragement', 'off_topic', 'crisis'])
     .describe('The classified user intent'),
-  dialogue: z
+  acknowledgment: z
     .string()
     .max(300)
-    .describe('Warm, empathetic response to the user (1-2 short sentences max, under 25 words). If crisis, offer human care and lifeline (988). If off_topic, ask one short gentle question to refocus.'),
+    .describe('Warm, empathetic response acknowledging the user (1-2 short sentences max, under 25 words). If crisis, offer human care and lifeline (988). If off_topic, ask one short gentle question to refocus.'),
   targetStepId: z.number().optional().describe('Target step ID if completing a step'),
   targetStepIndex: z.number().optional().describe('Target step index if shrinking a step'),
   microSteps: z.array(TaskStepSchema).optional().describe('Micro-steps if type is shrink_step'),

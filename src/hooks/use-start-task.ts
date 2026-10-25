@@ -72,8 +72,10 @@ export function useStartTask() {
         await sleep(MIN_BREAKDOWN_LOADER_MS - elapsed);
       }
 
+      const ack = breakdown.acknowledgment || breakdown.dialogue || '';
+
       if (breakdown.isRefused) {
-        setGenerationNotice(breakdown.dialogue);
+        setGenerationNotice(ack);
         setRestoreText(trimmed);
         return;
       }
@@ -81,7 +83,7 @@ export function useStartTask() {
       const newTaskId = createTask({
         title: breakdown.title,
         prompt: trimmed,
-        guidance: breakdown.dialogue,
+        guidance: ack,
         steps: breakdown.steps,
         energyLevel: granularity,
       });

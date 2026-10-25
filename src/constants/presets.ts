@@ -8,14 +8,15 @@ export interface LevelTemplateStep {
 
 export interface LevelTemplate {
   name: string;
-  dialogue: (task: string) => string;
+  acknowledgment: (task: string) => string;
+  dialogue?: (task: string) => string;
   steps: LevelTemplateStep[];
 }
 
 export const ENERGY_LEVEL_TEMPLATES: Record<GranularityLevel, LevelTemplate> = {
   1: {
     name: 'A little stuck',
-    dialogue: (task) =>
+    acknowledgment: (task) =>
       `Let's make clean work of "${task}". We don't have to finish the whole mountain—let's just clear the initial friction.`,
     steps: [
       {
@@ -42,7 +43,7 @@ export const ENERGY_LEVEL_TEMPLATES: Record<GranularityLevel, LevelTemplate> = {
   },
   2: {
     name: 'Overwhelmed',
-    dialogue: (task) =>
+    acknowledgment: (task) =>
       `I hear you. "${task}" feels heavy right now. Let's not look at the summit—let's just place one foot on level ground.`,
     steps: [
       {
@@ -74,7 +75,7 @@ export const ENERGY_LEVEL_TEMPLATES: Record<GranularityLevel, LevelTemplate> = {
   },
   3: {
     name: 'Full paralysis',
-    dialogue: (task) =>
+    acknowledgment: (task) =>
       `Breathe. You are safe. You do not have to finish "${task}" today. Doing just 1% of this is a 100% victory.`,
     steps: [
       {

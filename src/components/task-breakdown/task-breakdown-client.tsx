@@ -57,15 +57,17 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
         granularity
       );
 
+      const ack = intent.acknowledgment || intent.dialogue;
+
       if (intent.type === 'complete_step') {
         toggleStepCompletion(currentTask.id, intent.targetStepId);
-        if (intent.dialogue) {
-          updateTask(currentTask.id, { guidance: intent.dialogue });
+        if (ack) {
+          updateTask(currentTask.id, { guidance: ack });
         }
       } else if (intent.type === 'shrink_step') {
         shrinkStep(currentTask.id, intent.targetStepIndex, intent.microSteps);
-        if (intent.dialogue) {
-          updateTask(currentTask.id, { guidance: intent.dialogue });
+        if (ack) {
+          updateTask(currentTask.id, { guidance: ack });
         }
       } else if (intent.type === 'new_task') {
         const existingCompleted = steps.filter((s) => s.completed);
@@ -78,12 +80,12 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
         updateTask(currentTask.id, {
           title: intent.title || currentTask.title,
           steps: combinedSteps,
-          guidance: intent.dialogue || currentTask.guidance,
+          guidance: ack || currentTask.guidance,
         });
-      } else if (intent.dialogue) {
+      } else if (ack) {
         // Handles 'crisis', 'off_topic', 'all_complete', and general encouragement
         updateTask(currentTask.id, {
-          guidance: intent.dialogue,
+          guidance: ack,
         });
       }
     } catch (err) {

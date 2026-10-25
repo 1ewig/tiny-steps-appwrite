@@ -2,7 +2,8 @@ import type { Step, GranularityLevel } from '@/types/task';
 import { ENERGY_LEVEL_TEMPLATES } from '@/constants/presets';
 
 export interface BreakdownResult {
-  dialogue: string;
+  acknowledgment: string;
+  dialogue?: string;
   title: string;
   steps: Step[];
   isRefused?: boolean;
@@ -14,41 +15,49 @@ export type AssistantIntent =
   | {
       type: 'complete_step';
       targetStepId: number;
-      dialogue: string;
+      acknowledgment: string;
+      dialogue?: string;
     }
   | {
       type: 'shrink_step';
       targetStepIndex: number;
       microSteps: Step[];
-      dialogue: string;
+      acknowledgment: string;
+      dialogue?: string;
     }
   | {
       type: 'all_complete';
-      dialogue: string;
+      acknowledgment: string;
+      dialogue?: string;
     }
   | {
       type: 'new_task';
       title: string;
-      dialogue: string;
+      acknowledgment: string;
+      dialogue?: string;
       steps: Step[];
     }
   | {
       type: 'tweak_steps';
       title?: string;
-      dialogue: string;
+      acknowledgment: string;
+      dialogue?: string;
       steps: Step[];
     }
   | {
       type: 'encouragement';
-      dialogue: string;
+      acknowledgment: string;
+      dialogue?: string;
     }
   | {
       type: 'off_topic';
-      dialogue: string;
+      acknowledgment: string;
+      dialogue?: string;
     }
   | {
       type: 'crisis';
-      dialogue: string;
+      acknowledgment: string;
+      dialogue?: string;
     };
 
 /**
@@ -92,10 +101,12 @@ export function decomposeTask(input: string, level: GranularityLevel): Breakdown
   const clean = input.trim() || 'this task';
   const actionName = clean.length > 50 ? clean.substring(0, 47) + '...' : clean;
   const template = ENERGY_LEVEL_TEMPLATES[level] ?? ENERGY_LEVEL_TEMPLATES[2];
+  const ack = template.acknowledgment ? template.acknowledgment(actionName) : (template as any).dialogue(actionName);
 
   return {
     title: actionName,
-    dialogue: template.dialogue(actionName),
+    acknowledgment: ack,
+    dialogue: ack,
     steps: template.steps.map((s, i) => {
       const stepText = s.text(actionName);
       return {
@@ -130,10 +141,11 @@ export function interpretUserIntent(
     lower.includes('end it all') ||
     lower.includes("can't go on")
   ) {
+    const ack = 'Please know you are not alone and your life matters. Support is free and confidential: text HOME to 741741 or call/text 988 anytime (24/7).';
     return {
       type: 'crisis',
-      dialogue:
-        'Please know you are not alone and your life matters. Support is free and confidential: text HOME to 741741 or call/text 988 anytime (24/7).',
+      acknowledgment: ack,
+      dialogue: ack,
     };
   }
 
@@ -148,11 +160,12 @@ export function interpretUserIntent(
       lower === 'k' ||
       lower === 'ok')
   ) {
+    const ack = 'Incredible work! Notice how taking that one microscopic action did not break you. Take a brief breath. Here is your next step:';
     return {
       type: 'complete_step',
       targetStepId: nextIncomplete.id,
-      dialogue:
-        'Incredible work! Notice how taking that one microscopic action did not break you. Take a brief breath. Here is your next step:',
+      acknowledgment: ack,
+      dialogue: ack,
     };
   }
 
@@ -169,10 +182,11 @@ export function interpretUserIntent(
       lower.includes('all done') ||
       lower.includes('complete'))
   ) {
+    const ack = 'You did it! Every single tiny step is complete. Take a deep breath, unclench your jaw, and celebrate turning something heavy into momentum.';
     return {
       type: 'all_complete',
-      dialogue:
-        'You did it! Every single tiny step is complete. Take a deep breath, unclench your jaw, and celebrate turning something heavy into momentum.',
+      acknowledgment: ack,
+      dialogue: ack,
     };
   }
 
@@ -189,12 +203,13 @@ export function interpretUserIntent(
       lower.includes('cannot') ||
       lower.includes("can't"))
   ) {
+    const ack = 'No problem at all! If a step makes you hesitate, that is just your brain saying it is still too large. I shrank it into tiny bite-sized pieces for you:';
     return {
       type: 'shrink_step',
       targetStepIndex: nextIncompleteIdx,
       microSteps: generateMicroSteps(nextIncomplete.text),
-      dialogue:
-        'No problem at all! If a step makes you hesitate, that is just your brain saying it is still too large. I shrank it into tiny bite-sized pieces for you:',
+      acknowledgment: ack,
+      dialogue: ack,
     };
   }
 
@@ -203,7 +218,8 @@ export function interpretUserIntent(
   return {
     type: 'new_task',
     title: breakdown.title,
-    dialogue: breakdown.dialogue,
+    acknowledgment: breakdown.acknowledgment,
+    dialogue: breakdown.acknowledgment,
     steps: breakdown.steps,
   };
 }
