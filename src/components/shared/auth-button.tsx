@@ -17,6 +17,7 @@ import {
   popoverVariants,
 } from '@/constants/animation';
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
+import { AuthOverlay } from '@/components/shared/auth-overlay';
 
 export function GoogleIcon({ className = 'w-4 h-4' }: { className?: string }) {
   return (
@@ -43,9 +44,7 @@ export function AuthButton() {
     user,
     isAuthenticated,
     isLoading,
-    isSigningIn,
     isSigningOut,
-    signInWithGoogle,
     logout,
   } = useAuth();
   const { isSyncing, lastSyncedAt, syncNow } = useTaskSync();
@@ -53,6 +52,7 @@ export function AuthButton() {
   const [isManualSyncing, setIsManualSyncing] = useState(false);
   const [justSynced, setJustSynced] = useState(false);
   const [isSignOutConfirmOpen, setIsSignOutConfirmOpen] = useState(false);
+  const [isAuthOverlayOpen, setIsAuthOverlayOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click or Escape
@@ -110,38 +110,31 @@ export function AuthButton() {
     );
   }
 
-  // 2. Unauthenticated State: Sign in with Google
+  // 2. Unauthenticated State: Sign up button that opens full-screen overlay
   if (!isAuthenticated || !user) {
     return (
-      <motion.button
-        type="button"
-        disabled={isSigningIn}
-        onClick={() => signInWithGoogle()}
-        variants={reduceMotion ? undefined : tactileButtonVariants}
-        initial="rest"
-        animate="rest"
-        whileHover={isSigningIn || reduceMotion ? undefined : 'hover'}
-        whileTap={isSigningIn || reduceMotion ? undefined : 'tap'}
-        className="inline-flex items-center gap-2 h-8 px-3 rounded-md text-xs font-semibold text-text-primary bg-surface-subtle/80 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-accent shadow-subtle"
-        title={isSigningIn ? 'Connecting to Google...' : 'Sign in with Google'}
-        aria-busy={isSigningIn}
-      >
-        {isSigningIn ? (
-          <SpinnerGap
-            size={14}
-            weight="bold"
-            className={`shrink-0 text-accent ${reduceMotion ? '' : 'animate-spin'}`}
-          />
-        ) : (
+      <>
+        <motion.button
+          type="button"
+          onClick={() => setIsAuthOverlayOpen(true)}
+          variants={reduceMotion ? undefined : tactileButtonVariants}
+          initial="rest"
+          animate="rest"
+          whileHover={reduceMotion ? undefined : 'hover'}
+          whileTap={reduceMotion ? undefined : 'tap'}
+          className="inline-flex items-center gap-1.5 sm:gap-2 h-8 px-3 rounded-md text-xs font-semibold text-text-primary bg-surface-subtle/80 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent shadow-subtle"
+          title="Sign up or sign in for cloud backup"
+        >
           <GoogleIcon className="w-4 h-4 shrink-0 text-text-secondary" />
-        )}
-        <span className="hidden xs:inline">
-          {isSigningIn ? 'Connecting...' : 'Sign in with Google'}
-        </span>
-        <span className="xs:hidden">
-          {isSigningIn ? 'Connecting...' : 'Sign in'}
-        </span>
-      </motion.button>
+          <span className="hidden xs:inline">Sign up</span>
+          <span className="xs:hidden">Sign up</span>
+        </motion.button>
+
+        <AuthOverlay
+          isOpen={isAuthOverlayOpen}
+          onClose={() => setIsAuthOverlayOpen(false)}
+        />
+      </>
     );
   }
 
