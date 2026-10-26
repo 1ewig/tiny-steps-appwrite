@@ -2,6 +2,8 @@
 
 Tiny Steps turns a vague or overwhelming task into a few concrete steps you can start right away. It is built for low-energy days: one task at a time, no streaks, no guilt, and no pressure to plan everything upfront.
 
+See [docs/architecture.md](docs/architecture.md) for a deeper look at the internals.
+
 You can use it as a guest. Tasks stay in your browser, and if you sign in with Google they sync to Appwrite.
 
 ## What it does
@@ -33,7 +35,7 @@ Tiny Steps uses **Appwrite TablesDB** for relational, multi-device cloud synchro
 
 - **Relational Tables**: Normalized into `tasks` and linked `steps` with explicit order indexing.
 - **Row-Level Security (RLS)**: Enforces `Permission.read/update/delete(Role.user(userId))` per row on all cloud operations.
-- **Local-First & Auto-Migration**: Operates 100% offline via `localStorage`. Signing in with Google OAuth reconciles timestamps and migrates local guest tasks into TablesDB without data loss.
+- **Local-first storage**: Tasks persist in `localStorage`. Signing in with Google OAuth migrates guest tasks into TablesDB and merges changes by `updatedAt`.
 
 ## Getting started
 

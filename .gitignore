@@ -44,3 +44,6 @@ next-env.d.ts
 # eval
 /scripts/eval-suite.ts
 /eval-results/
+
+# local reference docs
+docs/appwrite-hackathon.md
