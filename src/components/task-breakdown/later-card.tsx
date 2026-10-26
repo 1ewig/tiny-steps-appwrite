@@ -45,8 +45,8 @@ export function LaterCard({
         {/* Pending Later Tasks */}
         {laterSteps.length > 0 ? (
           <ul className="space-y-1.5">
-            {laterSteps.map((st) => (
-              <li key={st.id}>
+            {laterSteps.map((st, idx) => (
+              <li key={`${st.id}-${idx}`}>
                 <motion.button
                   type="button"
                   onClick={() => onSelectStep(st.id)}
@@ -104,8 +104,8 @@ export function LaterCard({
                   exit={{ opacity: 0, height: 0 }}
                   className="space-y-1.5 px-1 pt-1 pb-1 overflow-hidden"
                 >
-                  {completedSteps.map((st) => (
-                    <li key={st.id}>
+                  {completedSteps.map((st, idx) => (
+                    <li key={`${st.id}-${idx}`}>
                       <motion.button
                         type="button"
                         onClick={() => onToggleStep(st.id)}

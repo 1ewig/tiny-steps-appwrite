@@ -8,7 +8,7 @@ import { shrinkStepWithAI, MAX_BREAKDOWN_WAIT_MS } from '@/lib/task-generation';
 import { getActiveStep, getActiveStepIndex } from '@/lib/task-utils';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { useShrinkStep } from '@/hooks/use-shrink-step';
-import { useTaskSync } from '@/hooks/use-task-sync';
+import { useTaskSyncSubscription } from '@/hooks/use-task-sync';
 import { AppIcon } from '@/components/shared/app-icon';
 import { AppHeader } from '@/components/shared/layout/app-header';
 import { HistoryDrawer } from '@/components/shared/layout/history-drawer';
@@ -23,8 +23,8 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
   const routeTaskId = typeof params?.id === 'string' ? params.id : null;
   const hasHydrated = useHydrated();
 
-  // Active two-way Appwrite TablesDB synchronization
-  useTaskSync();
+  // Single-instance active two-way Appwrite TablesDB synchronization
+  useTaskSyncSubscription();
 
   const {
     tasks,

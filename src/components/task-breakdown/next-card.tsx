@@ -26,9 +26,9 @@ export function NextCard({ steps, getStepNumber, onSelectStep }: NextCardProps) 
 
       <div className="space-y-2.5">
         {steps.length > 0 ? (
-          steps.map((st) => (
+          steps.map((st, idx) => (
             <motion.button
-              key={st.id}
+              key={`${st.id}-${idx}`}
               type="button"
               onClick={() => onSelectStep(st.id)}
               aria-label={`Bring ${st.text} to Now`}

@@ -142,7 +142,18 @@ export async function fetchUserTasksFromDb(userId: string): Promise<Task[]> {
           queries: [Query.equal('taskId', row.$id), Query.orderAsc('order')],
         });
 
-        steps = stepsResponse.rows.map((stRow: any, idx: number) => {
+        // Deduplicate step rows by order in case previous concurrent syncs created duplicates
+        const seenOrders = new Set<number>();
+        const uniqueStepRows = stepsResponse.rows.filter((stRow: any) => {
+          const ord = typeof stRow.order === 'number' ? stRow.order : null;
+          if (ord !== null) {
+            if (seenOrders.has(ord)) return false;
+            seenOrders.add(ord);
+          }
+          return true;
+        });
+
+        steps = uniqueStepRows.map((stRow: any, idx: number) => {
           let subSteps: Step[] | undefined = undefined;
           if (stRow.subSteps) {
             try {
@@ -155,8 +166,10 @@ export async function fetchUserTasksFromDb(userId: string): Promise<Task[]> {
             }
           }
 
+          const stepId = typeof stRow.order === 'number' && stRow.order > 0 ? stRow.order : idx + 1;
+
           return {
-            id: stRow.order ?? idx + 1,
+            id: stepId,
             title: stRow.title,
             text: stRow.title,
             instruction: stRow.instruction || '',
