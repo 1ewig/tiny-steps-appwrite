@@ -81,6 +81,7 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
       <main className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 scroll-smooth">
         <div className="w-full max-w-6xl mx-auto space-y-6 pb-28">
           <TaskCard
+            taskTitle={currentTask.title}
             guidanceText={currentTask.guidance}
             steps={steps}
             energyLevel={currentTask.energyLevel}
