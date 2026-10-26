@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import type { Step, EnergyLevel } from '@/types/task';
 import { useTaskCard } from '@/hooks/use-task-card';
 import { taskWorkspaceStaggerVariants, unblurFadeInVariants } from '@/constants/animation';
+import { isCrisisGuidance } from '@/lib/task-utils';
 import { NowCard } from './now-card';
 import { NextCard } from './next-card';
 import { LaterCard } from './later-card';
@@ -86,7 +87,7 @@ export function TaskCard({
           variants={reduceMotion ? undefined : unblurFadeInVariants}
           className="max-w-2xl mx-auto text-center px-4"
         >
-          {guidanceText.includes('988') || guidanceText.includes('741741') ? (
+          {isCrisisGuidance(guidanceText) ? (
             <div className="p-4 rounded-2xl bg-surface border border-accent/30 shadow-subtle text-left space-y-2">
               <p className="text-sm sm:text-base text-text-primary leading-relaxed font-medium">
                 {guidanceText}

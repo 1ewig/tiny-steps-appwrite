@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Trash, Warning, Check, SpinnerGap, X } from '@phosphor-icons/react';
+import { useFocusTrap } from '@/hooks/use-focus-trap';
 import {
   backdropVariants,
   tactileButtonVariants,
@@ -38,65 +39,15 @@ export function ConfirmDialog({
   const reduceMotion = useReducedMotion();
   const dialogRef = useRef<HTMLDivElement>(null);
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
-  const previousFocusRef = useRef<HTMLElement | null>(null);
 
-  // Focus management: capture previous focus & safely auto-focus the Cancel button
-  useEffect(() => {
-    if (!isOpen) return;
-
-    previousFocusRef.current =
-      document.activeElement instanceof HTMLElement ? document.activeElement : null;
-
-    const frame = requestAnimationFrame(() => {
-      cancelButtonRef.current?.focus();
-    });
-
-    return () => {
-      cancelAnimationFrame(frame);
-      previousFocusRef.current?.focus();
-      previousFocusRef.current = null;
-    };
-  }, [isOpen]);
-
-  // Intercept Escape key on window with capture to avoid triggering parent panels
-  useEffect(() => {
-    if (!isOpen || isBusy) return;
-
-    const handleKeyDownCapture = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        event.stopPropagation();
-        onClose();
-        return;
-      }
-
-      if (event.key === 'Tab' && dialogRef.current) {
-        const focusables = Array.from(
-          dialogRef.current.querySelectorAll<HTMLElement>(
-            'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-          )
-        ).filter((el) => el.offsetParent !== null);
-
-        if (focusables.length === 0) return;
-
-        const first = focusables[0];
-        const last = focusables[focusables.length - 1];
-
-        if (event.shiftKey && document.activeElement === first) {
-          event.preventDefault();
-          last.focus();
-        } else if (!event.shiftKey && document.activeElement === last) {
-          event.preventDefault();
-          first.focus();
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDownCapture, { capture: true });
-    return () => {
-      window.removeEventListener('keydown', handleKeyDownCapture, { capture: true });
-    };
-  }, [isOpen, isBusy, onClose]);
+  useFocusTrap({
+    isOpen,
+    containerRef: dialogRef,
+    initialFocusRef: cancelButtonRef,
+    isBusy,
+    onClose,
+    useCapture: true,
+  });
 
   const defaultIcon =
     variant === 'danger' ? (

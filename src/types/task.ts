@@ -208,4 +208,5 @@ export interface TaskState {
     afterStepId: number | null,
     step: { title: string; instruction?: string }
   ) => void;
+  applyAssistantIntent: (taskId: string, intent: AssistantIntent) => void;
 }

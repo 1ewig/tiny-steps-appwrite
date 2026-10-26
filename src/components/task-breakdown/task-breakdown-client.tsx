@@ -1,14 +1,11 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTaskStore } from '@/store/task-store';
 import { useHydrated } from '@/hooks/use-hydrated';
-import {
-  interpretUserIntentWithAI,
-  shrinkStepWithAI,
-} from '@/lib/ai/client';
+import { useAssistantChat } from '@/hooks/use-assistant-chat';
+import { shrinkStepWithAI } from '@/lib/ai/client';
 import { TaskCard } from '@/components/task-breakdown/task-card';
 import { PeekToggle } from '@/components/task-breakdown/peek-toggle';
 import { ChatInput } from '@/components/shared/chat-input';
@@ -22,29 +19,6 @@ interface TaskBreakdownClientProps {
 
 export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientProps) {
   const router = useRouter();
-  const [isTyping, setIsTyping] = useState(false);
-  const [assistantFeedback, setAssistantFeedback] = useState<string | null>(null);
-  const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (feedbackTimerRef.current) {
-        clearTimeout(feedbackTimerRef.current);
-      }
-    };
-  }, []);
-
-  const showFeedback = (msg?: string) => {
-    if (!msg) return;
-    if (feedbackTimerRef.current) {
-      clearTimeout(feedbackTimerRef.current);
-    }
-    setAssistantFeedback(msg);
-    feedbackTimerRef.current = setTimeout(() => {
-      setAssistantFeedback(null);
-    }, 5000);
-  };
-
   const activeId = taskId || sessionId || '';
   const hasHydrated = useHydrated();
 
@@ -54,99 +28,20 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
     peekFuture,
     togglePeek,
     focusTunnelTaskId,
-    updateTask,
     toggleStepCompletion,
     toggleSubStepCompletion,
     shrinkStep,
-    modifyStep,
-    modifySubStep,
-    removeStep,
-    removeSubStep,
-    insertStep,
   } = useTaskStore();
 
   const currentTask = tasks.find((t) => t.id === activeId);
   const focusTunnelOpen = focusTunnelTaskId === activeId;
-
   const steps = currentTask?.steps ?? [];
 
-  // Handle User Message Submission (Tweaking / Venting on the Living Card)
-  const handleSendMessage = async (text: string) => {
-    if (!currentTask || isTyping) return;
+  const { isTyping, assistantFeedback, showFeedback, sendMessage } = useAssistantChat(
+    currentTask,
+    granularity
+  );
 
-    setIsTyping(true);
-
-    try {
-      const intent = await interpretUserIntentWithAI(
-        text,
-        currentTask.title,
-        steps,
-        granularity
-      );
-
-      const ack = intent.acknowledgment || intent.dialogue;
-
-      if (intent.type === 'complete_step') {
-        toggleStepCompletion(currentTask.id, intent.targetStepId);
-        showFeedback(ack);
-      } else if (intent.type === 'shrink_step') {
-        shrinkStep(currentTask.id, intent.targetStepIndex, intent.microSteps);
-        showFeedback(ack);
-      } else if (intent.type === 'modify_step' || intent.type === 'reroute_constraint') {
-        if (intent.targetSubStepId) {
-          modifySubStep(currentTask.id, intent.targetStepId, intent.targetSubStepId, {
-            title: intent.title,
-            instruction: intent.instruction,
-          });
-        } else {
-          modifyStep(currentTask.id, intent.targetStepId, {
-            title: intent.title,
-            instruction: intent.instruction,
-          });
-        }
-        showFeedback(ack);
-      } else if (intent.type === 'modify_substep') {
-        modifySubStep(currentTask.id, intent.targetStepId, intent.targetSubStepId, {
-          title: intent.title,
-          instruction: intent.instruction,
-        });
-        showFeedback(ack);
-      } else if (intent.type === 'remove_step') {
-        if (intent.targetSubStepId) {
-          removeSubStep(currentTask.id, intent.targetStepId, intent.targetSubStepId);
-        } else {
-          removeStep(currentTask.id, intent.targetStepId);
-        }
-        showFeedback(ack);
-      } else if (intent.type === 'insert_step') {
-        insertStep(currentTask.id, intent.afterStepId ?? null, {
-          title: intent.title,
-          instruction: intent.instruction,
-        });
-        showFeedback(ack);
-      } else if (intent.type === 'new_task') {
-        const existingCompleted = steps.filter((s) => s.completed);
-        const combinedSteps = [
-          ...existingCompleted,
-          ...intent.steps.map((st, i) => ({ ...st, id: Date.now() + i, completed: false })),
-        ];
-
-        // Step-only update: Task title and original guidance remain immutable
-        updateTask(currentTask.id, {
-          steps: combinedSteps,
-        });
-        showFeedback(ack);
-      } else if (ack) {
-        // Handles 'crisis', 'off_topic', 'all_complete', and general encouragement
-        showFeedback(ack);
-      }
-    } catch (err) {
-      console.error('Failed to interpret intent:', err);
-      showFeedback('The assistant needs a moment. Please try again.');
-    } finally {
-      setIsTyping(false);
-    }
-  };
 
   // While localStorage is rehydrating, show gentle quiet animated cairn instead of flashing "not found"
   if (!hasHydrated) {
@@ -239,7 +134,7 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
       </AnimatePresence>
 
       {/* Collapsed Chat Chip at Bottom (expands on demand for venting/tweaking) */}
-      <ChatInput disabled={isTyping} onSubmit={handleSendMessage} collapsible />
+      <ChatInput disabled={isTyping} onSubmit={sendMessage} collapsible />
 
       {/* Floating Round Blur/Peek Toggle (Bottom-Right) */}
       {steps.length > 0 && !focusTunnelOpen && (

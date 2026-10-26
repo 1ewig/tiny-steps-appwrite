@@ -8,6 +8,7 @@ import {
   tactileButtonVariants,
   subtleMorphVariants,
 } from '@/constants/animation';
+import { isCrisisGuidance } from '@/lib/task-utils';
 
 const LOADING_LINES = [
   'Making this smaller…',
@@ -55,9 +56,7 @@ function FocusLoaderContent({
   const [lineIndex, setLineIndex] = useState(0);
   const dismissButtonRef = useRef<HTMLButtonElement>(null);
 
-  const isCrisis = noticeMessage
-    ? /findahelpline|helpline|crisis|lifeline|suicide|self-harm|988|741741/i.test(noticeMessage)
-    : false;
+  const isCrisis = isCrisisGuidance(noticeMessage);
 
   // Handle keyboard dismissal when notice is active
   useEffect(() => {

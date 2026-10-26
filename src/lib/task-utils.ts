@@ -65,3 +65,13 @@ export const formatSessionDate = formatTaskDate;
 export function getSessionSteps(task?: Task | null): Step[] {
   return task?.steps || [];
 }
+
+const CRISIS_PATTERN = /findahelpline|helpline|crisis|lifeline|suicide|self-harm|988|741741/i;
+
+/**
+ * Checks whether a guidance or notice message contains crisis helpline references.
+ */
+export function isCrisisGuidance(text?: string | null): boolean {
+  if (!text) return false;
+  return CRISIS_PATTERN.test(text);
+}

@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Sparkle, Check, X, SpinnerGap } from '@phosphor-icons/react';
 import type { Step } from '@/types/task';
+import { useFocusTrap } from '@/hooks/use-focus-trap';
 import {
   tactileButtonVariants,
   tactileIconVariants,
@@ -45,7 +46,6 @@ export function FocusTunnelModal({
   onShrink,
 }: FocusTunnelModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
-  const previousActiveElementRef = useRef<HTMLElement | null>(null);
   const reduceMotion = useReducedMotion();
 
   const morphVariants = reduceMotion
@@ -63,70 +63,18 @@ export function FocusTunnelModal({
   const currentSubStep = incompleteSubSteps[0] ?? null;
   const showAnchor = !isIntro && hasSubSteps && Boolean(currentSubStep);
 
-  // Preserve the previously focused element while the dialog is open
-  useEffect(() => {
-    if (!isOpen) return;
-
-    previousActiveElementRef.current = document.activeElement as HTMLElement | null;
-    return () => {
-      previousActiveElementRef.current?.focus();
-      previousActiveElementRef.current = null;
-    };
-  }, [isOpen]);
-
-  // Focus the dialog container so keyboard listeners and tab-trapping are active without auto-selecting buttons
-  useEffect(() => {
-    if (!isOpen || isBusy) return;
-
-    const timer = setTimeout(() => {
-      modalRef.current?.focus({ preventScroll: true });
-    }, 50);
-
-    return () => clearTimeout(timer);
-  }, [isOpen, isBusy, isIntro]);
-
-  // Key handling: Escape and Tab trapping
-  useEffect(() => {
-    if (!isOpen || isBusy) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onClose();
-        return;
-      }
-
+  useFocusTrap({
+    isOpen,
+    containerRef: modalRef,
+    isBusy,
+    onClose,
+    onKeyDown: (e) => {
       if (isIntro && (e.code === 'Space' || e.key === 'Enter')) {
         e.preventDefault();
         onBegin?.();
-        return;
       }
-
-      if (e.key === 'Tab' && modalRef.current) {
-        const focusables = modalRef.current.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        );
-        if (focusables.length === 0) return;
-        const first = focusables[0];
-        const last = focusables[focusables.length - 1];
-
-        if (document.activeElement === modalRef.current) {
-          e.preventDefault();
-          (e.shiftKey ? last : first).focus();
-          return;
-        }
-
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, isBusy, isIntro, onBegin, onClose]);
+    },
+  });
 
   return (
     <AnimatePresence>

@@ -1,5 +1,5 @@
 import type { StateCreator } from 'zustand';
-import type { TaskState, Task, Step, EnergyLevel } from '@/types/task';
+import type { TaskState, Task, Step, EnergyLevel, AssistantIntent } from '@/types/task';
 
 export interface TaskSlice {
   tasks: Task[];
@@ -43,9 +43,10 @@ export interface TaskSlice {
     afterStepId: number | null,
     step: { title: string; instruction?: string }
   ) => void;
+  applyAssistantIntent: (taskId: string, intent: AssistantIntent) => void;
 }
 
-export const createTaskSlice: StateCreator<TaskState, [], [], TaskSlice> = (set) => ({
+export const createTaskSlice: StateCreator<TaskState, [], [], TaskSlice> = (set, get) => ({
   tasks: [],
 
   setTasks: (tasks) => set({ tasks }),
@@ -285,5 +286,72 @@ export const createTaskSlice: StateCreator<TaskState, [], [], TaskSlice> = (set)
         return { ...task, steps: updatedSteps, updatedAt: Date.now() };
       }),
     }));
+  },
+
+  applyAssistantIntent: (taskId, intent) => {
+    switch (intent.type) {
+      case 'complete_step':
+        get().toggleStepCompletion(taskId, intent.targetStepId);
+        break;
+      case 'shrink_step':
+        get().shrinkStep(taskId, intent.targetStepIndex, intent.microSteps);
+        break;
+      case 'modify_step':
+      case 'reroute_constraint':
+        if (intent.targetSubStepId) {
+          get().modifySubStep(taskId, intent.targetStepId, intent.targetSubStepId, {
+            title: intent.title,
+            instruction: intent.instruction,
+          });
+        } else {
+          get().modifyStep(taskId, intent.targetStepId, {
+            title: intent.title,
+            instruction: intent.instruction,
+          });
+        }
+        break;
+      case 'modify_substep':
+        get().modifySubStep(taskId, intent.targetStepId, intent.targetSubStepId, {
+          title: intent.title,
+          instruction: intent.instruction,
+        });
+        break;
+      case 'remove_step':
+        if (intent.targetSubStepId) {
+          get().removeSubStep(taskId, intent.targetStepId, intent.targetSubStepId);
+        } else {
+          get().removeStep(taskId, intent.targetStepId);
+        }
+        break;
+      case 'insert_step':
+        get().insertStep(taskId, intent.afterStepId ?? null, {
+          title: intent.title,
+          instruction: intent.instruction,
+        });
+        break;
+      case 'new_task': {
+        const currentTask = get().tasks.find((t) => t.id === taskId);
+        if (!currentTask) break;
+        const existingCompleted = currentTask.steps.filter((s) => s.completed);
+        const combinedSteps = [
+          ...existingCompleted,
+          ...intent.steps.map((st, i) => ({ ...st, id: Date.now() + i, completed: false })),
+        ];
+        get().updateTask(taskId, { steps: combinedSteps });
+        break;
+      }
+      case 'tweak_steps': {
+        const currentTask = get().tasks.find((t) => t.id === taskId);
+        if (!currentTask) break;
+        get().updateTask(taskId, { steps: intent.steps });
+        break;
+      }
+      case 'all_complete':
+      case 'encouragement':
+      case 'off_topic':
+      case 'crisis':
+      default:
+        break;
+    }
   },
 });
