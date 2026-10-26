@@ -45,6 +45,11 @@ Review past sessions, resume incomplete tasks, or manage history with accessible
 
 ![History Drawer](public/screenshots/02-history-empty.webp)
 
+### 7. Clear Boundaries & Gentle Pauses
+Tiny Steps breaks down execution for humans—it refuses to do academic ghostwriting, solve homework, or roleplay therapy. When input falls outside its scope, a calm notice card explains the boundary with a quick way to return to your words without losing your prompt.
+
+![Boundary Notice Card](public/screenshots/08-refusal-notice.webp)
+
 ---
 
 ## Features at a Glance
@@ -53,6 +58,7 @@ Review past sessions, resume incomplete tasks, or manage history with accessible
 - **3-Column Workspace**: Spatial Now / Next / Later organization with anti-scan progressive disclosure.
 - **On-Demand Micro-Actions**: Dynamically break intimidating steps into 2–4 smaller pieces.
 - **Non-Destructive Assistant**: Surgical step surgery (modify, add, remove, reroute) preserving task immutability.
+- **Clear Execution Boundaries**: Calm refusal notices that prevent machine labor substitution while safeguarding crisis inputs.
 - **Sensory-Friendly Design**: Warm oatmeal canvas, calming sage accents, dim mode toggle, and reduced-motion support.
 - **Guest-First & Cloud-Synced**: Full offline capability via `localStorage`, with optional Appwrite TablesDB sync.
 
