@@ -15,6 +15,8 @@ export function useAuth() {
     closeFocusTunnel,
   } = useTaskStore();
   const [error, setError] = useState<string | null>(null);
+  const [isSigningIn, setIsSigningIn] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const checkSession = useCallback(async () => {
     try {
@@ -34,9 +36,11 @@ export function useAuth() {
 
   const signInWithGoogle = async () => {
     setError(null);
+    setIsSigningIn(true);
     try {
       await loginWithGoogle();
     } catch (err: unknown) {
+      setIsSigningIn(false);
       const message = err instanceof Error ? err.message : 'Failed to initialize Google Sign In';
       setError(message);
       console.error('[Auth] loginWithGoogle error:', err);
@@ -45,7 +49,7 @@ export function useAuth() {
 
   const logout = async (): Promise<void> => {
     setError(null);
-    setAuthLoading(true);
+    setIsSigningOut(true);
     try {
       await logoutUser();
     } catch (err: unknown) {
@@ -57,7 +61,7 @@ export function useAuth() {
       setTasks([]);
       setLastSyncedAt(null);
       closeFocusTunnel();
-      setAuthLoading(false);
+      setIsSigningOut(false);
     }
   };
 
@@ -65,6 +69,8 @@ export function useAuth() {
     user,
     isAuthenticated: Boolean(user),
     isLoading: isAuthLoading,
+    isSigningIn,
+    isSigningOut,
     error,
     clearError: () => setError(null),
     signInWithGoogle,

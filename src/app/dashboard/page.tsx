@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useReducedMotion } from 'framer-motion';
 import { getAccount } from '@/lib/appwrite/client';
 import { useTaskStore } from '@/store/task-store';
 import { AppIcon } from '@/components/shared/app-icon';
-import { CloudCheck, SignOut, ArrowRight } from '@phosphor-icons/react';
+import { CloudCheck, SignOut, ArrowRight, SpinnerGap } from '@phosphor-icons/react';
 
 interface UserProfile {
   id: string;
@@ -15,6 +16,7 @@ interface UserProfile {
 
 export default function DashboardPage() {
   const router = useRouter();
+  const reduceMotion = useReducedMotion();
   const setUser = useTaskStore((s) => s.setUser);
   const tasks = useTaskStore((s) => s.tasks);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -123,9 +125,19 @@ export default function DashboardPage() {
             type="button"
             onClick={handleSignOut}
             disabled={signingOut}
-            className="w-full inline-flex items-center justify-center gap-2 h-10 px-4 rounded-xl text-xs font-medium text-danger-text hover:bg-danger-subtle border border-border-subtle transition-colors duration-fast cursor-pointer disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-danger"
+            aria-busy={signingOut}
+            className="w-full inline-flex items-center justify-center gap-2 h-10 px-4 rounded-xl text-xs font-medium text-danger-text hover:bg-danger-subtle border border-border-subtle transition-colors duration-fast cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-danger"
           >
-            <SignOut size={15} weight="regular" />
+            {signingOut ? (
+              <SpinnerGap
+                size={15}
+                weight="bold"
+                className={`shrink-0 text-danger-text ${reduceMotion ? '' : 'animate-spin'}`}
+                aria-hidden="true"
+              />
+            ) : (
+              <SignOut size={15} weight="regular" />
+            )}
             <span>{signingOut ? 'Signing out...' : 'Sign out'}</span>
           </button>
         </div>

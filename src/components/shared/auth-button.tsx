@@ -7,6 +7,7 @@ import {
   ArrowsClockwise,
   CloudCheck,
   Check,
+  SpinnerGap,
 } from '@phosphor-icons/react';
 import { useAuth } from '@/hooks/use-auth';
 import { useTaskSync } from '@/hooks/use-task-sync';
@@ -38,13 +39,20 @@ export function GoogleIcon({ className = 'w-4 h-4' }: { className?: string }) {
 
 export function AuthButton() {
   const reduceMotion = useReducedMotion();
-  const { user, isAuthenticated, isLoading, signInWithGoogle, logout } = useAuth();
+  const {
+    user,
+    isAuthenticated,
+    isLoading,
+    isSigningIn,
+    isSigningOut,
+    signInWithGoogle,
+    logout,
+  } = useAuth();
   const { isSyncing, lastSyncedAt, syncNow } = useTaskSync();
   const [isOpen, setIsOpen] = useState(false);
   const [isManualSyncing, setIsManualSyncing] = useState(false);
   const [justSynced, setJustSynced] = useState(false);
   const [isSignOutConfirmOpen, setIsSignOutConfirmOpen] = useState(false);
-  const [isSigningOut, setIsSigningOut] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click or Escape
@@ -84,19 +92,16 @@ export function AuthButton() {
   };
 
   const handleConfirmSignOut = async () => {
-    setIsSigningOut(true);
     try {
       await logout();
       setIsSignOutConfirmOpen(false);
     } catch (err) {
       console.warn('Sign out failed:', err);
-    } finally {
-      setIsSigningOut(false);
     }
   };
 
-  // 1. Loading State
-  if (isLoading) {
+  // 1. Loading State (initial session bootstrap)
+  if (isLoading && !user && !isSigningOut) {
     return (
       <div
         className="h-8 w-20 rounded-md bg-surface-subtle/50 animate-pulse"
@@ -110,18 +115,32 @@ export function AuthButton() {
     return (
       <motion.button
         type="button"
+        disabled={isSigningIn}
         onClick={() => signInWithGoogle()}
         variants={reduceMotion ? undefined : tactileButtonVariants}
         initial="rest"
         animate="rest"
-        whileHover={reduceMotion ? undefined : 'hover'}
-        whileTap={reduceMotion ? undefined : 'tap'}
-        className="inline-flex items-center gap-2 h-8 px-3 rounded-md text-xs font-semibold text-text-primary bg-surface-subtle/80 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent shadow-subtle"
-        title="Sign in with Google"
+        whileHover={isSigningIn || reduceMotion ? undefined : 'hover'}
+        whileTap={isSigningIn || reduceMotion ? undefined : 'tap'}
+        className="inline-flex items-center gap-2 h-8 px-3 rounded-md text-xs font-semibold text-text-primary bg-surface-subtle/80 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-accent shadow-subtle"
+        title={isSigningIn ? 'Connecting to Google...' : 'Sign in with Google'}
+        aria-busy={isSigningIn}
       >
-        <GoogleIcon className="w-4 h-4 shrink-0 text-text-secondary" />
-        <span className="hidden xs:inline">Sign in with Google</span>
-        <span className="xs:hidden">Sign in</span>
+        {isSigningIn ? (
+          <SpinnerGap
+            size={14}
+            weight="bold"
+            className={`shrink-0 text-accent ${reduceMotion ? '' : 'animate-spin'}`}
+          />
+        ) : (
+          <GoogleIcon className="w-4 h-4 shrink-0 text-text-secondary" />
+        )}
+        <span className="hidden xs:inline">
+          {isSigningIn ? 'Connecting...' : 'Sign in with Google'}
+        </span>
+        <span className="xs:hidden">
+          {isSigningIn ? 'Connecting...' : 'Sign in'}
+        </span>
       </motion.button>
     );
   }
@@ -258,6 +277,7 @@ export function AuthButton() {
 
               <motion.button
                 type="button"
+                disabled={isSigningOut}
                 onClick={() => {
                   setIsOpen(false);
                   setIsSignOutConfirmOpen(true);
@@ -265,18 +285,26 @@ export function AuthButton() {
                 variants={reduceMotion ? undefined : tactileButtonVariants}
                 initial="rest"
                 animate="rest"
-                whileHover={reduceMotion ? undefined : 'hover'}
-                whileTap={reduceMotion ? undefined : 'tap'}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-2xs font-medium text-danger-text hover:bg-danger-subtle transition-colors duration-fast cursor-pointer"
+                whileHover={isSigningOut || reduceMotion ? undefined : 'hover'}
+                whileTap={isSigningOut || reduceMotion ? undefined : 'tap'}
+                className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-2xs font-medium text-danger-text hover:bg-danger-subtle transition-colors duration-fast cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 role="menuitem"
               >
                 <motion.span
                   variants={reduceMotion ? undefined : tactileIconVariants}
                   className="flex items-center shrink-0"
                 >
-                  <SignOut size={13} weight="regular" />
+                  {isSigningOut ? (
+                    <SpinnerGap
+                      size={13}
+                      weight="bold"
+                      className={reduceMotion ? undefined : 'animate-spin'}
+                    />
+                  ) : (
+                    <SignOut size={13} weight="regular" />
+                  )}
                 </motion.span>
-                <span>Sign out</span>
+                <span>{isSigningOut ? 'Signing out...' : 'Sign out'}</span>
               </motion.button>
             </div>
           </motion.div>
@@ -292,11 +320,21 @@ export function AuthButton() {
             Your tasks and progress are safely backed up in the cloud. You can sign back in anytime to pick up where you left off.
           </span>
         }
-        confirmLabel="Sign out"
+        confirmLabel={isSigningOut ? 'Signing out...' : 'Sign out'}
         cancelLabel="Stay signed in"
         variant="danger"
         isBusy={isSigningOut}
-        icon={<SignOut size={20} weight="duotone" className="text-danger-text" />}
+        icon={
+          isSigningOut ? (
+            <SpinnerGap
+              size={20}
+              weight="bold"
+              className={`text-danger-text ${reduceMotion ? '' : 'animate-spin'}`}
+            />
+          ) : (
+            <SignOut size={20} weight="duotone" className="text-danger-text" />
+          )
+        }
         onConfirm={handleConfirmSignOut}
         onClose={() => {
           if (!isSigningOut) {
