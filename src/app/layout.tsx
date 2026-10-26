@@ -12,7 +12,7 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL
   ? new URL(process.env.NEXT_PUBLIC_APP_URL)
   : process.env.VERCEL_URL
   ? new URL(`https://${process.env.VERCEL_URL}`)
-  : undefined;
+  : new URL("https://tiny-steps-gules.vercel.app");
 
 export const metadata: Metadata = {
   metadataBase: siteUrl,
@@ -35,6 +35,9 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Tiny Steps" }],
   creator: "Tiny Steps",
+  alternates: {
+    canonical: "/tasks",
+  },
   icons: {
     icon: "/icon.svg",
     apple: "/icon.svg",
@@ -43,15 +46,25 @@ export const metadata: Metadata = {
     title: "Tiny Steps — Low-Friction AI Task Companion",
     description:
       "Empathetic, zero-pressure task breakdown for ADHD paralysis, burnout, and executive dysfunction.",
-    type: "website",
+    url: siteUrl.toString(),
     siteName: "Tiny Steps",
     locale: "en_US",
+    type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Tiny Steps — Low-Friction AI Task Companion for ADHD & Burnout",
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Tiny Steps — Low-Friction AI Task Companion",
     description:
       "Empathetic, zero-pressure task breakdown for ADHD paralysis, burnout, and executive dysfunction.",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
@@ -72,10 +85,20 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
   name: "Tiny Steps",
-  applicationCategory: "ProductivityApplication",
+  url: "https://tiny-steps-gules.vercel.app",
+  applicationCategory: "HealthApplication, ProductivityApplication",
   operatingSystem: "Any",
   description:
     "Empathetic, zero-pressure task breakdown for ADHD paralysis, burnout, and executive dysfunction.",
+  image: "https://tiny-steps-gules.vercel.app/og-image.png",
+  screenshot: "https://tiny-steps-gules.vercel.app/screenshots/01-home.webp",
+  featureList: [
+    "Focus Tunnel with zero ambient distraction",
+    "Micro-step decomposition limited to 2-3 steps max",
+    "Three-tier energy level calibration",
+    "In-situ compassionate companion with off-topic boundaries",
+    "Local-first state with Appwrite TablesDB cloud synchronization",
+  ],
   offers: {
     "@type": "Offer",
     price: "0",
