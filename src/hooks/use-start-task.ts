@@ -4,11 +4,11 @@ import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import type { BreakdownResult } from '@/types/task';
+import { generateTaskBreakdown } from '@/lib/ai/client';
 import {
-  generateTaskBreakdown,
   MAX_BREAKDOWN_WAIT_MS,
   MIN_BREAKDOWN_LOADER_MS,
-} from '@/lib/task-generation';
+} from '@/constants/timing';
 
 const ERROR_MESSAGE =
   'The tiny-step maker needs a moment. Your words are safe—try again when you are ready.';

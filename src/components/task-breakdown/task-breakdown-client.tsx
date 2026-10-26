@@ -8,7 +8,7 @@ import { useHydrated } from '@/hooks/use-hydrated';
 import {
   interpretUserIntentWithAI,
   shrinkStepWithAI,
-} from '@/lib/task-generation';
+} from '@/lib/ai/client';
 import { TaskCard } from '@/components/task-breakdown/task-card';
 import { PeekToggle } from '@/components/task-breakdown/peek-toggle';
 import { ChatInput } from '@/components/shared/chat-input';

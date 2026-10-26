@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { SHRINK_STEP_LOADER_MS } from '@/lib/task-generation';
+import { SHRINK_STEP_LOADER_MS } from '@/constants/timing';
 
 export function useShrinkStep(onShrink: () => Promise<void> | void) {
   const [isShrinking, setIsShrinking] = useState(false);
