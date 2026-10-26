@@ -13,6 +13,10 @@ export const useTaskStore = create<TaskState>()(
       generationNotice: null,
       isHistoryOpen: false,
       theme: 'light',
+      user: null,
+      isAuthLoading: true,
+      setUser: (user) => set({ user }),
+      setAuthLoading: (isAuthLoading) => set({ isAuthLoading }),
 
       createTask: ({
         title,
@@ -38,7 +42,7 @@ export const useTaskStore = create<TaskState>()(
         };
 
         set((state) => ({
-          tasks: [newTask, ...state.tasks],
+          tasks: [{ ...newTask, userId: state.user?.id || null }, ...state.tasks],
         }));
 
         return newId;
@@ -301,6 +305,7 @@ export const useTaskStore = create<TaskState>()(
         granularity: state.granularity,
         peekFuture: state.peekFuture,
         theme: state.theme,
+        user: state.user,
       }),
       onRehydrateStorage: () => (state) => {
         if (typeof document !== 'undefined' && state?.theme === 'dark') {

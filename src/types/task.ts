@@ -1,6 +1,12 @@
 export type EnergyLevel = 1 | 2 | 3;
 export type GranularityLevel = EnergyLevel; // Backward-compatibility alias
 
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+}
+
 export interface Step {
   id: number;
   text: string;
@@ -24,6 +30,7 @@ export interface Task {
   updatedAt: number;
   steps: Step[];
   introSeen?: boolean;
+  userId?: string | null;
 }
 
 export interface BreakdownResult {
@@ -137,6 +144,12 @@ export interface TaskState {
   generationNotice: string | null;
   isHistoryOpen: boolean;
   theme: 'light' | 'dark';
+
+  // Auth State
+  user: AuthUser | null;
+  isAuthLoading: boolean;
+  setUser: (user: AuthUser | null) => void;
+  setAuthLoading: (loading: boolean) => void;
 
   // Task Actions
   createTask: (params: {
