@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getAccount } from '@/lib/appwrite/client';
 import { useTaskStore } from '@/store/task-store';
@@ -11,8 +11,11 @@ function OAuthSuccessContent() {
   const searchParams = useSearchParams();
   const setUser = useTaskStore((s) => s.setUser);
   const [error, setError] = useState<string | null>(null);
+  const hasExecutedRef = useRef(false);
 
   useEffect(() => {
+    if (hasExecutedRef.current) return;
+
     async function exchangeOAuthToken() {
       const userId = searchParams.get('userId');
       const secret = searchParams.get('secret');
@@ -21,6 +24,8 @@ function OAuthSuccessContent() {
         router.replace('/auth/failure');
         return;
       }
+
+      hasExecutedRef.current = true;
 
       try {
         const account = getAccount();
@@ -36,8 +41,25 @@ function OAuthSuccessContent() {
         });
 
         // Always await account calls before navigating
-        router.replace('/dashboard');
+        router.replace('/tasks');
       } catch (err: any) {
+        // Fallback: If token was already consumed, verify if an active session exists
+        try {
+          const account = getAccount();
+          const user = await account.get();
+          if (user) {
+            setUser({
+              id: user.$id,
+              email: user.email,
+              name: user.name || user.email.split('@')[0],
+            });
+            router.replace('/tasks');
+            return;
+          }
+        } catch {
+          // No active session
+        }
+
         console.error('[OAuth Success] Failed to create session:', err);
         setError(err?.message || 'Failed to authenticate session.');
         setTimeout(() => router.replace('/auth/failure'), 1500);

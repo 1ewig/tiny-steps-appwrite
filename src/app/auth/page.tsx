@@ -12,13 +12,13 @@ export default function AuthPage() {
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Auth guard: If already logged in, redirect to /dashboard
+  // Auth guard: If already logged in, redirect to /tasks
   useEffect(() => {
     async function checkAuth() {
       try {
         const account = getAccount();
         await account.get();
-        router.replace('/dashboard');
+        router.replace('/tasks');
       } catch {
         // Not logged in, render auth screen
         setCheckingAuth(false);
