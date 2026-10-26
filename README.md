@@ -29,11 +29,7 @@ Describe what's on your mind and choose how much energy you have today:
 - **Full paralysis** (2–4 micro-actions, never more than 4)
 
 ### 2. Enter the Focus Tunnel
-New tasks open directly into a full-screen, distraction-free tunnel isolating just one step at a time so you don't scan ahead and freeze.
-
-![Focus Tunnel Intro](public/screenshots/03-focus-tunnel-intro.webp)
-
-Advance through steps with minimal keystrokes. Press `Space` or `Enter` to complete a step, `S` to break it down, or `Esc` to view the full workspace.
+New tasks open directly into a full-screen, distraction-free tunnel isolating just one step at a time so you don't scan ahead and freeze. Advance through steps with minimal keystrokes: press `Space` or `Enter` to complete a step, `S` to break it down, or `Esc` to view the full workspace.
 
 ![Focus Tunnel Active Step](public/screenshots/04-focus-tunnel-step.webp)
 
