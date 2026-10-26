@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { X, ArrowLeft, CloudCheck, SpinnerGap } from '@phosphor-icons/react';
+import { X, CloudCheck, SpinnerGap } from '@phosphor-icons/react';
 import { useAuth } from '@/hooks/use-auth';
 import { useFocusTrap } from '@/hooks/use-focus-trap';
 import { AppIcon } from '@/components/shared/app-icon';
@@ -106,7 +106,7 @@ export function AuthOverlay({ isOpen, onClose }: AuthOverlayProps) {
               </p>
             </div>
 
-            {/* Actions: Sign in with Google (Primary) + Continue as Guest */}
+            {/* Actions: Sign in with Google (Primary) */}
             <div className="flex flex-col items-center gap-3 w-full max-w-xs sm:max-w-sm mx-auto pt-2">
               <motion.button
                 type="button"
@@ -132,21 +132,6 @@ export function AuthOverlay({ isOpen, onClose }: AuthOverlayProps) {
                   <GoogleIcon className="w-5 h-5 shrink-0 text-text-secondary" />
                 )}
                 <span>{isSigningIn ? 'Connecting to Google...' : 'Sign in with Google'}</span>
-              </motion.button>
-
-              <motion.button
-                type="button"
-                onClick={onClose}
-                disabled={isSigningIn}
-                variants={reduceMotion ? undefined : tactileButtonVariants}
-                initial="rest"
-                animate="rest"
-                whileHover={isSigningIn || reduceMotion ? undefined : 'hover'}
-                whileTap={isSigningIn || reduceMotion ? undefined : 'tap'}
-                className="inline-flex items-center gap-1.5 py-2 px-4 rounded-full text-xs font-medium text-text-tertiary hover:text-text-secondary hover:bg-surface-subtle transition-colors duration-fast cursor-pointer disabled:opacity-40"
-              >
-                <ArrowLeft size={13} weight="bold" />
-                <span>Continue as guest</span>
               </motion.button>
             </div>
           </main>
