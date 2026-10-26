@@ -145,11 +145,16 @@ export interface TaskState {
   isHistoryOpen: boolean;
   theme: 'light' | 'dark';
 
-  // Auth State
+  // Auth & Sync State
   user: AuthUser | null;
   isAuthLoading: boolean;
+  isSyncing: boolean;
+  lastSyncedAt: number | null;
   setUser: (user: AuthUser | null) => void;
   setAuthLoading: (loading: boolean) => void;
+  setIsSyncing: (isSyncing: boolean) => void;
+  setLastSyncedAt: (timestamp: number | null) => void;
+  setTasks: (tasks: Task[]) => void;
 
   // Task Actions
   createTask: (params: {

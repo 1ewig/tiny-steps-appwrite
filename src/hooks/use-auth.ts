@@ -20,6 +20,11 @@ export function useAuth() {
       setAuthLoading(true);
       const currentUser = await getCurrentUser();
       setUser(currentUser);
+      if (typeof window !== 'undefined' && window.location.search.includes('auth=')) {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('auth');
+        window.history.replaceState({}, '', url.pathname + (url.search ? url.search : ''));
+      }
     } catch {
       setUser(null);
     } finally {

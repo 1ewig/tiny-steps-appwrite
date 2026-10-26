@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from 'framer-motion';
 import { House, ClockCounterClockwise } from '@phosphor-icons/react';
+import { AuthButton } from '@/components/shared/auth-button';
 import {
   tactileButtonVariants,
   tactileIconVariants,
@@ -71,6 +72,9 @@ export function AppHeader({
       </div>
 
       <div className="flex items-center gap-1.5 sm:gap-2">
+        {/* Google OAuth & TablesDB Sync Pill */}
+        <AuthButton />
+
         {/* Focus Tunnel Launcher Button */}
         {hasActiveSteps && onOpenFocusTunnel && (
           <motion.button

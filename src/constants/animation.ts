@@ -293,6 +293,35 @@ export const fadeInScaleVariants: Variants = {
   },
 };
 
+/**
+ * Popover & Menu Dropdown Variants
+ */
+export const popoverVariants: Variants = {
+  initial: {
+    opacity: 0,
+    scale: 0.96,
+    y: -4,
+  },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      duration: 0.18,
+      ease: CALM_EASE,
+    },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.96,
+    y: -4,
+    transition: {
+      duration: 0.12,
+      ease: CALM_EASE,
+    },
+  },
+};
+
 // Backwards-compatible aliases
 export const heroItemEntranceVariants = unblurFadeInVariants;
 

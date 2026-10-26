@@ -15,8 +15,13 @@ export const useTaskStore = create<TaskState>()(
       theme: 'light',
       user: null,
       isAuthLoading: true,
+      isSyncing: false,
+      lastSyncedAt: null,
       setUser: (user) => set({ user }),
       setAuthLoading: (isAuthLoading) => set({ isAuthLoading }),
+      setIsSyncing: (isSyncing) => set({ isSyncing }),
+      setLastSyncedAt: (lastSyncedAt) => set({ lastSyncedAt }),
+      setTasks: (tasks) => set({ tasks }),
 
       createTask: ({
         title,
