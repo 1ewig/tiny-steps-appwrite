@@ -2,14 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTaskStore } from '@/store/task-store';
-import {
-  getCurrentUser,
-  loginWithGoogle,
-  loginWithEmail,
-  registerWithEmail,
-  logoutUser,
-} from '@/lib/appwrite/auth';
-import type { AuthUser } from '@/types/task';
+import { getCurrentUser, loginWithGoogle, logoutUser } from '@/lib/appwrite/auth';
 
 export function useAuth() {
   const { user, setUser, isAuthLoading, setAuthLoading } = useTaskStore();
@@ -20,11 +13,6 @@ export function useAuth() {
       setAuthLoading(true);
       const currentUser = await getCurrentUser();
       setUser(currentUser);
-      if (typeof window !== 'undefined' && window.location.search.includes('auth=')) {
-        const url = new URL(window.location.href);
-        url.searchParams.delete('auth');
-        window.history.replaceState({}, '', url.pathname + (url.search ? url.search : ''));
-      }
     } catch {
       setUser(null);
     } finally {
@@ -36,44 +24,13 @@ export function useAuth() {
     checkSession();
   }, [checkSession]);
 
-  const signInWithGoogle = (redirectPath?: string) => {
+  const signInWithGoogle = async () => {
     setError(null);
-    loginWithGoogle(redirectPath);
-  };
-
-  const login = async (email: string, password: string): Promise<AuthUser> => {
-    setError(null);
-    setAuthLoading(true);
     try {
-      const loggedIn = await loginWithEmail(email, password);
-      setUser(loggedIn);
-      return loggedIn;
+      await loginWithGoogle();
     } catch (err: any) {
-      const msg = err?.message || 'Failed to sign in. Please check your credentials.';
-      setError(msg);
-      throw err;
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-
-  const register = async (
-    email: string,
-    password: string,
-    name?: string
-  ): Promise<AuthUser> => {
-    setError(null);
-    setAuthLoading(true);
-    try {
-      const registered = await registerWithEmail(email, password, name);
-      setUser(registered);
-      return registered;
-    } catch (err: any) {
-      const msg = err?.message || 'Failed to create account.';
-      setError(msg);
-      throw err;
-    } finally {
-      setAuthLoading(false);
+      setError(err?.message || 'Failed to initialize Google Sign In');
+      console.error('[Auth] loginWithGoogle error:', err);
     }
   };
 
@@ -84,7 +41,7 @@ export function useAuth() {
       await logoutUser();
       setUser(null);
     } catch (err: any) {
-      console.error('Logout error:', err);
+      console.error('[Auth] Logout error:', err);
     } finally {
       setAuthLoading(false);
     }
@@ -97,8 +54,6 @@ export function useAuth() {
     error,
     clearError: () => setError(null),
     signInWithGoogle,
-    login,
-    register,
     logout,
     checkSession,
   };

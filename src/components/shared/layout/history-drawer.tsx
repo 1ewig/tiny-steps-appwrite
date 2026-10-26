@@ -321,11 +321,11 @@ export function HistoryDrawer({
                     </div>
                     <button
                       type="button"
-                      onClick={() => signInWithGoogle('/tasks')}
-                      className="shrink-0 inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md text-xs font-medium text-text-primary bg-surface border border-border-subtle hover:bg-surface-subtle transition-colors duration-fast shadow-subtle cursor-pointer focus-visible:ring-2 focus-visible:ring-accent"
+                      onClick={() => signInWithGoogle()}
+                      className="shrink-0 inline-flex items-center gap-2 h-8 px-2.5 rounded-md text-xs font-semibold text-text-primary bg-surface border border-border-subtle hover:bg-surface-subtle transition-colors duration-fast shadow-subtle cursor-pointer focus-visible:ring-2 focus-visible:ring-accent"
                     >
-                      <GoogleIcon className="w-3.5 h-3.5" />
-                      <span>Sign in</span>
+                      <GoogleIcon className="w-4 h-4" />
+                      <span>Sign in with Google</span>
                     </button>
                   </div>
                 </div>
