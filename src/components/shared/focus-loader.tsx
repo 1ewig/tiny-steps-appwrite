@@ -76,9 +76,11 @@ function FocusLoaderContent({
 
   // Auto-focus dismiss button when notice appears
   useEffect(() => {
-    if (noticeMessage && dismissButtonRef.current) {
-      dismissButtonRef.current.focus();
-    }
+    if (!noticeMessage) return;
+    const timer = setTimeout(() => {
+      dismissButtonRef.current?.focus();
+    }, 60);
+    return () => clearTimeout(timer);
   }, [noticeMessage]);
 
   // Overlay covers screen first (~0.2s) before loading text begins

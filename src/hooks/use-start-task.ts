@@ -73,6 +73,7 @@ export function useStartTask() {
       const ack = breakdown.acknowledgment || breakdown.dialogue || '';
 
       if (breakdown.isRefused) {
+        setGeneratingTask(false);
         setGenerationNotice(ack);
         setRestoreText(trimmed);
         return;
@@ -91,8 +92,8 @@ export function useStartTask() {
     } catch (err) {
       console.error(err);
       setGeneratingTask(false);
-      setGenerationNotice(null);
-      setError(ERROR_MESSAGE);
+      setGenerationNotice(ERROR_MESSAGE);
+      setError(null);
       setRestoreText(trimmed);
     } finally {
       inFlightRef.current = false;
