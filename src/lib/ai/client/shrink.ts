@@ -1,28 +1,41 @@
 import type { Step } from '@/types/task';
+import { serializeStepTree } from './serialize';
 
 /**
  * Shrinks an overwhelming step into 2 to 4 tailored micro-actions using the LLM,
- * with surrounding step context to dissolve the specific stall point.
+ * with full lifecycle-aware step context to dissolve the specific stall point.
  */
 export async function shrinkStepWithAI(
-  stepText: string,
-  taskTitle: string = 'Task',
-  previousStepText?: string,
-  nextStepText?: string,
+  taskTitle: string,
+  steps: Step[],
+  targetStepIndex: number,
   signal?: AbortSignal
 ): Promise<{ acknowledgment: string; dialogue?: string; microSteps: Step[] }> {
   if (signal?.aborted) {
     throw new DOMException('Aborted', 'AbortError');
   }
 
+  const targetStep = steps[targetStepIndex];
+  if (!targetStep) {
+    throw new Error('Invalid target step index');
+  }
+
   const startTime = Date.now();
-  console.log(`[Shrink] START - Step: "${stepText}" | Task Title: "${taskTitle}"`);
+  const targetTitle = targetStep.title?.trim() || targetStep.text?.trim() || 'Step';
+  const completedCount = steps.filter((step) => step.completed).length;
+  console.log(
+    `[Shrink] START - Step: "${targetTitle}" | Task Title: "${taskTitle}" | Progress: ${completedCount}/${steps.length}`
+  );
 
   try {
     const res = await fetch('/api/shrink', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ stepText, taskTitle, previousStepText, nextStepText }),
+      body: JSON.stringify({
+        taskTitle,
+        steps: serializeStepTree(steps),
+        targetStepIndex,
+      }),
       signal,
     });
 

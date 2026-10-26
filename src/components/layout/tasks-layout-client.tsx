@@ -126,14 +126,11 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
       activeTask &&
       activeStep.canSplit
     ) {
-      const prevStep = steps[activeStepIndex - 1]?.text;
-      const nextStep = steps[activeStepIndex + 1]?.text;
       try {
         const { microSteps } = await shrinkStepWithAI(
-          activeStep.text,
           activeTask.title,
-          prevStep,
-          nextStep
+          steps,
+          activeStepIndex
         );
         shrinkStep(activeTask.id, activeStepIndex, microSteps);
       } catch (err) {

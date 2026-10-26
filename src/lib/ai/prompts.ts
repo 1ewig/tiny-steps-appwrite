@@ -84,33 +84,6 @@ ${breakdownRules}`,
   };
 }
 
-export function getShrinkStepPrompt(
-  stepText: string,
-  taskTitle: string,
-  previousStepText?: string,
-  nextStepText?: string
-): { system: string; prompt: string } {
-  const context = `Overall Goal: "${taskTitle}"
-Previous Step: "${previousStepText || 'None (this is the first step)'}"
-Step Causing Resistance: "${stepText}"
-Next Step: "${nextStepText || 'None (this is the last step)'}"`;
-
-  return {
-    system: `${SYSTEM_PERSONA}
-
-The user feels resistance on a specific step.
-Replace it with 2 to 4 smaller sub-steps that dissolve the hesitation:
-- Shrink the SCOPE or DECISION COMPLEXITY—never reduce it to trivial computer mechanics (like launching apps or clicking menus).
-- Sub-step 1 is the easiest possible entry point into the real task, starting from the state the previous step left behind without repeating its work.
-- The final sub-step finishes the original step as a self-contained result, so the next step can begin with no cleanup.
-- Do not absorb the next step's work, add transition filler, or name the neighboring steps.
-- If Previous Step or Next Step is "None", enter or end cleanly within this step's own scope.
-- Titles must be 3-7 words. Instructions must be a single sentence under 12 words.
-- Provide a brief reassuring acknowledgment under 25 words. Zero cheerleading. Zero time estimates.`,
-    prompt: context,
-  };
-}
-
 export interface PromptStepTreeItem {
   id: number;
   text?: string;
@@ -126,23 +99,45 @@ export interface PromptStepTreeItem {
   }>;
 }
 
-export function getAssistantInteractionPrompt(
-  userMessage: string,
-  taskTitle: string,
-  activeSteps: PromptStepTreeItem[]
-): { system: string; prompt: string } {
-  const firstIncompleteIdx = activeSteps.findIndex((s) => !s.completed);
+interface FormatStepTreeOptions {
+  activeStepId?: number | null;
+  focusStepId?: number | null;
+}
 
-  // Format the full hierarchical step and sub-step tree with precise lifecycle markers
-  const formattedTree = activeSteps
+/**
+ * Formats the full hierarchical step tree with lifecycle markers.
+ * Defaults to the first incomplete step as active; pass activeStepId to
+ * override it for out-of-order execution or a specific focus step.
+ */
+export function formatStepTree(
+  steps: PromptStepTreeItem[],
+  { activeStepId, focusStepId }: FormatStepTreeOptions = {}
+): string {
+  const firstIncompleteIdx = steps.findIndex((s) => !s.completed);
+  const activeIdx =
+    activeStepId !== undefined && activeStepId !== null
+      ? steps.findIndex((s) => s.id === activeStepId)
+      : firstIncompleteIdx;
+
+  return steps
     .map((step, idx) => {
       const stepTitle = step.title?.trim() || step.text?.trim() || `Step ${idx + 1}`;
       const instructionText = step.instruction ? ` — ${step.instruction}` : '';
+      const isActive = idx === activeIdx;
+      const isFocus =
+        focusStepId !== undefined && focusStepId !== null && step.id === focusStepId;
+
       let statusTag = '[UPCOMING]';
       if (step.completed) {
         statusTag = '[COMPLETED]';
-      } else if (idx === firstIncompleteIdx) {
+      } else if (isActive && isFocus) {
+        statusTag = '[CURRENT / ACTIVE · STEP CAUSING RESISTANCE]';
+      } else if (isFocus) {
+        statusTag = '[STEP CAUSING RESISTANCE]';
+      } else if (isActive) {
         statusTag = '[CURRENT / ACTIVE]';
+      } else if (activeIdx !== -1 && idx < activeIdx) {
+        statusTag = '[PENDING / NOT COMPLETED]';
       }
 
       let lines = [`${idx + 1}. ${statusTag} (Step ID: ${step.id}) "${stepTitle}"${instructionText}`];
@@ -155,7 +150,7 @@ export function getAssistantInteractionPrompt(
           let subStatus = '[UPCOMING]';
           if (sub.completed) {
             subStatus = '[COMPLETED]';
-          } else if (subIdx === firstIncompleteSubIdx && idx === firstIncompleteIdx) {
+          } else if (subIdx === firstIncompleteSubIdx && isActive) {
             subStatus = '[CURRENT SUB-STEP]';
           }
           lines.push(`   ├─ ${idx + 1}.${subIdx + 1} ${subStatus} (Sub-Step ID: ${sub.id}) "${subTitle}"${subInstruction}`);
@@ -164,6 +159,82 @@ export function getAssistantInteractionPrompt(
       return lines.join('\n');
     })
     .join('\n');
+}
+
+function getStepStatus(
+  step: PromptStepTreeItem | undefined,
+  position: 'previous' | 'target' | 'next'
+): string {
+  if (!step) return '';
+  if (step.completed) return '[COMPLETED]';
+  if (position === 'target') return '[CURRENT / ACTIVE]';
+  if (position === 'next') return '[UPCOMING]';
+  return '[PENDING / NOT COMPLETED]';
+}
+
+function formatFocusStepLine(
+  label: string,
+  step: PromptStepTreeItem | undefined,
+  position: 'previous' | 'target' | 'next',
+  emptyText: string
+): string {
+  if (!step) return `${label}: ${emptyText}`;
+
+  const title = step.title?.trim() || step.text?.trim() || 'Untitled step';
+  const instruction = step.instruction ? ` — ${step.instruction}` : '';
+  return `${label}: ${getStepStatus(step, position)} "${title}"${instruction}`;
+}
+
+export function getShrinkStepPrompt(
+  taskTitle: string,
+  steps: PromptStepTreeItem[],
+  targetStepIndex: number
+): { system: string; prompt: string } {
+  const targetStep = steps[targetStepIndex];
+  const previousStep = steps[targetStepIndex - 1];
+  const nextStep = steps[targetStepIndex + 1];
+
+  const context = `Overall Goal: "${taskTitle}"
+
+Step Tree (ordered, lifecycle-tagged):
+${formatStepTree(steps, {
+    activeStepId: targetStep?.id,
+    focusStepId: targetStep?.id,
+  })}
+
+Focus Context:
+- ${formatFocusStepLine('Previous Step', previousStep, 'previous', 'None (this is the first step)')}
+- ${formatFocusStepLine('Step Causing Resistance', targetStep, 'target', 'None')}
+- ${formatFocusStepLine('Next Step', nextStep, 'next', 'None (this is the last step)')}`;
+
+  return {
+    system: `${SYSTEM_PERSONA}
+
+The user feels resistance on one specific step.
+Replace ONLY that step with 2 to 4 smaller sub-steps that dissolve the hesitation:
+- The step tree uses lifecycle markers. Respect them exactly.
+- Never modify, complete, rename, remove, or regenerate any step other than the Step Causing Resistance. Preserve all [COMPLETED] work.
+- If Previous Step is [COMPLETED], sub-step 1 must start from the concrete state it left behind without repeating its work.
+- If Previous Step is [PENDING / NOT COMPLETED] or [UPCOMING], do not assume its work is done. Start from the target step's own initial state without repeating or absorbing the previous step.
+- If Next Step is [COMPLETED], do not hand off to it. If Next Step is [UPCOMING], finish with a self-contained result so the next step can begin cleanly. Never absorb the next step's work.
+- If the target step already contains sub-steps, replace only those sub-steps while preserving its parent title, instruction, and completion state.
+- Shrink the SCOPE or DECISION COMPLEXITY—never reduce it to trivial computer mechanics (like launching apps or clicking menus).
+- Sub-step 1 is the easiest possible entry point into the real task.
+- The final sub-step finishes the original step as a self-contained result, so the next step can begin with no cleanup.
+- Do not add transition filler or name neighboring steps.
+- If Previous Step or Next Step is None, enter or end cleanly within this step's own scope.
+- Titles must be 3-7 words. Instructions must be a single sentence under 12 words.
+- Provide a brief reassuring acknowledgment under 25 words. Zero cheerleading. Zero time estimates.`,
+    prompt: context,
+  };
+}
+
+export function getAssistantInteractionPrompt(
+  userMessage: string,
+  taskTitle: string,
+  activeSteps: PromptStepTreeItem[]
+): { system: string; prompt: string } {
+  const formattedTree = formatStepTree(activeSteps);
 
   return {
     system: `${SYSTEM_PERSONA}

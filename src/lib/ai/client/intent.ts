@@ -1,4 +1,5 @@
 import type { Step, GranularityLevel, AssistantIntent } from '@/types/task';
+import { serializeStepTree } from './serialize';
 
 // Helper to normalize and enforce concise brevity on step titles and instructions
 function cleanStepTitle(raw?: string, fallback: string = 'Next tiny action'): string {
@@ -37,20 +38,7 @@ export async function interpretUserIntentWithAI(
       body: JSON.stringify({
         message: input,
         taskTitle,
-        activeSteps: activeSteps.map((s) => ({
-          id: s.id,
-          text: s.text,
-          title: s.title,
-          instruction: s.instruction,
-          completed: s.completed,
-          subSteps: s.subSteps?.map((sub) => ({
-            id: sub.id,
-            text: sub.text,
-            title: sub.title,
-            instruction: sub.instruction,
-            completed: sub.completed,
-          })),
-        })),
+        activeSteps: serializeStepTree(activeSteps),
       }),
       signal,
     });

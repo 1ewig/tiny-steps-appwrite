@@ -88,16 +88,12 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
               toggleStepCompletion(currentTask.id, stepId);
             }}
             onShrinkStep={async (stepIdx) => {
-              const targetStep = steps[stepIdx];
-              if (!targetStep) return;
-              const prevStep = steps[stepIdx - 1]?.text;
-              const nextStep = steps[stepIdx + 1]?.text;
+              if (!steps[stepIdx]) return;
               try {
                 const { microSteps } = await shrinkStepWithAI(
-                  targetStep.text,
                   currentTask.title,
-                  prevStep,
-                  nextStep
+                  steps,
+                  stepIdx
                 );
                 shrinkStep(currentTask.id, stepIdx, microSteps);
               } catch (err) {
