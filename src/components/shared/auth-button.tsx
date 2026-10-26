@@ -12,8 +12,10 @@ import { useAuth } from '@/hooks/use-auth';
 import { useTaskSync } from '@/hooks/use-task-sync';
 import {
   tactileButtonVariants,
+  tactileIconVariants,
   popoverVariants,
 } from '@/constants/animation';
+import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 
 export function GoogleIcon({ className = 'w-4 h-4' }: { className?: string }) {
   return (
@@ -41,6 +43,8 @@ export function AuthButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [isManualSyncing, setIsManualSyncing] = useState(false);
   const [justSynced, setJustSynced] = useState(false);
+  const [isSignOutConfirmOpen, setIsSignOutConfirmOpen] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click or Escape
@@ -76,6 +80,18 @@ export function AuthButton() {
       console.warn('Manual sync failed:', err);
     } finally {
       setIsManualSyncing(false);
+    }
+  };
+
+  const handleConfirmSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      await logout();
+      setIsSignOutConfirmOpen(false);
+    } catch (err) {
+      console.warn('Sign out failed:', err);
+    } finally {
+      setIsSigningOut(false);
     }
   };
 
@@ -198,48 +214,95 @@ export function AuthButton() {
                 Your tasks and micro-steps are securely backed up in the cloud.
               </p>
 
-              <button
+              <motion.button
                 type="button"
                 onClick={handleManualSync}
                 disabled={syncingActive}
+                variants={reduceMotion ? undefined : tactileButtonVariants}
+                initial="rest"
+                animate="rest"
+                whileHover={syncingActive || reduceMotion ? undefined : 'hover'}
+                whileTap={syncingActive || reduceMotion ? undefined : 'tap'}
                 className="w-full inline-flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-2xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/80 hover:bg-surface-subtle border border-border-subtle transition-colors duration-fast cursor-pointer disabled:opacity-50"
               >
                 {justSynced ? (
                   <>
-                    <Check size={13} weight="bold" className="text-accent" />
+                    <motion.span
+                      variants={reduceMotion ? undefined : tactileIconVariants}
+                      className="flex items-center shrink-0"
+                    >
+                      <Check size={13} weight="bold" className="text-accent" />
+                    </motion.span>
                     <span>Up to date</span>
                   </>
                 ) : (
                   <>
-                    <ArrowsClockwise
-                      size={13}
-                      weight="bold"
-                      className={syncingActive ? 'animate-spin text-accent' : ''}
-                    />
+                    <motion.span
+                      variants={reduceMotion ? undefined : tactileIconVariants}
+                      className="flex items-center shrink-0"
+                    >
+                      <ArrowsClockwise
+                        size={13}
+                        weight="bold"
+                        className={syncingActive ? 'animate-spin text-accent' : ''}
+                      />
+                    </motion.span>
                     <span>{syncingActive ? 'Syncing...' : 'Sync now'}</span>
                   </>
                 )}
-              </button>
+              </motion.button>
             </div>
 
             {/* Sign Out Action */}
             <div className="pt-2">
-              <button
+              <motion.button
                 type="button"
-                onClick={async () => {
+                onClick={() => {
                   setIsOpen(false);
-                  await logout();
+                  setIsSignOutConfirmOpen(true);
                 }}
+                variants={reduceMotion ? undefined : tactileButtonVariants}
+                initial="rest"
+                animate="rest"
+                whileHover={reduceMotion ? undefined : 'hover'}
+                whileTap={reduceMotion ? undefined : 'tap'}
                 className="w-full inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-danger-text hover:bg-danger-subtle transition-colors duration-fast cursor-pointer"
                 role="menuitem"
               >
-                <SignOut size={14} weight="regular" />
+                <motion.span
+                  variants={reduceMotion ? undefined : tactileIconVariants}
+                  className="flex items-center shrink-0"
+                >
+                  <SignOut size={14} weight="regular" />
+                </motion.span>
                 <span>Sign out</span>
-              </button>
+              </motion.button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Reusable ConfirmDialog wired to Sign Out */}
+      <ConfirmDialog
+        isOpen={isSignOutConfirmOpen}
+        title="Sign out of Tiny Steps?"
+        description={
+          <span>
+            Your tasks and progress are safely backed up in the cloud. You can sign back in anytime to pick up where you left off.
+          </span>
+        }
+        confirmLabel="Sign out"
+        cancelLabel="Stay signed in"
+        variant="danger"
+        isBusy={isSigningOut}
+        icon={<SignOut size={20} weight="duotone" className="text-danger-text" />}
+        onConfirm={handleConfirmSignOut}
+        onClose={() => {
+          if (!isSigningOut) {
+            setIsSignOutConfirmOpen(false);
+          }
+        }}
+      />
     </div>
   );
 }
