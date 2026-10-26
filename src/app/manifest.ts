@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'Empathetic, zero-pressure task breakdown for ADHD paralysis, burnout, and executive dysfunction.',
     start_url: '/tasks',
     display: 'standalone',
-    background_color: '#FAF9F6',
-    theme_color: '#5A8A70',
+    background_color: '#F5F2E6',
+    theme_color: '#465940',
     icons: [
       {
         src: '/icon.svg',
