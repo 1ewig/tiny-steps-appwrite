@@ -45,11 +45,12 @@ export async function POST(req: Request) {
     return NextResponse.json(output);
   } catch (error: any) {
     console.error(`[API:Assistant/Tweak] ERROR (${Date.now() - startTime}ms):`, error);
-    return NextResponse.json(
-      {
-        error: error?.message || 'Failed to process assistant intent',
-      },
-      { status: 500 }
-    );
+
+    // If model returned malformed output or Zod validation failed, fallback gracefully to encouragement
+    // so executive-dysfunction users are not stranded with a jarring HTTP 500 failure
+    return NextResponse.json({
+      type: 'encouragement',
+      acknowledgment: "I'm right here with you. Which specific step feels heaviest right now?",
+    });
   }
 }

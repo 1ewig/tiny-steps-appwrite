@@ -102,14 +102,14 @@ export const AssistantIntentSchema = z.object({
     .describe('Target step index (0-based) if shrinking a step'),
   title: z
     .string()
-    .max(80)
+    .max(200)
     .optional()
     .describe(
-      'PUNCHY ACTION VERB PHRASE: 3 to 6 words (approx 18 to 32 characters). Strictly NO trailing period. E.g. "Order stamps online", "Submit via portal". NEVER use generic labels or trailing periods.'
+      'PUNCHY ACTION VERB PHRASE: 3 to 6 words (approx 18 to 32 characters). Strictly NO trailing period. E.g. "Order stamps online", "Submit via portal". NEVER write essays, explanations, or advice here.'
     ),
   instruction: z
     .string()
-    .max(160)
+    .max(300)
     .optional()
     .describe(
       'MANDATORY TACTILE SENTENCE: Exactly 1 short physical or digital sentence under 10 words (approx 30 to 55 characters) giving concrete clarity. Must end with a period. Required whenever modifying, inserting, or rerouting a step.'
@@ -118,7 +118,7 @@ export const AssistantIntentSchema = z.object({
     .array(TaskStepSchema)
     .max(3)
     .optional()
-    .describe('2 to 3 micro-steps (strictly maximum 3) if type is shrink_step'),
+    .describe('2 to 3 micro-steps (strictly maximum 3) if type is shrink_step. MANDATORY whenever type is shrink_step.'),
   steps: z.array(TaskStepSchema).optional().describe('Adjusted steps if type is new_task or tweak_steps'),
 });
 

@@ -4,7 +4,12 @@ import { serializeStepTree } from './serialize';
 // Helper to normalize and enforce concise brevity on step titles and instructions
 function cleanStepTitle(raw?: string, fallback: string = 'Next tiny action'): string {
   if (!raw) return fallback;
-  const cleaned = raw.trim().replace(/\.+$/, '');
+  let cleaned = raw.trim().replace(/\.+$/, '');
+  if (cleaned.length > 80) {
+    const truncated = cleaned.slice(0, 77);
+    const lastSpace = truncated.lastIndexOf(' ');
+    cleaned = lastSpace > 20 ? `${truncated.slice(0, lastSpace)}…` : `${truncated}…`;
+  }
   return cleaned || fallback;
 }
 
@@ -164,34 +169,57 @@ export async function interpretUserIntentWithAI(
       const nextIncompleteIdx = activeSteps.findIndex((s) => !s.completed);
       const targetStepIndex = typeof data.targetStepIndex === 'number' ? data.targetStepIndex : nextIncompleteIdx;
       if (targetStepIndex !== -1) {
-        if (!Array.isArray(data.microSteps) || data.microSteps.length === 0) {
-          throw new Error('Invalid shrink_step microSteps received from assistant');
-        }
+        let microSteps: Step[] = [];
 
-        const microSteps: Step[] = data.microSteps.slice(0, 3).map(
-          (s: { title?: string; text?: string; instruction?: string }, i: number) => {
-            const title = s.title?.trim() || s.text?.trim() || 'Micro action';
-            return {
-              id: baseTime + i + 1,
-              title,
-              instruction: s.instruction?.trim(),
-              text: title,
+        if (Array.isArray(data.microSteps) && data.microSteps.length > 0) {
+          microSteps = data.microSteps.slice(0, 3).map(
+            (s: { title?: string; text?: string; instruction?: string }, i: number) => {
+              const title = cleanStepTitle(s.title || s.text, 'Micro action');
+              return {
+                id: baseTime + i + 1,
+                title,
+                instruction: cleanStepInstruction(s.instruction),
+                text: title,
+                completed: false,
+                canSplit: false,
+              };
+            }
+          );
+        } else if (data.title) {
+          // Defensive fallback: model emitted title instead of microSteps array
+          const fallbackTitle = cleanStepTitle(data.title, 'Next tiny action');
+          microSteps = [
+            {
+              id: baseTime + 1,
+              title: fallbackTitle,
+              instruction: cleanStepInstruction(data.instruction, 'Take one gentle physical motion to begin.'),
+              text: fallbackTitle,
               completed: false,
               canSplit: false,
-            };
-          }
-        );
+            },
+            {
+              id: baseTime + 2,
+              title: 'Continue with next small piece',
+              instruction: 'Keep gentle focus on this step.',
+              text: 'Continue with next small piece',
+              completed: false,
+              canSplit: false,
+            },
+          ];
+        }
 
-        console.log(
-          `[Tweak] END (${Date.now() - startTime}ms) - Intent: shrink_step (Micro-steps: ${microSteps.length})`
-        );
-        return {
-          type: 'shrink_step',
-          targetStepIndex,
-          microSteps,
-          acknowledgment: ack,
-          dialogue: ack,
-        };
+        if (microSteps.length > 0) {
+          console.log(
+            `[Tweak] END (${Date.now() - startTime}ms) - Intent: shrink_step (Micro-steps: ${microSteps.length})`
+          );
+          return {
+            type: 'shrink_step',
+            targetStepIndex,
+            microSteps,
+            acknowledgment: ack,
+            dialogue: ack,
+          };
+        }
       }
     }
 
