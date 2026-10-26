@@ -168,9 +168,16 @@ export function FocusTunnelModal({
                   className="col-start-1 row-start-1 w-full flex flex-col items-center justify-center text-center px-2"
                 >
                   {isIntro ? (
-                    <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-text-primary leading-snug sm:leading-tight tracking-tight text-center max-w-4xl mx-auto">
-                      {introText}
-                    </h1>
+                    <div className="space-y-3 max-w-4xl w-full mx-auto">
+                      <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-text-primary leading-snug sm:leading-tight tracking-tight text-center max-w-4xl mx-auto">
+                        {sessionTitle}
+                      </h1>
+                      {introText && (
+                        <p className="text-sm sm:text-lg text-text-secondary leading-relaxed max-w-xl mx-auto font-medium">
+                          {introText}
+                        </p>
+                      )}
+                    </div>
                   ) : activeStep ? (
                     hasSubSteps && currentSubStep ? (
                       <div className="space-y-3 max-w-4xl w-full mx-auto">
