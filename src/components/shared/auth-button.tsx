@@ -116,7 +116,7 @@ export function AuthButton() {
         animate="rest"
         whileHover={reduceMotion ? undefined : 'hover'}
         whileTap={reduceMotion ? undefined : 'tap'}
-        className="inline-flex items-center gap-2 h-8 px-3 rounded-md text-xs font-semibold text-text-primary bg-surface-subtle/80 hover:bg-surface-subtle border border-border-subtle hover:border-border-muted transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent shadow-subtle"
+        className="inline-flex items-center gap-2 h-8 px-3 rounded-md text-xs font-semibold text-text-primary bg-surface-subtle/80 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent shadow-subtle"
         title="Sign in with Google"
       >
         <GoogleIcon className="w-4 h-4 shrink-0 text-text-secondary" />
@@ -141,7 +141,7 @@ export function AuthButton() {
         animate="rest"
         whileHover={reduceMotion ? undefined : 'hover'}
         whileTap={reduceMotion ? undefined : 'tap'}
-        className="inline-flex items-center gap-1.5 h-8 pl-1.5 pr-2.5 rounded-md text-xs font-medium text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle border border-border-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="inline-flex items-center gap-1.5 h-8 pl-1.5 pr-2.5 rounded-md text-xs font-medium text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         aria-expanded={isOpen}
         aria-haspopup="menu"
         title={`${displayName} (Cloud synced)`}
@@ -177,7 +177,7 @@ export function AuthButton() {
             initial="initial"
             animate="animate"
             exit="exit"
-            className="absolute right-0 mt-1.5 w-60 rounded-xl bg-surface border border-border-subtle shadow-modal z-drawer p-3 font-sans focus:outline-none"
+            className="absolute right-0 mt-1.5 w-64 rounded-xl bg-surface shadow-modal z-drawer p-3 font-sans focus:outline-none"
             role="menu"
           >
             {/* User Profile Header */}
@@ -210,10 +210,13 @@ export function AuthButton() {
                     : 'Connected'}
                 </span>
               </div>
-              <p className="text-[11px] text-text-tertiary leading-relaxed mb-2">
+              <p className="text-[11px] text-text-tertiary leading-relaxed">
                 Your tasks and micro-steps are securely backed up in the cloud.
               </p>
+            </div>
 
+            {/* Actions: Sync & Sign Out on the same bottom row */}
+            <div className="pt-2.5 flex items-center gap-2">
               <motion.button
                 type="button"
                 onClick={handleManualSync}
@@ -223,7 +226,8 @@ export function AuthButton() {
                 animate="rest"
                 whileHover={syncingActive || reduceMotion ? undefined : 'hover'}
                 whileTap={syncingActive || reduceMotion ? undefined : 'tap'}
-                className="w-full inline-flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-2xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/80 hover:bg-surface-subtle border border-border-subtle transition-colors duration-fast cursor-pointer disabled:opacity-50"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-2xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/80 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer disabled:opacity-50"
+                role="menuitem"
               >
                 {justSynced ? (
                   <>
@@ -251,10 +255,7 @@ export function AuthButton() {
                   </>
                 )}
               </motion.button>
-            </div>
 
-            {/* Sign Out Action */}
-            <div className="pt-2">
               <motion.button
                 type="button"
                 onClick={() => {
@@ -266,14 +267,14 @@ export function AuthButton() {
                 animate="rest"
                 whileHover={reduceMotion ? undefined : 'hover'}
                 whileTap={reduceMotion ? undefined : 'tap'}
-                className="w-full inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-danger-text hover:bg-danger-subtle transition-colors duration-fast cursor-pointer"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-2xs font-medium text-danger-text hover:bg-danger-subtle transition-colors duration-fast cursor-pointer"
                 role="menuitem"
               >
                 <motion.span
                   variants={reduceMotion ? undefined : tactileIconVariants}
                   className="flex items-center shrink-0"
                 >
-                  <SignOut size={14} weight="regular" />
+                  <SignOut size={13} weight="regular" />
                 </motion.span>
                 <span>Sign out</span>
               </motion.button>
