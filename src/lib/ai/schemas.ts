@@ -58,17 +58,50 @@ export type ShrinkStepOutput = z.infer<typeof ShrinkStepSchema>;
 
 export const AssistantIntentSchema = z.object({
   type: z
-    .enum(['complete_step', 'shrink_step', 'all_complete', 'new_task', 'tweak_steps', 'encouragement', 'off_topic', 'crisis'])
+    .enum([
+      'complete_step',
+      'modify_step',
+      'modify_substep',
+      'reroute_constraint',
+      'remove_step',
+      'insert_step',
+      'shrink_step',
+      'all_complete',
+      'new_task',
+      'tweak_steps',
+      'encouragement',
+      'off_topic',
+      'crisis',
+    ])
     .describe('The classified user intent'),
   acknowledgment: z
     .string()
     .max(300)
-    .describe('Warm, empathetic response acknowledging the user (1-2 short sentences max, under 35 words). If self-harm or crisis, offer human care and universal lifeline (https://findahelpline.com). If off_topic, ask one short gentle question to refocus.'),
-  targetStepId: z.number().optional().describe('Target step ID if completing a step'),
-  targetStepIndex: z.number().optional().describe('Target step index if shrinking a step'),
+    .describe(
+      'Warm, calm response acknowledging the user (1-2 short sentences max, under 30 words). If self-harm or crisis, offer human care and universal lifeline (https://findahelpline.com). If off_topic, ask one short gentle question to refocus.'
+    ),
+  targetStepId: z
+    .union([z.number(), z.string().transform((v) => Number(v) || undefined)])
+    .optional()
+    .describe('Target step ID if targeting, completing, or modifying a specific parent step'),
+  targetSubStepId: z
+    .union([z.number(), z.string().transform((v) => Number(v) || undefined)])
+    .optional()
+    .describe('Target sub-step ID if modifying or removing a specific sub-step'),
+  targetStepIndex: z
+    .union([z.number(), z.string().transform((v) => Number(v) || undefined)])
+    .optional()
+    .describe('Target step index (0-based) if shrinking a step'),
+  title: z
+    .string()
+    .max(100)
+    .optional()
+    .describe(
+      'Updated STEP title (3 to 7 words) for the modified or inserted step. You NEVER change the overall task title.'
+    ),
+  instruction: z.string().max(250).optional().describe('Updated step instruction (single sentence under 12 words) if modifying or rerouting a step'),
   microSteps: z.array(TaskStepSchema).optional().describe('Micro-steps if type is shrink_step'),
   steps: z.array(TaskStepSchema).optional().describe('Adjusted steps if type is new_task or tweak_steps'),
-  title: z.string().max(100).optional().describe('Updated task title if applicable'),
 });
 
 export type AssistantIntentOutput = z.infer<typeof AssistantIntentSchema>;

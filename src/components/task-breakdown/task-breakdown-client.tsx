@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTaskStore } from '@/store/task-store';
 import { useHydrated } from '@/hooks/use-hydrated';
 import {
@@ -22,6 +23,27 @@ interface TaskBreakdownClientProps {
 export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientProps) {
   const router = useRouter();
   const [isTyping, setIsTyping] = useState(false);
+  const [assistantFeedback, setAssistantFeedback] = useState<string | null>(null);
+  const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (feedbackTimerRef.current) {
+        clearTimeout(feedbackTimerRef.current);
+      }
+    };
+  }, []);
+
+  const showFeedback = (msg?: string) => {
+    if (!msg) return;
+    if (feedbackTimerRef.current) {
+      clearTimeout(feedbackTimerRef.current);
+    }
+    setAssistantFeedback(msg);
+    feedbackTimerRef.current = setTimeout(() => {
+      setAssistantFeedback(null);
+    }, 5000);
+  };
 
   const activeId = taskId || sessionId || '';
   const hasHydrated = useHydrated();
@@ -36,6 +58,11 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
     toggleStepCompletion,
     toggleSubStepCompletion,
     shrinkStep,
+    modifyStep,
+    modifySubStep,
+    removeStep,
+    removeSubStep,
+    insertStep,
   } = useTaskStore();
 
   const currentTask = tasks.find((t) => t.id === activeId);
@@ -61,14 +88,42 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
 
       if (intent.type === 'complete_step') {
         toggleStepCompletion(currentTask.id, intent.targetStepId);
-        if (ack) {
-          updateTask(currentTask.id, { guidance: ack });
-        }
+        showFeedback(ack);
       } else if (intent.type === 'shrink_step') {
         shrinkStep(currentTask.id, intent.targetStepIndex, intent.microSteps);
-        if (ack) {
-          updateTask(currentTask.id, { guidance: ack });
+        showFeedback(ack);
+      } else if (intent.type === 'modify_step' || intent.type === 'reroute_constraint') {
+        if (intent.targetSubStepId) {
+          modifySubStep(currentTask.id, intent.targetStepId, intent.targetSubStepId, {
+            title: intent.title,
+            instruction: intent.instruction,
+          });
+        } else {
+          modifyStep(currentTask.id, intent.targetStepId, {
+            title: intent.title,
+            instruction: intent.instruction,
+          });
         }
+        showFeedback(ack);
+      } else if (intent.type === 'modify_substep') {
+        modifySubStep(currentTask.id, intent.targetStepId, intent.targetSubStepId, {
+          title: intent.title,
+          instruction: intent.instruction,
+        });
+        showFeedback(ack);
+      } else if (intent.type === 'remove_step') {
+        if (intent.targetSubStepId) {
+          removeSubStep(currentTask.id, intent.targetStepId, intent.targetSubStepId);
+        } else {
+          removeStep(currentTask.id, intent.targetStepId);
+        }
+        showFeedback(ack);
+      } else if (intent.type === 'insert_step') {
+        insertStep(currentTask.id, intent.afterStepId ?? null, {
+          title: intent.title,
+          instruction: intent.instruction,
+        });
+        showFeedback(ack);
       } else if (intent.type === 'new_task') {
         const existingCompleted = steps.filter((s) => s.completed);
         const combinedSteps = [
@@ -76,17 +131,14 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
           ...intent.steps.map((st, i) => ({ ...st, id: Date.now() + i, completed: false })),
         ];
 
-        // Single Living Task Card: Mutate existing card steps and title in-place
+        // Step-only update: Task title and original guidance remain immutable
         updateTask(currentTask.id, {
-          title: intent.title || currentTask.title,
           steps: combinedSteps,
-          guidance: ack || currentTask.guidance,
         });
+        showFeedback(ack);
       } else if (ack) {
         // Handles 'crisis', 'off_topic', 'all_complete', and general encouragement
-        updateTask(currentTask.id, {
-          guidance: ack,
-        });
+        showFeedback(ack);
       }
     } catch (err) {
       console.error('Failed to interpret intent:', err);
@@ -163,6 +215,23 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
           />
         </div>
       </main>
+
+      {/* Ephemeral Assistant Feedback Pill */}
+      <AnimatePresence>
+        {assistantFeedback && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 6, scale: 0.98 }}
+            transition={{ duration: 0.2 }}
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-30 max-w-md w-[calc(100%-2rem)] sm:w-auto px-4 py-2.5 rounded-2xl bg-surface-elevated/95 backdrop-blur-md border border-border-subtle shadow-capsule text-center pointer-events-none"
+          >
+            <p className="text-xs sm:text-sm text-text-primary font-medium leading-relaxed">
+              {assistantFeedback}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Collapsed Chat Chip at Bottom (expands on demand for venting/tweaking) */}
       <ChatInput disabled={isTyping} onSubmit={handleSendMessage} collapsible />

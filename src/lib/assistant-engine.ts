@@ -19,6 +19,48 @@ export type AssistantIntent =
       dialogue?: string;
     }
   | {
+      type: 'modify_step';
+      targetStepId: number;
+      targetSubStepId?: number;
+      title: string;
+      instruction?: string;
+      acknowledgment: string;
+      dialogue?: string;
+    }
+  | {
+      type: 'modify_substep';
+      targetStepId: number;
+      targetSubStepId: number;
+      title: string;
+      instruction?: string;
+      acknowledgment: string;
+      dialogue?: string;
+    }
+  | {
+      type: 'reroute_constraint';
+      targetStepId: number;
+      targetSubStepId?: number;
+      title: string;
+      instruction?: string;
+      acknowledgment: string;
+      dialogue?: string;
+    }
+  | {
+      type: 'remove_step';
+      targetStepId: number;
+      targetSubStepId?: number;
+      acknowledgment: string;
+      dialogue?: string;
+    }
+  | {
+      type: 'insert_step';
+      afterStepId?: number;
+      title: string;
+      instruction?: string;
+      acknowledgment: string;
+      dialogue?: string;
+    }
+  | {
       type: 'shrink_step';
       targetStepIndex: number;
       microSteps: Step[];

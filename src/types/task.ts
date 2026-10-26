@@ -76,6 +76,24 @@ export interface TaskState {
     subStepId: number
   ) => void;
   shrinkStep: (taskId: string, stepIndex: number, subSteps?: Step[]) => void;
+  modifyStep: (
+    taskId: string,
+    stepId: number,
+    updates: { title?: string; instruction?: string; text?: string }
+  ) => void;
+  modifySubStep: (
+    taskId: string,
+    parentStepId: number,
+    subStepId: number,
+    updates: { title?: string; instruction?: string; text?: string }
+  ) => void;
+  removeStep: (taskId: string, stepId: number) => void;
+  removeSubStep: (taskId: string, parentStepId: number, subStepId: number) => void;
+  insertStep: (
+    taskId: string,
+    afterStepId: number | null,
+    step: { title: string; instruction?: string }
+  ) => void;
 
   // Compatibility aliases
   sessions?: Task[];

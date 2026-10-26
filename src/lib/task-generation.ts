@@ -206,7 +206,20 @@ export async function interpretUserIntentWithAI(
       body: JSON.stringify({
         message: input,
         taskTitle,
-        activeSteps: activeSteps.map((s) => ({ id: s.id, text: s.text, completed: s.completed })),
+        activeSteps: activeSteps.map((s) => ({
+          id: s.id,
+          text: s.text,
+          title: s.title,
+          instruction: s.instruction,
+          completed: s.completed,
+          subSteps: s.subSteps?.map((sub) => ({
+            id: sub.id,
+            text: sub.text,
+            title: sub.title,
+            instruction: sub.instruction,
+            completed: sub.completed,
+          })),
+        })),
       }),
       signal,
     });
@@ -218,6 +231,101 @@ export async function interpretUserIntentWithAI(
     const data = await res.json();
     const ack = data.acknowledgment || data.dialogue || '';
     const baseTime = Date.now();
+
+    // Surgical Constraint Rerouting (Real-world blocker substitution)
+    if (data.type === 'reroute_constraint') {
+      const targetStep = activeSteps.find((s) => s.id === data.targetStepId) || activeSteps.find((s) => !s.completed);
+      const targetStepId = targetStep?.id ?? activeSteps[0]?.id;
+      if (targetStepId !== undefined) {
+        console.log(`[Tweak] END (${Date.now() - startTime}ms) - Intent: reroute_constraint (Step #${targetStepId})`);
+        return {
+          type: 'reroute_constraint',
+          targetStepId,
+          targetSubStepId: data.targetSubStepId,
+          title: data.title || targetStep?.title || 'Alternative action',
+          instruction: data.instruction || 'Take this alternative step without friction.',
+          acknowledgment: ack,
+          dialogue: ack,
+        };
+      }
+    }
+
+    // Surgical Step Modification
+    if (data.type === 'modify_step') {
+      const targetStep = activeSteps.find((s) => s.id === data.targetStepId) || activeSteps.find((s) => !s.completed);
+      const targetStepId = targetStep?.id ?? activeSteps[0]?.id;
+      if (targetStepId !== undefined) {
+        console.log(`[Tweak] END (${Date.now() - startTime}ms) - Intent: modify_step (Step #${targetStepId})`);
+        return {
+          type: 'modify_step',
+          targetStepId,
+          targetSubStepId: data.targetSubStepId,
+          title: data.title || targetStep?.title || 'Adjusted action',
+          instruction: data.instruction || targetStep?.instruction,
+          acknowledgment: ack,
+          dialogue: ack,
+        };
+      }
+    }
+
+    // Surgical Sub-Step Modification
+    if (data.type === 'modify_substep') {
+      let targetStepId = data.targetStepId;
+      let targetSubStepId = data.targetSubStepId;
+
+      if (!targetStepId || !targetSubStepId) {
+        // Fallback: locate first step with pending sub-steps
+        const stepWithSub = activeSteps.find((s) => s.subSteps && s.subSteps.some((sub) => !sub.completed));
+        if (stepWithSub && stepWithSub.subSteps) {
+          targetStepId = stepWithSub.id;
+          targetSubStepId = stepWithSub.subSteps.find((sub) => !sub.completed)?.id ?? stepWithSub.subSteps[0]?.id;
+        }
+      }
+
+      if (targetStepId !== undefined && targetSubStepId !== undefined) {
+        console.log(
+          `[Tweak] END (${Date.now() - startTime}ms) - Intent: modify_substep (Step #${targetStepId}, Sub #${targetSubStepId})`
+        );
+        return {
+          type: 'modify_substep',
+          targetStepId,
+          targetSubStepId,
+          title: data.title || 'Adjusted micro action',
+          instruction: data.instruction,
+          acknowledgment: ack,
+          dialogue: ack,
+        };
+      }
+    }
+
+    // Surgical Step or Sub-Step Removal
+    if (data.type === 'remove_step') {
+      const targetStep = activeSteps.find((s) => s.id === data.targetStepId) || activeSteps.find((s) => !s.completed);
+      const targetStepId = targetStep?.id ?? activeSteps[0]?.id;
+      if (targetStepId !== undefined) {
+        console.log(`[Tweak] END (${Date.now() - startTime}ms) - Intent: remove_step (Step #${targetStepId})`);
+        return {
+          type: 'remove_step',
+          targetStepId,
+          targetSubStepId: data.targetSubStepId,
+          acknowledgment: ack,
+          dialogue: ack,
+        };
+      }
+    }
+
+    // Surgical Step Insertion
+    if (data.type === 'insert_step') {
+      console.log(`[Tweak] END (${Date.now() - startTime}ms) - Intent: insert_step`);
+      return {
+        type: 'insert_step',
+        afterStepId: data.targetStepId,
+        title: data.title || 'Added action',
+        instruction: data.instruction,
+        acknowledgment: ack,
+        dialogue: ack,
+      };
+    }
 
     if (data.type === 'complete_step') {
       const nextIncomplete = activeSteps.find((s) => !s.completed);
@@ -297,7 +405,7 @@ export async function interpretUserIntentWithAI(
       );
       return {
         type: 'new_task',
-        title: data.title || taskTitle,
+        title: taskTitle,
         acknowledgment: ack,
         dialogue: ack,
         steps: formattedSteps,

@@ -189,6 +189,111 @@ export const useTaskStore = create<TaskState>()(
           }),
         }));
       },
+
+      modifyStep: (taskId, stepId, updates) => {
+        set((state) => ({
+          tasks: state.tasks.map((task) => {
+            if (task.id !== taskId) return task;
+            const updatedSteps = task.steps.map((st) => {
+              if (st.id !== stepId) return st;
+              const title = updates.title ?? st.title ?? st.text;
+              const text = updates.text ?? title;
+              return {
+                ...st,
+                title,
+                text,
+                instruction: updates.instruction ?? st.instruction,
+              };
+            });
+            return { ...task, steps: updatedSteps, updatedAt: Date.now() };
+          }),
+        }));
+      },
+
+      modifySubStep: (taskId, parentStepId, subStepId, updates) => {
+        set((state) => ({
+          tasks: state.tasks.map((task) => {
+            if (task.id !== taskId) return task;
+            const updatedSteps = task.steps.map((st) => {
+              if (st.id !== parentStepId || !st.subSteps) return st;
+              const updatedSubSteps = st.subSteps.map((sub) => {
+                if (sub.id !== subStepId) return sub;
+                const title = updates.title ?? sub.title ?? sub.text;
+                const text = updates.text ?? title;
+                return {
+                  ...sub,
+                  title,
+                  text,
+                  instruction: updates.instruction ?? sub.instruction,
+                };
+              });
+              return { ...st, subSteps: updatedSubSteps };
+            });
+            return { ...task, steps: updatedSteps, updatedAt: Date.now() };
+          }),
+        }));
+      },
+
+      removeStep: (taskId, stepId) => {
+        set((state) => ({
+          tasks: state.tasks.map((task) => {
+            if (task.id !== taskId) return task;
+            const updatedSteps = task.steps.filter((st) => st.id !== stepId);
+            return { ...task, steps: updatedSteps, updatedAt: Date.now() };
+          }),
+        }));
+      },
+
+      removeSubStep: (taskId, parentStepId, subStepId) => {
+        set((state) => ({
+          tasks: state.tasks.map((task) => {
+            if (task.id !== taskId) return task;
+            const updatedSteps = task.steps.map((st) => {
+              if (st.id !== parentStepId || !st.subSteps) return st;
+              const remainingSubSteps = st.subSteps.filter((sub) => sub.id !== subStepId);
+              return {
+                ...st,
+                subSteps: remainingSubSteps.length > 0 ? remainingSubSteps : undefined,
+                canSplit: remainingSubSteps.length === 0,
+              };
+            });
+            return { ...task, steps: updatedSteps, updatedAt: Date.now() };
+          }),
+        }));
+      },
+
+      insertStep: (taskId, afterStepId, step) => {
+        set((state) => ({
+          tasks: state.tasks.map((task) => {
+            if (task.id !== taskId) return task;
+            const newStep: Step = {
+              id: Date.now(),
+              title: step.title,
+              text: step.title,
+              instruction: step.instruction ?? 'Take a calm breath and take just this one physical step.',
+              completed: false,
+              canSplit: true,
+            };
+
+            let updatedSteps: Step[];
+            if (afterStepId === null) {
+              updatedSteps = [...task.steps, newStep];
+            } else {
+              const targetIdx = task.steps.findIndex((st) => st.id === afterStepId);
+              if (targetIdx === -1) {
+                updatedSteps = [...task.steps, newStep];
+              } else {
+                updatedSteps = [
+                  ...task.steps.slice(0, targetIdx + 1),
+                  newStep,
+                  ...task.steps.slice(targetIdx + 1),
+                ];
+              }
+            }
+            return { ...task, steps: updatedSteps, updatedAt: Date.now() };
+          }),
+        }));
+      },
     }),
     {
       name: 'tinysteps_zustand_store',

@@ -111,33 +111,99 @@ Replace it with 2 to 4 smaller sub-steps that dissolve the hesitation:
   };
 }
 
+export interface PromptStepTreeItem {
+  id: number;
+  text?: string;
+  title?: string;
+  instruction?: string;
+  completed: boolean;
+  subSteps?: Array<{
+    id: number;
+    text?: string;
+    title?: string;
+    instruction?: string;
+    completed: boolean;
+  }>;
+}
+
 export function getAssistantInteractionPrompt(
   userMessage: string,
   taskTitle: string,
-  activeSteps: Array<{ id: number; text: string; completed: boolean }>
+  activeSteps: PromptStepTreeItem[]
 ): { system: string; prompt: string } {
-  const stepsList = activeSteps
-    .map((s, i) => `${i + 1}. [${s.completed ? 'COMPLETED' : 'PENDING'}] (ID: ${s.id}) "${s.text}"`)
+  // Format the full hierarchical step and sub-step tree
+  const formattedTree = activeSteps
+    .map((step, idx) => {
+      const stepTitle = step.title?.trim() || step.text?.trim() || `Step ${idx + 1}`;
+      const instructionText = step.instruction ? ` — ${step.instruction}` : '';
+      const statusTag = step.completed ? '[COMPLETED]' : '[PENDING]';
+      let lines = [`${idx + 1}. ${statusTag} (Step ID: ${step.id}) "${stepTitle}"${instructionText}`];
+
+      if (step.subSteps && step.subSteps.length > 0) {
+        step.subSteps.forEach((sub, subIdx) => {
+          const subTitle = sub.title?.trim() || sub.text?.trim() || `Micro action ${subIdx + 1}`;
+          const subInstruction = sub.instruction ? ` — ${sub.instruction}` : '';
+          const subStatus = sub.completed ? '[COMPLETED]' : '[PENDING]';
+          lines.push(`   ├─ ${idx + 1}.${subIdx + 1} ${subStatus} (Sub-Step ID: ${sub.id}) "${subTitle}"${subInstruction}`);
+        });
+      }
+      return lines.join('\n');
+    })
     .join('\n');
 
   return {
     system: `${SYSTEM_PERSONA}
 
-The user is working on an active task card and sent a message.
-Classify their intent into exactly one of these 8 categories:
-1. 'complete_step': User completed current step ("done", "finished", "ok", "next").
-2. 'shrink_step': User feels stuck, overwhelmed, or hesitant on current step ("too hard", "can't", "stuck").
-3. 'all_complete': User finished everything or all steps are done.
-4. 'tweak_steps': User wants to adjust remaining steps without losing completed ones ("skip step 2", "add an errand").
-5. 'new_task': User wants to switch to an entirely new task or restart fresh ("actually let's do laundry instead", "new task").
-6. 'encouragement': User is venting frustration or exhaustion about the task.
-7. 'off_topic': User sent an unrelated message, question, joke, or gibberish. Provide a brief gentle question to refocus.
-8. 'crisis': User expresses self-harm, hopelessness, or unsafe thoughts ("I can't go on", "want to die"). Provide warm care and universal lifeline link (https://findahelpline.com, strictly no country-specific phone numbers).
+You are the in-situ Adaptive Task Navigator. The user is actively executing a task card and encountered reality friction, a missing tool, or wants to surgically adjust a step or micro-action.
 
-Strictly adhere to 3-7 word titles for any steps returned, zero time estimates, and keep acknowledgment under 25 words!`,
+IMMUTABLE TASK IDENTITY:
+- The task's overall mission title and original guidance are PERMANENT and IMMUTABLE.
+- You must NEVER attempt to rename the overall task or replace its initial guidance.
+- The 'title' field in your response is STRICTLY the active verb phrase (3 to 7 words) for the specific STEP being modified or inserted.
+- Your sole jurisdiction is adjusting, rerouting, or refining the STEPS and SUB-STEPS.
+
+SURGICAL INTERACTION LAWS:
+1. MINIMAL INVASIVENESS (Surgical Rule):
+   - When the user refers to one specific step or obstacle, touch ONLY that step.
+   - NEVER regenerate or overwrite the entire task list unless the user explicitly requests a brand-new task ("start over", "let's do laundry instead").
+   - Existing completed work and unaffected steps must remain untouched.
+
+2. CONSTRAINT REROUTING ('reroute_constraint'):
+   - When the user reports an obstacle or missing resource (e.g. "I don't have printer ink", "The office is closed", "I don't have a car", "Can't make phone calls"):
+     * Identify the target step (targetStepId).
+     * Provide a practical, low-friction alternative in 'title' (3-7 words) and 'instruction' (single sentence <= 12 words).
+     * Examples: No printer -> "Save barcode to smartphone photos". No phone calls -> "Submit message via online portal". No car -> "Schedule USPS package home pickup".
+
+3. SURGICAL MODIFICATION ('modify_step' / 'modify_substep'):
+   - 'modify_step': User wants to change, clarify, or rephrase a parent step. Specify 'targetStepId', updated 'title' (3-7 words), and 'instruction' (<= 12 words).
+   - 'modify_substep': User wants to change a specific micro-action. Specify 'targetStepId', 'targetSubStepId', updated 'title', and 'instruction'.
+
+4. STEP REMOVAL ('remove_step'):
+   - User says "skip step 2", "delete the third step", "remove that sub-step", or "I already did that yesterday".
+   - Specify 'targetStepId' (and optionally 'targetSubStepId' if removing a micro-action).
+
+5. DISSOLVING RESISTANCE ('shrink_step'):
+   - User feels overwhelmed or stuck on the active step ("too hard", "can't face this", "stuck").
+   - Target the active step with 2 to 4 micro-steps that make immediate physical contact effortless.
+
+6. QUIET PRAGMATISM:
+   - Keep 'acknowledgment' under 25 words. Calm, grounded, validating reality without lecturing or exclamation-mark cheerleading.
+
+CLASSIFICATION RULES:
+- 'complete_step': User finished current step ("done", "finished", "ok", "next").
+- 'modify_step': User wants to reword, adjust, or tweak a specific step.
+- 'modify_substep': User wants to adjust a specific micro-action within a split step.
+- 'reroute_constraint': User reports a real-world blocker/friction on a step.
+- 'remove_step': User wants to delete or skip a step or sub-step.
+- 'shrink_step': User feels stuck or overwhelmed by a step.
+- 'all_complete': User finished everything.
+- 'new_task': User explicitly wants to discard current task for an entirely new one.
+- 'encouragement': User is venting exhaustion or self-doubt.
+- 'off_topic': Unrelated query; ask one gentle question to refocus.
+- 'crisis': Self-harm or hopelessness. Universal lifeline: https://findahelpline.com.`,
     prompt: `Task: "${taskTitle}"
-Active Steps:
-${stepsList}
+Active Step Tree:
+${formattedTree}
 
 User message: "${userMessage}"`,
   };
