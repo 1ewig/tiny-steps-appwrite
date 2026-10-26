@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   SignOut,
+  SignIn,
   ArrowsClockwise,
   CloudCheck,
   Check,
@@ -43,7 +44,6 @@ export function AuthButton() {
   const {
     user,
     isAuthenticated,
-    isLoading,
     isSigningOut,
     logout,
   } = useAuth();
@@ -100,17 +100,7 @@ export function AuthButton() {
     }
   };
 
-  // 1. Loading State (initial session bootstrap)
-  if (isLoading && !user && !isSigningOut) {
-    return (
-      <div
-        className="h-8 w-20 rounded-md bg-surface-subtle/50 animate-pulse"
-        aria-hidden="true"
-      />
-    );
-  }
-
-  // 2. Unauthenticated State: Sign up button that opens full-screen overlay
+  // 1. Unauthenticated State: Sign in trigger button (matches History button style)
   if (!isAuthenticated || !user) {
     return (
       <>
@@ -122,12 +112,17 @@ export function AuthButton() {
           animate="rest"
           whileHover={reduceMotion ? undefined : 'hover'}
           whileTap={reduceMotion ? undefined : 'tap'}
-          className="inline-flex items-center gap-1.5 sm:gap-2 h-8 px-3 rounded-md text-xs font-semibold text-text-primary bg-surface-subtle/80 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent shadow-subtle"
-          title="Sign up or sign in for cloud backup"
+          className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          title="Sign in for cloud backup"
+          aria-label="Sign in"
         >
-          <GoogleIcon className="w-4 h-4 shrink-0 text-text-secondary" />
-          <span className="hidden xs:inline">Sign up</span>
-          <span className="xs:hidden">Sign up</span>
+          <motion.span
+            variants={reduceMotion ? undefined : tactileIconVariants}
+            className="shrink-0 flex items-center"
+          >
+            <SignIn size={15} weight="regular" className="text-accent" />
+          </motion.span>
+          <span className="hidden sm:inline">Sign in</span>
         </motion.button>
 
         <AuthOverlay
