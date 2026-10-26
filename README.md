@@ -6,21 +6,57 @@ See [docs/architecture.md](docs/architecture.md) for a deeper look at the intern
 
 You can use it as a guest. Tasks stay in your browser, and if you sign in with Google they sync to Appwrite.
 
-## What it does
+![Tiny Steps — Home](public/screenshots/01-home.webp)
 
-- Breaks a task into 3–6 steps based on how much energy you have.
-- Shows the current step, the next one, and the rest in a simple Now / Next / Later workspace.
-- Focus Tunnel puts a single step on screen so you can work without scanning ahead.
-- If a step is still too big, break it into 2–4 smaller actions.
-- A small assistant lets you tweak a step, reroute a blocker, remove a step, or add one without losing completed work.
-- History keeps past tasks and progress; deleting a task asks for confirmation.
-- Dim mode and reduced-motion support.
+## The Flow
 
-## How it works
+### 1. Set Your Energy
+Describe what's on your mind and choose how much energy you have today:
+- **A little stuck** (3–6 steps)
+- **Overwhelmed** (3–5 gentle starter steps)
+- **Full paralysis** (2–4 micro-actions, never more than 4)
 
-1. Describe the task and pick an energy level.
-2. The AI returns a short title, some guidance, and a handful of steps.
-3. Work through them in the workspace or Focus Tunnel.
+### 2. Enter the Focus Tunnel
+New tasks open directly into a full-screen, distraction-free tunnel isolating just one step at a time so you don't scan ahead and freeze.
+
+![Focus Tunnel Intro](public/screenshots/03-focus-tunnel-intro.webp)
+
+Advance through steps with minimal keystrokes. Press `Space` or `Enter` to complete a step, `S` to break it down, or `Esc` to view the full workspace.
+
+![Focus Tunnel Active Step](public/screenshots/04-focus-tunnel-step.webp)
+
+### 3. Spatial Workspace (Now / Next / Later)
+In the full workspace, steps are organized spatially across three columns. Future steps are softly blurred by default to prevent scan panic.
+
+![Spatial Workspace](public/screenshots/05-workspace-now-next-later.webp)
+
+### 4. Shrink Resistance On Demand
+If any step feels too big or triggers hesitation, "Break it down" dynamically splits it into 2–4 bite-sized sub-steps directly within the card.
+
+![Step with Micro-Steps](public/screenshots/06-workspace-substeps.webp)
+
+### 5. Surgical In-Situ Assistant
+Need to adjust reality? The unobtrusive bottom chip lets you tweak steps, reroute blockers, or add items without wiping your completed progress or dumping noisy chat transcripts.
+
+![In-Situ Assistant](public/screenshots/07-workspace-assistant.webp)
+
+### 6. History Drawer
+Review past sessions, resume incomplete tasks, or manage history with accessible confirmation dialogs.
+
+![History Drawer](public/screenshots/02-history-empty.webp)
+
+---
+
+## Features at a Glance
+
+- **Distraction-Free Focus Tunnel**: Full-screen monotasking with smooth optical morphs.
+- **3-Column Workspace**: Spatial Now / Next / Later organization with anti-scan progressive disclosure.
+- **On-Demand Micro-Actions**: Dynamically break intimidating steps into 2–4 smaller pieces.
+- **Non-Destructive Assistant**: Surgical step surgery (modify, add, remove, reroute) preserving task immutability.
+- **Sensory-Friendly Design**: Warm oatmeal canvas, calming sage accents, dim mode toggle, and reduced-motion support.
+- **Guest-First & Cloud-Synced**: Full offline capability via `localStorage`, with optional Appwrite TablesDB sync.
+
+---
 
 ## Stack
 
