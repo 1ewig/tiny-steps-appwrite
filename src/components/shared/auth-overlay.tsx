@@ -55,7 +55,7 @@ export function AuthOverlay({ isOpen, onClose }: AuthOverlayProps) {
               ease: CALM_EASE,
             },
           }}
-          className="fixed inset-0 z-modal bg-canvas/95 backdrop-blur-md flex flex-col justify-between p-4 sm:p-6 select-none focus:outline-none overflow-y-auto"
+          className="fixed inset-0 z-modal bg-canvas/95 backdrop-blur-md flex flex-col justify-between p-3 sm:p-5 select-none focus:outline-none overflow-y-auto"
         >
           {/* Header: App Brand + Close Button */}
           <header className="w-full flex items-center justify-between z-10 shrink-0">
@@ -88,19 +88,19 @@ export function AuthOverlay({ isOpen, onClose }: AuthOverlayProps) {
             </motion.button>
           </header>
 
-          {/* Main Stage: Centered Peaceful Typography + Google Sign-In Action */}
-          <main className="flex-1 flex flex-col items-center justify-center text-center px-4 sm:px-6 py-8 max-w-2xl mx-auto w-full my-auto space-y-7">
+          {/* Main Stage: Expansive Centered Typography + Google Sign-In Action */}
+          <main className="flex-1 flex flex-col items-center justify-center text-center px-2 sm:px-4 py-8 max-w-4xl lg:max-w-5xl mx-auto w-full my-auto space-y-7">
             {/* Soft Icon Badge */}
             <div className="w-14 h-14 rounded-2xl bg-accent-subtle text-accent-text flex items-center justify-center shadow-subtle">
               <CloudCheck size={28} weight="fill" className="text-accent" />
             </div>
 
-            {/* Reassuring, Zero-Guilt Messaging */}
-            <div className="space-y-3 max-w-xl mx-auto">
-              <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-text-primary leading-snug sm:leading-tight tracking-tight">
+            {/* Reassuring, Expansive Wide Messaging */}
+            <div className="space-y-3 max-w-3xl lg:max-w-4xl w-full mx-auto">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary leading-snug sm:leading-tight tracking-tight">
                 Save your steps across devices
               </h1>
-              <p className="text-sm sm:text-base text-text-secondary leading-relaxed max-w-lg mx-auto font-medium">
+              <p className="text-sm sm:text-base md:text-lg text-text-secondary leading-relaxed max-w-2xl lg:max-w-3xl mx-auto font-medium">
                 Sign in with Google to sync your micro-steps and tasks.
                 Signing in is completely optional — Tiny Steps always works offline right here with zero pressure.
               </p>
