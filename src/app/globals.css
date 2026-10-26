@@ -7,27 +7,27 @@
    ========================================================================== */
 :root {
   /* --- Semantic Colors (Light) --- */
-  --color-canvas: #F5F2E6;
-  /* Rich tactile warm milk base for true foreground card lift */
-  --color-canvas-subtle: #ECE8DA;
+  --color-canvas: #F4F0E4;
+  /* Rich tactile warm linen base */
+  --color-canvas-subtle: #EAE4D4;
   /* Recessed wells, input tracks, sunken areas */
-  --color-canvas-glow: rgba(253, 251, 240, 0.95);
+  --color-canvas-glow: rgba(253, 251, 240, 0.9);
   /* Natural Milk White (#FDFBF0) ambient highlight */
-  --color-canvas-accent-glow: rgba(70, 89, 64, 0.06);
+  --color-canvas-accent-glow: rgba(70, 89, 64, 0.05);
   /* Subtle Deep Sage (#465940) depth glow */
 
-  --color-surface: #FFFFFF;
-  /* Pure porcelain card/container surface */
-  --color-surface-subtle: #EBE6D8;
+  --color-surface: #F8F5EB;
+  /* Tactile warm milk-linen card surface (eliminates harsh stark white) */
+  --color-surface-subtle: #EDE6D6;
   /* Secondary chips, pill tags, inactive button surface */
-  --color-surface-hover: #FDFBF0;
-  /* Milk White hover surface */
-  --color-surface-elevated: #FDFBF0;
-  /* Milk White elevated popovers, modals, drawers */
+  --color-surface-hover: #F2ECDC;
+  /* Interactive hover surface */
+  --color-surface-elevated: #FAF7ED;
+  /* Warm elevated popovers, modals, drawers */
 
-  --color-border-subtle: #E2DBD0;
+  --color-border-subtle: #DFD8C6;
   /* Crisp, physical edge divider */
-  --color-border-muted: #D1C8B8;
+  --color-border-muted: #CEC5B2;
   /* Secondary borders, inactive states */
   --color-border-focus: #465940;
   /* Deep Sage (#465940) focus ring */
@@ -47,7 +47,7 @@
   /* Deep Sage (#465940) */
   --color-accent-hover: #374632;
   /* Rich deep forest sage hover state */
-  --color-accent-subtle: #E8EFE6;
+  --color-accent-subtle: #E4ECE1;
   /* Luminous pale sage mist tint for badges & active states */
   --color-accent-border: #B2C7AD;
   /* Delicate sage outline */
@@ -136,28 +136,24 @@
   --shadow-subtle:
     0 0 0 1px var(--color-border-subtle),
     0 1px 2px rgba(28, 34, 26, 0.04),
-    0 2px 6px rgba(28, 34, 26, 0.03),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+    0 2px 6px rgba(28, 34, 26, 0.03);
 
   --shadow-card:
     0 0 0 1px var(--color-border-subtle),
     0 1px 3px rgba(28, 34, 26, 0.04),
     0 8px 20px -2px rgba(70, 89, 64, 0.08),
-    0 20px 40px -4px rgba(28, 34, 26, 0.04),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
+    0 20px 40px -4px rgba(28, 34, 26, 0.04);
 
   --shadow-capsule:
     0 0 0 1px rgba(70, 89, 64, 0.16),
     0 4px 12px -2px rgba(70, 89, 64, 0.14),
-    0 16px 36px -6px rgba(70, 89, 64, 0.22),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
+    0 16px 36px -6px rgba(70, 89, 64, 0.22);
 
   --shadow-modal:
     0 0 0 1px var(--color-border-subtle),
     0 8px 24px -4px rgba(28, 34, 26, 0.08),
     0 24px 60px -12px rgba(28, 34, 26, 0.16),
-    0 48px 96px -20px rgba(70, 89, 64, 0.14),
-    inset 0 1px 0 0 rgba(255, 255, 255, 1);
+    0 48px 96px -20px rgba(70, 89, 64, 0.14);
 
   --shadow-inset:
     inset 0 2px 4px rgba(28, 34, 26, 0.05),
