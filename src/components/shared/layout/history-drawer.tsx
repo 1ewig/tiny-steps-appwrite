@@ -12,11 +12,7 @@ import {
   ChatText,
   X,
   Trash,
-  CloudCheck,
 } from '@phosphor-icons/react';
-import { useAuth } from '@/hooks/use-auth';
-import { useTaskSync } from '@/hooks/use-task-sync';
-import { GoogleIcon } from '@/components/shared/auth-button';
 import {
   drawerSlideVariants,
   backdropVariants,
@@ -60,9 +56,6 @@ export function HistoryDrawer({
     onClose,
     onDeleteTask,
   });
-
-  const { user, signInWithGoogle } = useAuth();
-  const { isSyncing } = useTaskSync();
 
   return (
     <>
@@ -306,38 +299,6 @@ export function HistoryDrawer({
                   )}
                 </AnimatePresence>
               </div>
-
-              {/* Bottom Sync & Auth Callout */}
-              {!user ? (
-                <div className="p-4 border-t border-border-subtle bg-canvas/80 backdrop-blur-xs">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-semibold text-text-primary">
-                        Sync tasks across devices
-                      </p>
-                      <p className="text-[11px] text-text-tertiary">
-                        Optional. Tasks remain saved on this device.
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => signInWithGoogle()}
-                      className="shrink-0 inline-flex items-center gap-2 h-8 px-2.5 rounded-md text-xs font-semibold text-text-primary bg-surface border border-border-subtle hover:bg-surface-subtle transition-colors duration-fast shadow-subtle cursor-pointer focus-visible:ring-2 focus-visible:ring-accent"
-                    >
-                      <GoogleIcon className="w-4 h-4" />
-                      <span>Sign in with Google</span>
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="p-3.5 px-4 border-t border-border-subtle bg-canvas/80 backdrop-blur-xs flex items-center justify-between text-2xs text-text-tertiary">
-                  <div className="flex items-center gap-1.5 text-text-secondary">
-                    <CloudCheck size={14} className="text-accent" weight="fill" />
-                    <span className="font-medium text-text-primary">Appwrite TablesDB</span>
-                  </div>
-                  <span>{isSyncing ? 'Syncing...' : 'Backed up in cloud'}</span>
-                </div>
-              )}
 
             </motion.aside>
           </>

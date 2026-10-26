@@ -128,7 +128,7 @@ export function AuthButton() {
         className="inline-flex items-center gap-1.5 h-8 pl-1.5 pr-2.5 rounded-md text-xs font-medium text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle border border-border-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         aria-expanded={isOpen}
         aria-haspopup="menu"
-        title={`${displayName} (Appwrite TablesDB synced)`}
+        title={`${displayName} (Cloud synced)`}
       >
         <span className="w-5 h-5 rounded-full bg-accent text-text-inverse flex items-center justify-center text-[10px] font-bold shrink-0">
           {initial}
@@ -147,7 +147,7 @@ export function AuthButton() {
           ) : (
             <span
               className="w-1.5 h-1.5 rounded-full bg-accent"
-              title="Synced with TablesDB"
+              title="Synced with cloud"
             />
           )}
         </span>
@@ -184,7 +184,7 @@ export function AuthButton() {
               <div className="flex items-center justify-between text-2xs mb-1">
                 <span className="text-text-secondary flex items-center gap-1 font-medium">
                   <CloudCheck size={14} className="text-accent" weight="fill" />
-                  Appwrite TablesDB
+                  Cloud Backup
                 </span>
                 <span className="text-text-tertiary">
                   {syncingActive
@@ -195,7 +195,7 @@ export function AuthButton() {
                 </span>
               </div>
               <p className="text-[11px] text-text-tertiary leading-relaxed mb-2">
-                Your tasks and micro-steps are persisted to Appwrite TablesDB.
+                Your tasks and micro-steps are securely backed up in the cloud.
               </p>
 
               <button
