@@ -36,8 +36,9 @@ export function useAuth() {
     setError(null);
     try {
       await loginWithGoogle();
-    } catch (err: any) {
-      setError(err?.message || 'Failed to initialize Google Sign In');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to initialize Google Sign In';
+      setError(message);
       console.error('[Auth] loginWithGoogle error:', err);
     }
   };
@@ -47,13 +48,15 @@ export function useAuth() {
     setAuthLoading(true);
     try {
       await logoutUser();
+    } catch (err: unknown) {
+      console.warn('[Auth] Remote logout error:', err);
+    } finally {
+      // Always guarantee full client-side cache and session purge,
+      // even if offline or if remote session deletion fails
       setUser(null);
       setTasks([]);
       setLastSyncedAt(null);
       closeFocusTunnel();
-    } catch (err: any) {
-      console.error('[Auth] Logout error:', err);
-    } finally {
       setAuthLoading(false);
     }
   };
