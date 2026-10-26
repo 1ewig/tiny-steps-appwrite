@@ -2,7 +2,7 @@ import type { Step } from '@/types/task';
 import { serializeStepTree } from './serialize';
 
 /**
- * Shrinks an overwhelming step into 2 to 4 tailored micro-actions using the LLM,
+ * Shrinks an overwhelming step into 2 to 3 tailored micro-actions using the LLM,
  * with full lifecycle-aware step context to dissolve the specific stall point.
  */
 export async function shrinkStepWithAI(
@@ -49,7 +49,7 @@ export async function shrinkStepWithAI(
     }
 
     const baseTime = Date.now();
-    const microSteps: Step[] = data.microSteps.map(
+    const microSteps: Step[] = data.microSteps.slice(0, 3).map(
       (s: { title?: string; text?: string; instruction?: string }, i: number) => {
         const title = s.title?.trim() || s.text?.trim() || 'Micro action';
         return {

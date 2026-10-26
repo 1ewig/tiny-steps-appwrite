@@ -211,7 +211,7 @@ Focus Context:
     system: `${SYSTEM_PERSONA}
 
 The user feels resistance on one specific step.
-Replace ONLY that step with 2 to 4 smaller sub-steps that dissolve the hesitation:
+Replace ONLY that step with 2 to 3 smaller sub-steps (STRICTLY CAPPED at 3, NEVER 4) that dissolve the hesitation:
 - The step tree uses lifecycle markers. Respect them exactly.
 - Never modify, complete, rename, remove, or regenerate any step other than the Step Causing Resistance. Preserve all [COMPLETED] work.
 - If Previous Step is [COMPLETED], sub-step 1 must start from the concrete state it left behind without repeating its work.
@@ -275,7 +275,7 @@ SURGICAL INTERACTION LAWS:
 
 6. DISSOLVING RESISTANCE ('shrink_step'):
    - User feels overwhelmed or stuck on the active step ("too hard", "can't face this", "stuck").
-   - Target the active step with 2 to 4 micro-steps that make immediate physical contact effortless.
+   - Target the active step with 2 to 3 micro-steps (strictly maximum 3) that make immediate physical contact effortless.
 
 7. QUIET PRAGMATISM:
    - Keep 'acknowledgment' under 25 words. Calm, grounded, validating reality without lecturing or exclamation-mark cheerleading.

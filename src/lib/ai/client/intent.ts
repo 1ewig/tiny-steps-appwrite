@@ -168,7 +168,7 @@ export async function interpretUserIntentWithAI(
           throw new Error('Invalid shrink_step microSteps received from assistant');
         }
 
-        const microSteps: Step[] = data.microSteps.map(
+        const microSteps: Step[] = data.microSteps.slice(0, 3).map(
           (s: { title?: string; text?: string; instruction?: string }, i: number) => {
             const title = s.title?.trim() || s.text?.trim() || 'Micro action';
             return {

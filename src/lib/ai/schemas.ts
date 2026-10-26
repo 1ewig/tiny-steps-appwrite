@@ -50,8 +50,8 @@ export const ShrinkStepSchema = z.object({
   microSteps: z
     .array(TaskStepSchema)
     .min(2)
-    .max(4)
-    .describe('2 to 4 smaller sub-steps that dissolve the hesitation dimension (too big, unclear, decision needed, or emotional friction)'),
+    .max(3)
+    .describe('2 to 3 smaller sub-steps (strictly maximum 3) that dissolve the hesitation dimension (too big, unclear, decision needed, or emotional friction)'),
 });
 
 export type ShrinkStepOutput = z.infer<typeof ShrinkStepSchema>;
@@ -106,7 +106,11 @@ export const AssistantIntentSchema = z.object({
     .describe(
       'MANDATORY TACTILE SENTENCE: Exactly 1 short physical or digital sentence under 10 words (approx 30 to 55 characters) giving concrete clarity. Must end with a period. Required whenever modifying, inserting, or rerouting a step.'
     ),
-  microSteps: z.array(TaskStepSchema).optional().describe('Micro-steps if type is shrink_step'),
+  microSteps: z
+    .array(TaskStepSchema)
+    .max(3)
+    .optional()
+    .describe('2 to 3 micro-steps (strictly maximum 3) if type is shrink_step'),
   steps: z.array(TaskStepSchema).optional().describe('Adjusted steps if type is new_task or tweak_steps'),
 });
 

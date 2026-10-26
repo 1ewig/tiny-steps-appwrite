@@ -175,7 +175,7 @@ export const createTaskSlice: StateCreator<TaskState, [], [], TaskSlice> = (set,
         const updatedSteps = [...task.steps];
         updatedSteps[stepIndex] = {
           ...original,
-          subSteps,
+          subSteps: subSteps.slice(0, 3),
           canSplit: false,
         };
         return { ...task, steps: updatedSteps, updatedAt: Date.now() };
