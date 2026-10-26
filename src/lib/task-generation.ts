@@ -181,6 +181,18 @@ export async function shrinkStepWithAI(
   }
 }
 
+// Helper to normalize and enforce concise brevity on step titles and instructions
+function cleanStepTitle(raw?: string, fallback: string = 'Next tiny action'): string {
+  if (!raw) return fallback;
+  const cleaned = raw.trim().replace(/\.+$/, '');
+  return cleaned || fallback;
+}
+
+function cleanStepInstruction(raw?: string, fallback?: string): string {
+  const text = (raw || fallback || 'Focus gently on just this physical motion.').trim();
+  return text.endsWith('.') ? text : `${text}.`;
+}
+
 /**
  * Interprets user intent when tweaking or venting in an active session,
  * using the LLM to update guidance or mutate steps in-place.
@@ -242,8 +254,8 @@ export async function interpretUserIntentWithAI(
           type: 'reroute_constraint',
           targetStepId,
           targetSubStepId: data.targetSubStepId,
-          title: data.title || targetStep?.title || 'Alternative action',
-          instruction: data.instruction || 'Take this alternative step without friction.',
+          title: cleanStepTitle(data.title, targetStep?.title || 'Alternative action'),
+          instruction: cleanStepInstruction(data.instruction, targetStep?.instruction),
           acknowledgment: ack,
           dialogue: ack,
         };
@@ -260,8 +272,8 @@ export async function interpretUserIntentWithAI(
           type: 'modify_step',
           targetStepId,
           targetSubStepId: data.targetSubStepId,
-          title: data.title || targetStep?.title || 'Adjusted action',
-          instruction: data.instruction || targetStep?.instruction,
+          title: cleanStepTitle(data.title, targetStep?.title || 'Adjusted action'),
+          instruction: cleanStepInstruction(data.instruction, targetStep?.instruction),
           acknowledgment: ack,
           dialogue: ack,
         };
@@ -290,8 +302,8 @@ export async function interpretUserIntentWithAI(
           type: 'modify_substep',
           targetStepId,
           targetSubStepId,
-          title: data.title || 'Adjusted micro action',
-          instruction: data.instruction,
+          title: cleanStepTitle(data.title, 'Micro action'),
+          instruction: cleanStepInstruction(data.instruction),
           acknowledgment: ack,
           dialogue: ack,
         };
@@ -320,8 +332,8 @@ export async function interpretUserIntentWithAI(
       return {
         type: 'insert_step',
         afterStepId: data.targetStepId,
-        title: data.title || 'Added action',
-        instruction: data.instruction,
+        title: cleanStepTitle(data.title, 'Added action'),
+        instruction: cleanStepInstruction(data.instruction),
         acknowledgment: ack,
         dialogue: ack,
       };
