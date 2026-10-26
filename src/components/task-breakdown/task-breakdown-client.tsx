@@ -188,7 +188,6 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
             guidanceText={currentTask.guidance}
             steps={steps}
             energyLevel={currentTask.energyLevel}
-            isAdjusting={isTyping}
             onToggleStep={(stepId) => {
               toggleStepCompletion(currentTask.id, stepId);
             }}

@@ -13,7 +13,6 @@ interface TaskCardProps {
   guidanceText?: string;
   steps: Step[];
   energyLevel?: EnergyLevel;
-  isAdjusting?: boolean;
   onToggleStep: (stepId: number) => void;
   onShrinkStep: (stepIndex: number) => Promise<void> | void;
   onToggleSubStep?: (parentStepId: number, subStepId: number) => void;
@@ -23,7 +22,6 @@ export function TaskCard({
   guidanceText,
   steps,
   energyLevel,
-  isAdjusting = false,
   onToggleStep,
   onShrinkStep,
   onToggleSubStep,
@@ -107,16 +105,6 @@ export function TaskCard({
             </p>
           )}
         </motion.div>
-      )}
-
-      {/* Adjusting Indicator */}
-      {isAdjusting && (
-        <div className="flex items-center justify-center gap-2 py-1 text-xs text-text-tertiary animate-pulse">
-          <span className="w-1.5 h-1.5 rounded-full bg-accent dot-1" />
-          <span className="w-1.5 h-1.5 rounded-full bg-accent dot-2" />
-          <span className="w-1.5 h-1.5 rounded-full bg-accent dot-3" />
-          <span>Adjusting your steps...</span>
-        </div>
       )}
 
       {/* 3-Column Layout: Now, Next, Later */}

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { ChatCircleDots, X } from '@phosphor-icons/react';
+import { ChatCircleDots, X, SpinnerGap } from '@phosphor-icons/react';
 import { tactileButtonVariants, tactileIconVariants } from '@/constants/animation';
 
 interface ChatInputProps {
@@ -55,9 +55,6 @@ export function ChatInput({
     onSubmit(trimmed);
     setText('');
     setIsMultiline(false);
-    if (collapsible) {
-      setIsExpanded(false);
-    }
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
@@ -110,20 +107,24 @@ export function ChatInput({
           animate="rest"
           whileHover={!text.trim() || disabled || reduceMotion ? undefined : 'hover'}
           whileTap={!text.trim() || disabled || reduceMotion ? undefined : 'tap'}
-          className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-accent hover:bg-accent-hover text-text-inverse flex items-center justify-center shrink-0 shadow-subtle transition-colors duration-fast disabled:opacity-40 disabled:cursor-not-allowed mb-0.5"
-          title="Break it down"
-          aria-label="Send message"
+          className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-accent hover:bg-accent-hover text-text-inverse flex items-center justify-center shrink-0 shadow-subtle transition-colors duration-fast disabled:opacity-50 disabled:cursor-not-allowed mb-0.5"
+          title={disabled ? 'Adjusting...' : 'Break it down'}
+          aria-label={disabled ? 'Adjusting...' : 'Send message'}
         >
-          <motion.svg
-            variants={reduceMotion ? undefined : tactileIconVariants}
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 10.5L12 3m0 0l7.5 7.5M12 3v18" />
-          </motion.svg>
+          {disabled ? (
+            <SpinnerGap size={18} className="animate-spin text-text-inverse" />
+          ) : (
+            <motion.svg
+              variants={reduceMotion ? undefined : tactileIconVariants}
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 10.5L12 3m0 0l7.5 7.5M12 3v18" />
+            </motion.svg>
+          )}
         </motion.button>
       </div>
     </div>
