@@ -39,12 +39,15 @@ Traditional productivity tools (Todoist, Notion, Jira) are designed for organize
 
 ### 1. 📋 The Single Living Task Card (Anti-Overwhelm)
 * **Domain-Driven Architecture**: Backed by a clean, first-class `Task` and `Step` model rather than a legacy chatbot transcript.
-* **In-Place Guidance & Adaptation**: Tweaking or venting updates the **existing card guidance in-place** instead of stacking duplicate checklists or noisy message bubbles.
-* **Preserves Progress**: Completed steps remain checked off; only the pending steps adjust.
+* **In-Place Guidance & Adaptation**: Tweaking or venting uses the **Adaptive Task Navigator** to surgically modify specific steps or reroute blockers without stacking duplicate checklists or noisy message bubbles.
+* **Task Identity Immutability**: The task's overall mission title and original empathetic guidance remain permanent and unpolluted.
+* **Preserves Progress**: Completed steps remain checked off; only the active or targeted pending steps adjust.
 
-### 2. 🎯 Centered Hero & Collapsible Tweak Chip
+### 2. 🎯 Centered Hero & Adaptive In-Situ Copilot
 * **Empty State**: The prompt input is centered directly under the greeting, inviting step #1 with zero visual noise.
 * **Active Working Mode**: Once steps are generated, the input collapses into a quiet bottom chip (`Need to tweak or vent?`), keeping 98% of the screen clear for execution. Click anytime to expand and adjust.
+* **Persistent Execution Context**: Submitting a tweak keeps the sheet open with an inline `<SpinnerGap>` on the send button, preventing jarring collapses while you work through reality friction.
+* **Surgical Step & Sub-Step Surgery**: The assistant has complete hierarchical awareness (`[COMPLETED]`, `[CURRENT / ACTIVE]`, `[UPCOMING]`), allowing precise sub-step edits (`modifySubStep`), constraint substitutions (`reroute_constraint`), or step deletions (`removeStep`).
 
 ### 3. 🎚️ Elastic Sensitivity Modes
 Users experience task resistance differently depending on their daily energy:
@@ -93,6 +96,9 @@ If any step triggers hesitation or resistance, click **"Break it down"** to spli
 
 | Commit | Change |
 | :--- | :--- |
+| `730a775` | **Concise Character Bounds**: Enforced strict 18–32 char titles, stripped trailing periods, and concise $\le 10$-word instructions on assistant steps. |
+| `e1db2f2` | **Persistent Input & Button Spinner**: Kept assistant input open on submit, placed spinner on enter button, and removed redundant loader below acknowledgment. |
+| `6a94cb1` | **Adaptive Task Navigator**: Implemented surgical step/sub-step mutations, full tree serialization, constraint rerouting, and task identity immutability. |
 | `c3de0f8` | **Quiet Competence Persona**: Aligned AI persona and app microcopy with pragmatic task decompressor; de-therapized offline presets and UI completion cards. |
 | `086bbf6` | **Universal Prompts**: Replaced niche pseudo-academic jargon with universal substance-first task and decision decomposition prompts. |
 | `0d34431` | **Gemini 2.5 Flash Lite & Benchmark Suite**: Adopted `google/gemini-2.5-flash-lite`, added configurable `AI_REASONING_EFFORT` env helper, and added gateway benchmarking suite. |
@@ -241,7 +247,15 @@ bun run check  # Multi-threaded native typecheck (~250ms)
 bun run lint   # Oxlint static analysis (~30ms)
 ```
 
-### 5. Production Build
+### 5. Automated AI Evaluation Suite
+Run the 29-scenario benchmark suite covering real-world tasks, boundary refusals, and adversarial stress tests:
+```bash
+bun run scripts/eval-suite.ts            # Run full evaluation suite
+bun run scripts/eval-suite.ts --relevant # Run only real-world human tasks
+bun run scripts/eval-suite.ts --stress   # Run adversarial panic dump stress tests
+```
+
+### 6. Production Build
 Create an optimized production bundle:
 ```bash
 bun run build
