@@ -58,7 +58,7 @@ If the model refuses, the API returns `status: "refused"` and an empty `steps` a
 
 `shrinkStepWithAI` sends the task title, the full serialized step tree, and the target index to `/api/shrink`. The prompt marks completed, active, upcoming, pending, and focus steps so the model respects earlier work and the next step.
 
-`ShrinkStepSchema` returns an acknowledgment and 2–4 micro-steps. `shrinkStep` attaches them to the parent as `subSteps` and sets `canSplit: false`. The parent title, instruction, and completion state stay in place.
+`ShrinkStepSchema` returns an acknowledgment and 2–3 micro-steps (strictly capped at 3 to prevent overwhelm). `shrinkStep` attaches them to the parent as `subSteps` and sets `canSplit: false`. The parent title, instruction, and completion state stay in place.
 
 ## Tweaking a task
 
@@ -72,10 +72,12 @@ The bottom chat chip sends the message, task title, and serialized tree to `/api
 | `modify_step`, `modify_substep`, `reroute_constraint` | Change the title or instruction of a step or sub-step. |
 | `remove_step` | Remove a step or sub-step. |
 | `insert_step` | Insert a step after `afterStepId`, or append it. |
-| `shrink_step` | Attach the returned micro-steps to the target step. |
+| `shrink_step` | Attach the returned micro-steps to the target step (capped at 3). |
 | `new_task` | Keep completed steps and append a new set of steps. |
 | `tweak_steps` | Replace the step list. |
-| `all_complete`, `encouragement`, `off_topic`, `crisis` | Show the acknowledgment without changing steps. |
+| `all_complete`, `encouragement` | Show calm solidarity or celebration without modifying steps. |
+| `off_topic` | Show a gentle 1-sentence boundary redirecting to task steps without touching the tree. |
+| `crisis` | Surface universal crisis support (findahelpline.com) without roleplaying therapy. |
 
 ## Data model
 
@@ -111,12 +113,12 @@ The three routes share the same shape:
 | Route | Schema | Output |
 | --- | --- | --- |
 | `/api/breakdown` | `TaskBreakdownSchema` | title, acknowledgment, steps, refusal metadata |
-| `/api/shrink` | `ShrinkStepSchema` | acknowledgment + 2–4 micro-steps |
+| `/api/shrink` | `ShrinkStepSchema` | acknowledgment + 2–3 micro-steps |
 | `/api/assistant` | `AssistantIntentSchema` | one structured intent |
 
 Routes validate the request body, return 400 for missing fields, 503 when the Gateway is not configured, and 500 on model errors.
 
-Prompts live in `src/lib/ai/prompts.ts`. The breakdown prompt enforces concrete, short actions and refuses self-harm, harmful, irrelevant, joke, and gibberish input. For self-harm input it points to https://findahelpline.com rather than roleplaying support. The shrink prompt receives the lifecycle-tagged tree. The assistant prompt receives the same tree and asks for one surgical intent.
+Prompts live in `src/lib/ai/prompts.ts`. The breakdown prompt enforces concrete, short actions and refuses self-harm, harmful, irrelevant, joke, and gibberish input. For self-harm input it points to https://findahelpline.com rather than roleplaying support. Acknowledgments use level-tuned companion voices—from direct forward clarity at Level 1 to radical permission ("Everything else can wait. We're only touching one tiny piece to get moving.") at Level 3—strictly banning robotic corporate clichés like "This is a common challenge". The shrink prompt receives the lifecycle-tagged tree and caps micro-steps at 3. The assistant prompt receives the same tree, enforces strict boundaries against off-topic fluff, trivia, and ghostwriting, and asks for one surgical intent.
 
 ## Testing and evaluation
 
@@ -124,7 +126,7 @@ Prompts live in `src/lib/ai/prompts.ts`. The breakdown prompt enforces concrete,
 
 ## Cloud sync
 
-Auth is optional Google OAuth through Appwrite. `loginWithGoogle` uses the OAuth2 token flow, and `/auth/success` exchanges the returned user ID and secret for a session. `/auth/failure` handles aborted sign-ins.
+Auth is optional Google OAuth through Appwrite. A full-screen, sensory-friendly `AuthOverlay` provides distraction-free sign-in with Google, keyboard `Esc` return, and loading indicators. `loginWithGoogle` uses the OAuth2 token flow, and `/auth/success` exchanges the returned user ID and secret for a session. `/auth/failure` handles aborted sign-ins.
 
 When a user signs in, `useTaskSyncSubscription` runs once from the tasks layout:
 
@@ -144,7 +146,7 @@ Route pages stay thin. `src/app/tasks/[id]/page.tsx` reads the route param and r
 
 `TasksLayoutClient` is mounted once for the tasks area. It owns the header, history drawer, theme toggle, Focus Tunnel, loader, keyboard shortcuts, and the single sync subscription.
 
-Focus Tunnel shows the active step and advances through incomplete sub-steps before completing the parent step. Space or Enter advances, S shrinks, and Escape closes.
+Focus Tunnel shows the active step and advances through incomplete sub-steps before completing the parent step. On initial entry, it displays the session title in `h1` and acknowledgment guidance in `p` to eliminate layout shift before step 1. Space or Enter advances, S shrinks, and Escape closes.
 
 ## Design system
 

@@ -31,12 +31,12 @@ In the full workspace, steps are organized spatially across three columns. Futur
 ![Spatial Workspace](public/screenshots/05-workspace-now-next-later.webp)
 
 ### 4. Shrink Resistance On Demand
-If any step feels too big or triggers hesitation, "Break it down" dynamically splits it into 2–4 bite-sized sub-steps directly within the card.
+If any step feels too big or triggers hesitation, "Break it down" dynamically splits it into 2–3 bite-sized sub-steps directly within the card (strictly capped at 3 to prevent overwhelm).
 
 ![Step with Micro-Steps](public/screenshots/06-workspace-substeps.webp)
 
 ### 5. Surgical In-Situ Assistant
-Need to adjust reality? The unobtrusive bottom chip lets you tweak steps, reroute blockers, or add items without wiping your completed progress or dumping noisy chat transcripts.
+Need to adjust reality? The unobtrusive bottom chip lets you tweak steps, reroute blockers, or add items without wiping your completed progress or dumping noisy chat transcripts. It also sets calm, zero-guilt boundaries against off-topic fluff or general trivia to keep your focus intact.
 
 ![In-Situ Assistant](public/screenshots/07-workspace-assistant.webp)
 
@@ -56,7 +56,7 @@ Tiny Steps breaks down execution for humans—it refuses to do academic ghostwri
 
 - **Distraction-Free Focus Tunnel**: Full-screen monotasking with smooth optical morphs.
 - **3-Column Workspace**: Spatial Now / Next / Later organization with anti-scan progressive disclosure.
-- **On-Demand Micro-Actions**: Dynamically break intimidating steps into 2–4 smaller pieces.
+- **On-Demand Micro-Actions**: Dynamically break intimidating steps into 2–3 smaller pieces.
 - **Non-Destructive Assistant**: Surgical step surgery (modify, add, remove, reroute) preserving task immutability.
 - **Clear Execution Boundaries**: Calm refusal notices that prevent machine labor substitution while safeguarding crisis inputs.
 - **Sensory-Friendly Design**: Warm oatmeal canvas, calming sage accents, dim mode toggle, and reduced-motion support.
