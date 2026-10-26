@@ -70,7 +70,7 @@ export function StartClient() {
       {hasSavedTasks && (
         <motion.div
           variants={reduceMotion ? undefined : unblurFadeInVariants}
-          className="pt-4 pb-2 text-center shrink-0"
+          className="pt-4 pb-16 sm:pb-2 text-center shrink-0"
         >
           <motion.button
             type="button"
@@ -81,10 +81,11 @@ export function StartClient() {
             animate="rest"
             whileHover={reduceMotion || isGeneratingTask ? undefined : 'hover'}
             whileTap={reduceMotion || isGeneratingTask ? undefined : 'tap'}
-            className="inline-flex items-center gap-1.5 text-xs text-text-tertiary hover:text-text-secondary transition-colors duration-fast cursor-pointer py-1.5 px-3.5 rounded-full hover:bg-surface-subtle disabled:pointer-events-none"
+            className="inline-flex items-center gap-1.5 text-xs text-text-tertiary hover:text-text-secondary transition-colors duration-fast cursor-pointer py-1.5 px-3.5 rounded-full hover:bg-surface-subtle disabled:pointer-events-none whitespace-nowrap"
           >
-            <ClockCounterClockwise size={14} className="text-accent" />
-            <span>Looking for an earlier task? View history</span>
+            <ClockCounterClockwise size={14} className="text-accent shrink-0" />
+            <span className="sm:hidden">View earlier tasks</span>
+            <span className="hidden sm:inline">Looking for an earlier task? View history</span>
             <span aria-hidden="true">→</span>
           </motion.button>
         </motion.div>
