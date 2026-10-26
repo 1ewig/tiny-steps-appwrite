@@ -141,7 +141,7 @@ function NowCardBody({
         )}
       </div>
 
-      <div className="mt-5 flex items-center gap-4 pt-1">
+      <div className="mt-5 flex items-center gap-3 sm:gap-4 pt-1 flex-nowrap">
         <motion.button
           type="button"
           onClick={onMarkDone}
@@ -151,12 +151,13 @@ function NowCardBody({
           animate="rest"
           whileHover={isShrinking || reduceMotion ? undefined : 'hover'}
           whileTap={isShrinking || reduceMotion ? undefined : 'tap'}
-          className="h-10 px-6 rounded-full bg-accent hover:bg-accent-hover text-text-inverse font-semibold text-xs sm:text-sm shadow-subtle flex items-center gap-2 transition-colors duration-fast cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+          className="h-10 px-4 sm:px-6 rounded-full bg-accent hover:bg-accent-hover text-text-inverse font-semibold text-xs sm:text-sm shadow-subtle flex items-center gap-1.5 sm:gap-2 transition-colors duration-fast cursor-pointer shrink-0 whitespace-nowrap disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <motion.span variants={reduceMotion ? undefined : tactileIconVariants}>
             <Check size={14} weight="bold" />
           </motion.span>
-          <span>Mark as done</span>
+          <span className="sm:hidden">Done</span>
+          <span className="hidden sm:inline">Mark as done</span>
         </motion.button>
 
         {hasSubSteps ? (
@@ -177,11 +178,12 @@ function NowCardBody({
             animate="rest"
             whileHover={isShrinking || reduceMotion ? undefined : 'hover'}
             whileTap={isShrinking || reduceMotion ? undefined : 'tap'}
-            className="text-xs font-medium text-text-tertiary hover:text-accent transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="text-xs font-medium text-text-tertiary hover:text-accent transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
+            title="Break this step into smaller micro-steps"
           >
             <motion.span
               variants={reduceMotion ? undefined : tactileIconVariants}
-              className="inline-flex"
+              className="inline-flex shrink-0"
             >
               {isShrinking ? (
                 <SpinnerGap
@@ -194,7 +196,17 @@ function NowCardBody({
               )}
             </motion.span>
             <span aria-live="polite">
-              {isShrinking ? 'Breaking it down…' : 'Still too big? Break it down'}
+              {isShrinking ? (
+                <>
+                  <span className="sm:hidden">Shrinking…</span>
+                  <span className="hidden sm:inline">Breaking it down…</span>
+                </>
+              ) : (
+                <>
+                  <span className="sm:hidden">Shrink</span>
+                  <span className="hidden sm:inline">Still too big? Break it down</span>
+                </>
+              )}
             </span>
           </motion.button>
         ) : null}

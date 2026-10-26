@@ -27,7 +27,7 @@ export function StepVisibilityToggle({
       animate="rest"
       whileHover={reduceMotion ? undefined : 'hover'}
       whileTap={reduceMotion ? undefined : 'tap'}
-      className="group text-xs font-medium text-text-tertiary hover:text-text-primary transition-colors cursor-pointer inline-flex items-center gap-1.5 select-none"
+      className="group text-xs font-medium text-text-tertiary hover:text-text-primary transition-colors cursor-pointer inline-flex items-center gap-1.5 select-none shrink-0"
     >
       <span className="relative inline-grid">
         <motion.span
@@ -54,7 +54,8 @@ export function StepVisibilityToggle({
           transition={{ duration: 0.14, ease: 'easeOut' }}
           className="[grid-area:1/1] whitespace-nowrap"
         >
-          {`Show ${count} smaller steps`}
+          <span className="sm:hidden">{`Show ${count} steps`}</span>
+          <span className="hidden sm:inline">{`Show ${count} smaller steps`}</span>
         </motion.span>
       </span>
       <motion.span
