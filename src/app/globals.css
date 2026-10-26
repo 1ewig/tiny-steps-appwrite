@@ -7,52 +7,52 @@
    ========================================================================== */
 :root {
   /* --- Semantic Colors (Light) --- */
-  --color-canvas: #F4F1EA;
-  /* Rich tactile washi base (darker than pure white for true foreground lift) */
-  --color-canvas-subtle: #EBE5D8;
+  --color-canvas: #F5F2E6;
+  /* Rich tactile warm milk base for true foreground card lift */
+  --color-canvas-subtle: #ECE8DA;
   /* Recessed wells, input tracks, sunken areas */
-  --color-canvas-glow: rgba(255, 255, 255, 0.9);
-  /* Natural zenith ambient highlight */
-  --color-canvas-accent-glow: rgba(37, 70, 104, 0.05);
-  /* Subtle mineral indigo depth glow */
+  --color-canvas-glow: rgba(253, 251, 240, 0.95);
+  /* Natural Milk White (#FDFBF0) ambient highlight */
+  --color-canvas-accent-glow: rgba(70, 89, 64, 0.06);
+  /* Subtle Deep Sage (#465940) depth glow */
 
   --color-surface: #FFFFFF;
   /* Pure porcelain card/container surface */
-  --color-surface-subtle: #ECE6D8;
+  --color-surface-subtle: #EBE6D8;
   /* Secondary chips, pill tags, inactive button surface */
-  --color-surface-hover: #F8F6F0;
-  /* Interactive hover surface */
-  --color-surface-elevated: #FFFFFF;
-  /* High-elevation floating popovers, modals, drawers */
+  --color-surface-hover: #FDFBF0;
+  /* Milk White hover surface */
+  --color-surface-elevated: #FDFBF0;
+  /* Milk White elevated popovers, modals, drawers */
 
   --color-border-subtle: #E2DBD0;
   /* Crisp, physical edge divider */
   --color-border-muted: #D1C8B8;
   /* Secondary borders, inactive states */
-  --color-border-focus: #254668;
-  /* Mineral indigo focus ring */
-  --color-border-accent: #B8D1EC;
-  /* Delicate accent rim */
+  --color-border-focus: #465940;
+  /* Deep Sage (#465940) focus ring */
+  --color-border-accent: #B0C4AB;
+  /* Delicate sage rim */
 
-  --color-text-primary: #141920;
-  /* Sumi ink high-legibility deep charcoal */
-  --color-text-secondary: #4F5864;
+  --color-text-primary: #1C221A;
+  /* Deep forest charcoal */
+  --color-text-secondary: #515B4E;
   /* Muted body copy & descriptions */
-  --color-text-tertiary: #7D8896;
+  --color-text-tertiary: #7D887A;
   /* Captions, subtle hints, placeholders */
-  --color-text-inverse: #FFFFFF;
-  /* White text on accent backgrounds */
+  --color-text-inverse: #FDFBF0;
+  /* Milk White text on accent backgrounds */
 
-  --color-accent-primary: #254668;
-  /* Deep Mineral Indigo with commanding presence */
-  --color-accent-hover: #1C3652;
-  /* Mineral indigo hover state */
-  --color-accent-subtle: #E6EFF8;
-  /* Luminous indigo mist tint for badges & active states */
-  --color-accent-border: #B8D1EC;
-  /* Delicate accent outline */
-  --color-accent-text: #162E48;
-  /* High contrast dark indigo text */
+  --color-accent-primary: #465940;
+  /* Deep Sage (#465940) */
+  --color-accent-hover: #374632;
+  /* Rich deep forest sage hover state */
+  --color-accent-subtle: #E8EFE6;
+  /* Luminous pale sage mist tint for badges & active states */
+  --color-accent-border: #B2C7AD;
+  /* Delicate sage outline */
+  --color-accent-text: #273423;
+  /* High contrast dark forest sage text */
 
   --color-danger-primary: #D34541;
   /* Soft red */
@@ -61,7 +61,7 @@
   --color-danger-text: #9B2C2C;
   /* Red text */
 
-  --color-scrim: rgba(20, 25, 32, 0.45);
+  --color-scrim: rgba(20, 26, 18, 0.45);
   /* Drawer & modal backdrop dim */
 
   /* --- Spacing Scale Tokens --- */
@@ -135,33 +135,33 @@
   /* --- Shadows & Elevations (Light) --- */
   --shadow-subtle:
     0 0 0 1px var(--color-border-subtle),
-    0 1px 2px rgba(20, 25, 32, 0.04),
-    0 2px 6px rgba(20, 25, 32, 0.03),
+    0 1px 2px rgba(28, 34, 26, 0.04),
+    0 2px 6px rgba(28, 34, 26, 0.03),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
 
   --shadow-card:
     0 0 0 1px var(--color-border-subtle),
-    0 1px 3px rgba(20, 25, 32, 0.04),
-    0 8px 20px -2px rgba(37, 70, 104, 0.07),
-    0 20px 40px -4px rgba(20, 25, 32, 0.04),
+    0 1px 3px rgba(28, 34, 26, 0.04),
+    0 8px 20px -2px rgba(70, 89, 64, 0.08),
+    0 20px 40px -4px rgba(28, 34, 26, 0.04),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
 
   --shadow-capsule:
-    0 0 0 1px rgba(37, 70, 104, 0.15),
-    0 4px 12px -2px rgba(37, 70, 104, 0.14),
-    0 16px 36px -6px rgba(37, 70, 104, 0.22),
+    0 0 0 1px rgba(70, 89, 64, 0.16),
+    0 4px 12px -2px rgba(70, 89, 64, 0.14),
+    0 16px 36px -6px rgba(70, 89, 64, 0.22),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
 
   --shadow-modal:
     0 0 0 1px var(--color-border-subtle),
-    0 8px 24px -4px rgba(20, 25, 32, 0.08),
-    0 24px 60px -12px rgba(20, 25, 32, 0.16),
-    0 48px 96px -20px rgba(37, 70, 104, 0.14),
+    0 8px 24px -4px rgba(28, 34, 26, 0.08),
+    0 24px 60px -12px rgba(28, 34, 26, 0.16),
+    0 48px 96px -20px rgba(70, 89, 64, 0.14),
     inset 0 1px 0 0 rgba(255, 255, 255, 1);
 
   --shadow-inset:
-    inset 0 2px 4px rgba(20, 25, 32, 0.05),
-    inset 0 1px 2px rgba(20, 25, 32, 0.03);
+    inset 0 2px 4px rgba(28, 34, 26, 0.05),
+    inset 0 1px 2px rgba(28, 34, 26, 0.03);
 
   /* --- Motion & Transitions --- */
   --ease-calm: cubic-bezier(0.2, 0.9, 0.3, 1);
@@ -188,52 +188,52 @@
    ========================================================================== */
 .dark {
   /* --- Semantic Colors (Dark) --- */
-  --color-canvas: #090D14;
-  /* Deep sensory oceanic midnight */
-  --color-canvas-subtle: #0E1420;
+  --color-canvas: #0D120E;
+  /* Deep sensory forest midnight */
+  --color-canvas-subtle: #121813;
   /* Sunken track, recessed wells */
-  --color-canvas-glow: rgba(30, 48, 72, 0.35);
-  /* Subtle overhead illumination */
-  --color-canvas-accent-glow: rgba(118, 160, 212, 0.07);
-  /* Subtle periwinkle ember */
+  --color-canvas-glow: rgba(45, 62, 47, 0.35);
+  /* Subtle overhead forest illumination */
+  --color-canvas-accent-glow: rgba(118, 169, 125, 0.07);
+  /* Subtle sage ember */
 
-  --color-surface: #131A26;
+  --color-surface: #172019;
   /* Distinct, tactile resting card surface */
-  --color-surface-subtle: #192334;
+  --color-surface-subtle: #1F2B22;
   /* Secondary chips & hover */
-  --color-surface-hover: #1E2B3E;
+  --color-surface-hover: #26352A;
   /* Elevated hover layer */
-  --color-surface-elevated: #223046;
+  --color-surface-elevated: #2B3C30;
   /* Floating popovers, modals, dropdowns */
 
-  --color-border-subtle: #1E293B;
+  --color-border-subtle: #233125;
   /* Visible structural separation */
-  --color-border-muted: #2A3952;
+  --color-border-muted: #304333;
   /* Standard borders */
-  --color-border-focus: #76A0D4;
-  /* Soft cornflower focus */
-  --color-border-accent: #2F4B72;
+  --color-border-focus: #76A97D;
+  /* Luminous sage focus */
+  --color-border-accent: #3A553E;
   /* Accent border tint */
 
-  --color-text-primary: #EEF3F8;
-  /* Luminous moonlight (prevents harsh eye fatigue) */
-  --color-text-secondary: #9DB0C6;
-  /* Clear, readable slate body */
-  --color-text-tertiary: #65778E;
+  --color-text-primary: #F4F7F2;
+  /* Luminous milk-white (prevents harsh eye fatigue) */
+  --color-text-secondary: #A0B2A3;
+  /* Clear, readable sage body */
+  --color-text-tertiary: #677A6A;
   /* Low contrast hints */
-  --color-text-inverse: #090D14;
+  --color-text-inverse: #0D120E;
   /* Inverted dark text */
 
-  --color-accent-primary: #76A0D4;
-  /* Luminous cornflower slate */
-  --color-accent-hover: #8EB4E4;
+  --color-accent-primary: #76A97D;
+  /* Luminous balanced sage */
+  --color-accent-hover: #8EC195;
   /* Lighter hover in dark */
-  --color-accent-subtle: #132236;
-  /* Deep submerged navy glow */
-  --color-accent-border: #2B4568;
+  --color-accent-subtle: #162419;
+  /* Deep submerged forest tint */
+  --color-accent-border: #2D4832;
   /* Luminous accent boundary */
-  --color-accent-text: #CDE1F7;
-  /* Crisp pale cornflower */
+  --color-accent-text: #CEE9D2;
+  /* Crisp pale milk-sage */
 
   --color-danger-primary: #E56E77;
   --color-danger-subtle: #2C181C;
@@ -257,9 +257,10 @@
     inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
 
   --shadow-capsule:
-    0 0 0 1px rgba(118, 160, 212, 0.35), Working 0 6px 20px -2px rgba(0, 0, 0, 0.75),
+    0 0 0 1px rgba(118, 169, 125, 0.35),
+    0 6px 20px -2px rgba(0, 0, 0, 0.75),
     0 20px 48px -8px rgba(0, 0, 0, 0.9),
-    0 0 28px -4px rgba(118, 160, 212, 0.18),
+    0 0 28px -4px rgba(118, 169, 125, 0.18),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
 
   --shadow-modal:
