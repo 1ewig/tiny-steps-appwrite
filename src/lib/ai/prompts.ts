@@ -131,19 +131,33 @@ export function getAssistantInteractionPrompt(
   taskTitle: string,
   activeSteps: PromptStepTreeItem[]
 ): { system: string; prompt: string } {
-  // Format the full hierarchical step and sub-step tree
+  const firstIncompleteIdx = activeSteps.findIndex((s) => !s.completed);
+
+  // Format the full hierarchical step and sub-step tree with precise lifecycle markers
   const formattedTree = activeSteps
     .map((step, idx) => {
       const stepTitle = step.title?.trim() || step.text?.trim() || `Step ${idx + 1}`;
       const instructionText = step.instruction ? ` — ${step.instruction}` : '';
-      const statusTag = step.completed ? '[COMPLETED]' : '[PENDING]';
+      let statusTag = '[UPCOMING]';
+      if (step.completed) {
+        statusTag = '[COMPLETED]';
+      } else if (idx === firstIncompleteIdx) {
+        statusTag = '[CURRENT / ACTIVE]';
+      }
+
       let lines = [`${idx + 1}. ${statusTag} (Step ID: ${step.id}) "${stepTitle}"${instructionText}`];
 
       if (step.subSteps && step.subSteps.length > 0) {
+        const firstIncompleteSubIdx = step.subSteps.findIndex((sub) => !sub.completed);
         step.subSteps.forEach((sub, subIdx) => {
           const subTitle = sub.title?.trim() || sub.text?.trim() || `Micro action ${subIdx + 1}`;
           const subInstruction = sub.instruction ? ` — ${sub.instruction}` : '';
-          const subStatus = sub.completed ? '[COMPLETED]' : '[PENDING]';
+          let subStatus = '[UPCOMING]';
+          if (sub.completed) {
+            subStatus = '[COMPLETED]';
+          } else if (subIdx === firstIncompleteSubIdx && idx === firstIncompleteIdx) {
+            subStatus = '[CURRENT SUB-STEP]';
+          }
           lines.push(`   ├─ ${idx + 1}.${subIdx + 1} ${subStatus} (Sub-Step ID: ${sub.id}) "${subTitle}"${subInstruction}`);
         });
       }
