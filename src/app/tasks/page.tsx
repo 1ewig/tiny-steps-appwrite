@@ -4,8 +4,12 @@ import { StartClient } from '@/components/start/start-client';
 export const instant = false;
 
 export const metadata: Metadata = {
-  title: 'Start a Gentle Task — Tiny Steps',
+  title: 'Start a Gentle Task',
   description: 'Tell me what feels heavy right now. Break down avoidance and burnout into microscopic, zero-guilt steps.',
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function TasksPage() {

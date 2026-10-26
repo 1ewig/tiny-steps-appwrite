@@ -4,8 +4,12 @@ import { TaskBreakdownClient } from '@/components/task-breakdown/task-breakdown-
 export const instant = false;
 
 export const metadata: Metadata = {
-  title: 'Task Breakdown — Tiny Steps',
+  title: 'Task Breakdown',
   description: 'Your gentle, living task checklist.',
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default async function TaskDetailPage({
