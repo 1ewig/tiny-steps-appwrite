@@ -6,6 +6,47 @@ See [docs/architecture.md](docs/architecture.md) for a deeper look at the intern
 
 You can use it as a guest. Tasks stay in your browser, and if you sign in with Google they sync to Appwrite.
 
+## Product Demo
+
+https://github.com/user-attachments/assets/demo (local file: `public/video/tiny-steps-demo.mp4`)
+
+<video src="public/video/tiny-steps-demo.mp4" controls="controls" width="100%"></video>
+
+> This video showcases the user flow of a minimalist productivity and task-management web application designed to help overwhelmed users overcome executive dysfunction by breaking down intimidating tasks into manageable micro-steps.
+
+### Key Events & Flow
+
+- **0:00 – 0:05 | Prompt & Input**:
+  - The user is on the main screen, which asks, *"What feels heavy right now? Brain-dump your thoughts. We'll make it tiny."*
+  - Below the input box, energy-level options are displayed: *A little stuck*, *Overwhelmed*, and *Full paralysis*. The user toggles through them and selects *Full paralysis*, displaying the note: *"Ultra-small initial actions to break inertia with zero pressure."*
+  - The user enters their prompt: *"I've been avoiding 30 unread work emails for three days and now I have an urgent client review tomorrow morning."* and submits.
+
+- **0:06 – 0:17 | Task Generation & Reassurance**:
+  - Clean, calming loading messages appear sequentially: *"Making this smaller..."*, *"Finding your start..."*, and *"Getting things ready..."*
+  - An onboarding prompt appears titled **Address Urgent Work Emails** with the compassionate validation: *"It makes complete sense that this feels heavy. We're only doing the first 60 seconds."* The user clicks **Start step 1**.
+
+- **0:18 – 0:25 | Stepping Through Tasks**:
+  - **Step 1 of 3**: *"Filter for client review emails – Type 'client review' into your email search bar."* The user marks this done.
+  - **Step 2 of 3**: *"Mark one review email as read – Click the 'mark as read' button for this email."*
+
+- **0:26 – 0:46 | Context Adjustment & Customization**:
+  - The user exits the full-screen focus view to the main dashboard.
+  - At the bottom, under *"Need to tweak or vent?"*, the user inputs a constraint: *"I only have my phone right now"*.
+  - The system adapts dynamically, responding: *"I understand. Let's adjust for your phone,"* and revises Step 2 to: *"Swipe email to mark read onscreen."*
+
+- **0:47 – 0:54 | Breaking Down Steps Further & Completion**:
+  - When the user clicks *"Still too big? Break it down,"* the app decomposes the current step into three even smaller micro-steps:
+    1. Locate the email read status symbol
+    2. Position your pointer on the symbol
+    3. Click the icon to mark as read
+  - Checking these off completes the session, presenting a celebratory completion card: *"All steps complete. You turned initial friction into momentum."*
+
+- **0:55 – 1:03 | Task History & Account Management**:
+  - The user returns to the home screen and clicks **History** in the top-right corner to open a sidebar showing completed tasks (*Address Urgent Work Emails* and *Kitchen Help*).
+  - Finally, the user opens their account menu, showing their cloud backup status and sign-out options.
+
+---
+
 ![Tiny Steps — Home](public/screenshots/01-home.webp)
 
 ## The Flow
