@@ -83,7 +83,10 @@ export const AssistantIntentSchema = z.object({
     .string()
     .max(300)
     .describe(
-      'Warm, calm response acknowledging the user (1-2 short sentences max, under 30 words). If self-harm or crisis, offer human care and universal lifeline (https://findahelpline.com). If off_topic, ask one short gentle question to refocus.'
+      'Warm, calm response acknowledging the user (1-2 short sentences max, under 30 words). ' +
+      'If self-harm or crisis, offer human care and universal lifeline (https://findahelpline.com). ' +
+      'If off_topic / fluff / general chatbot query, set a calm 1-sentence boundary: "I can only adjust or reroute steps for this task. Which step feels in the way right now?". ' +
+      'If encouragement (venting exhaustion), provide calm solidarity.'
     ),
   targetStepId: z
     .union([z.number(), z.string().transform((v) => Number(v) || undefined)])
