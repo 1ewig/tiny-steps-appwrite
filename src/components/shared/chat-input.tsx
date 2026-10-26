@@ -7,7 +7,7 @@ import { tactileButtonVariants, tactileIconVariants } from '@/constants/animatio
 
 interface ChatInputProps {
   disabled?: boolean;
-  onSubmit: (text: string) => void;
+  onSubmit: (text: string) => void | Promise<void>;
   isCentered?: boolean;
   collapsible?: boolean;
   initialText?: string;
@@ -49,16 +49,32 @@ export function ChatInput({
     }
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     const trimmed = text.trim();
     if (!trimmed || disabled) return;
-    onSubmit(trimmed);
+    const submittedText = trimmed;
     setText('');
     setIsMultiline(false);
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
+    try {
+      await onSubmit(submittedText);
+    } finally {
+      if (collapsible) {
+        setIsExpanded(false);
+      }
+    }
   };
+
+  // Automatically dismiss collapsible input when assistant response arrives
+  const prevDisabledRef = useRef(disabled);
+  useEffect(() => {
+    if (prevDisabledRef.current && !disabled && collapsible) {
+      setIsExpanded(false);
+    }
+    prevDisabledRef.current = disabled;
+  }, [disabled, collapsible]);
 
   useEffect(() => {
     if (isCentered && !disabled) {
