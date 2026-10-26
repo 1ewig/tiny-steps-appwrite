@@ -34,7 +34,12 @@ export const TaskBreakdownSchema = z.object({
   acknowledgment: z
     .string()
     .max(300)
-    .describe('If accepted: calm assurance under 25 words validating weight with zero cheerleading. If refused: warm, non-judgmental redirection explaining Tiny Steps is for helping you take action on things you want to do.'),
+    .describe(
+      'If accepted: calm, grounded companion reassurance under 25 words validating weight without cheerleading. ' +
+      'Strictly forbidden: robotic clichés ("This is a common challenge", "We will break it down into simple, manageable actions/steps", "Don\'t worry"). ' +
+      'For Level 3 (Full Paralysis), provide radical permission to only do one tiny piece with zero pressure to finish the whole mountain. ' +
+      'If refused: warm, non-judgmental redirection explaining Tiny Steps is for helping you take action on things you want to do.'
+    ),
   steps: z
     .array(TaskStepSchema)
     .describe('Adaptive sequence of 2 to 6 steps if accepted (matching energy level guidelines); empty array [] if refused'),
