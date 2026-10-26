@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     const model = getAIGatewayModel();
     if (!model) {
       return NextResponse.json(
-        { error: 'AI Gateway is not configured', fallback: true },
+        { error: 'AI Gateway is not configured' },
         { status: 503 }
       );
     }
@@ -48,7 +48,6 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         error: error?.message || 'Failed to process assistant intent',
-        fallback: true,
       },
       { status: 500 }
     );

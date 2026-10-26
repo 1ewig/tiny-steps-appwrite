@@ -14,8 +14,6 @@ export interface Step {
   subSteps?: Step[];
 }
 
-export type MicroStep = Step;
-
 export interface Task {
   id: string;
   title: string;
@@ -28,8 +26,106 @@ export interface Task {
   introSeen?: boolean;
 }
 
-// Backward-compatibility aliases during transition
-export type ChatSession = Task;
+export interface BreakdownResult {
+  acknowledgment: string;
+  dialogue?: string;
+  title: string;
+  steps: Step[];
+  isRefused?: boolean;
+  refusalCategory?: string;
+  refusalReason?: string;
+}
+
+export type AssistantIntent =
+  | {
+      type: 'complete_step';
+      targetStepId: number;
+      acknowledgment: string;
+      dialogue?: string;
+    }
+  | {
+      type: 'modify_step';
+      targetStepId: number;
+      targetSubStepId?: number;
+      title: string;
+      instruction?: string;
+      acknowledgment: string;
+      dialogue?: string;
+    }
+  | {
+      type: 'modify_substep';
+      targetStepId: number;
+      targetSubStepId: number;
+      title: string;
+      instruction?: string;
+      acknowledgment: string;
+      dialogue?: string;
+    }
+  | {
+      type: 'reroute_constraint';
+      targetStepId: number;
+      targetSubStepId?: number;
+      title: string;
+      instruction?: string;
+      acknowledgment: string;
+      dialogue?: string;
+    }
+  | {
+      type: 'remove_step';
+      targetStepId: number;
+      targetSubStepId?: number;
+      acknowledgment: string;
+      dialogue?: string;
+    }
+  | {
+      type: 'insert_step';
+      afterStepId?: number;
+      title: string;
+      instruction?: string;
+      acknowledgment: string;
+      dialogue?: string;
+    }
+  | {
+      type: 'shrink_step';
+      targetStepIndex: number;
+      microSteps: Step[];
+      acknowledgment: string;
+      dialogue?: string;
+    }
+  | {
+      type: 'all_complete';
+      acknowledgment: string;
+      dialogue?: string;
+    }
+  | {
+      type: 'new_task';
+      title: string;
+      acknowledgment: string;
+      dialogue?: string;
+      steps: Step[];
+    }
+  | {
+      type: 'tweak_steps';
+      title?: string;
+      acknowledgment: string;
+      dialogue?: string;
+      steps: Step[];
+    }
+  | {
+      type: 'encouragement';
+      acknowledgment: string;
+      dialogue?: string;
+    }
+  | {
+      type: 'off_topic';
+      acknowledgment: string;
+      dialogue?: string;
+    }
+  | {
+      type: 'crisis';
+      acknowledgment: string;
+      dialogue?: string;
+    };
 
 export interface TaskState {
   // State
@@ -75,7 +171,7 @@ export interface TaskState {
     parentStepId: number,
     subStepId: number
   ) => void;
-  shrinkStep: (taskId: string, stepIndex: number, subSteps?: Step[]) => void;
+  shrinkStep: (taskId: string, stepIndex: number, subSteps: Step[]) => void;
   modifyStep: (
     taskId: string,
     stepId: number,
@@ -94,9 +190,4 @@ export interface TaskState {
     afterStepId: number | null,
     step: { title: string; instruction?: string }
   ) => void;
-
-  // Compatibility aliases
-  sessions?: Task[];
-  focusTunnelSessionId?: string | null;
-  deleteSession?: (sessionId: string) => void;
 }

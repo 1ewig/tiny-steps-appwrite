@@ -123,13 +123,17 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     ) {
       const prevStep = steps[activeStepIndex - 1]?.text;
       const nextStep = steps[activeStepIndex + 1]?.text;
-      const { microSteps } = await shrinkStepWithAI(
-        activeStep.text,
-        activeTask.title,
-        prevStep,
-        nextStep
-      );
-      shrinkStep(activeTask.id, activeStepIndex, microSteps);
+      try {
+        const { microSteps } = await shrinkStepWithAI(
+          activeStep.text,
+          activeTask.title,
+          prevStep,
+          nextStep
+        );
+        shrinkStep(activeTask.id, activeStepIndex, microSteps);
+      } catch (err) {
+        console.error('Failed to shrink step in Focus Tunnel:', err);
+      }
     }
   };
 

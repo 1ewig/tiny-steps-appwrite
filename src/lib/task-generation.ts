@@ -1,22 +1,14 @@
-import type { Step, GranularityLevel } from '@/types/task';
-import {
-  decomposeTask,
-  generateMicroSteps,
-  interpretUserIntent,
-  type BreakdownResult,
-  type AssistantIntent,
-} from '@/lib/assistant-engine';
+import type { Step, GranularityLevel, BreakdownResult, AssistantIntent } from '@/types/task';
 
 // Brief minimum duration (600ms) prevents UI flash and ensures smooth motion.
 export const MIN_BREAKDOWN_LOADER_MS = 600;
-// Maximum wait time before automatically falling back to offline templates.
+// Maximum wait time before timing out request.
 export const MAX_BREAKDOWN_WAIT_MS = 15000;
 // Minimum loader duration for step shrinking to keep tactile smoothness.
 export const SHRINK_STEP_LOADER_MS = 400;
 
 /**
- * Decomposes a task using the LLM API via Vercel AI Gateway,
- * with automatic fallback to the offline template engine.
+ * Decomposes a task using the LLM API via Vercel AI Gateway.
  */
 export async function generateTaskBreakdown(
   text: string,
@@ -95,8 +87,8 @@ export async function generateTaskBreakdown(
     if (signal?.aborted) {
       throw error;
     }
-    console.warn(`[Breakdown] Offline Fallback (${Date.now() - startTime}ms):`, error);
-    return decomposeTask(text, granularity);
+    console.error(`[Breakdown] Failed (${Date.now() - startTime}ms):`, error);
+    throw error;
   }
 }
 
@@ -170,14 +162,8 @@ export async function shrinkStepWithAI(
     if (signal?.aborted) {
       throw error;
     }
-    console.warn(`[Shrink] Offline Fallback (${Date.now() - startTime}ms):`, error);
-    const fallbackAck =
-      'No problem at all! If a step makes you hesitate, that is just your brain saying it is still too large. I shrank it into tiny bite-sized pieces for you:';
-    return {
-      acknowledgment: fallbackAck,
-      dialogue: fallbackAck,
-      microSteps: generateMicroSteps(stepText),
-    };
+    console.error(`[Shrink] Failed (${Date.now() - startTime}ms):`, error);
+    throw error;
   }
 }
 
@@ -357,21 +343,23 @@ export async function interpretUserIntentWithAI(
       const nextIncompleteIdx = activeSteps.findIndex((s) => !s.completed);
       const targetStepIndex = typeof data.targetStepIndex === 'number' ? data.targetStepIndex : nextIncompleteIdx;
       if (targetStepIndex !== -1) {
-        const microSteps: Step[] = Array.isArray(data.microSteps) && data.microSteps.length > 0
-          ? data.microSteps.map(
-              (s: { title?: string; text?: string; instruction?: string }, i: number) => {
-                const title = s.title?.trim() || s.text?.trim() || 'Micro action';
-                return {
-                  id: baseTime + i + 1,
-                  title,
-                  instruction: s.instruction?.trim(),
-                  text: title,
-                  completed: false,
-                  canSplit: false,
-                };
-              }
-            )
-          : generateMicroSteps(activeSteps[targetStepIndex]?.text || 'this step');
+        if (!Array.isArray(data.microSteps) || data.microSteps.length === 0) {
+          throw new Error('Invalid shrink_step microSteps received from assistant');
+        }
+
+        const microSteps: Step[] = data.microSteps.map(
+          (s: { title?: string; text?: string; instruction?: string }, i: number) => {
+            const title = s.title?.trim() || s.text?.trim() || 'Micro action';
+            return {
+              id: baseTime + i + 1,
+              title,
+              instruction: s.instruction?.trim(),
+              text: title,
+              completed: false,
+              canSplit: false,
+            };
+          }
+        );
 
         console.log(
           `[Tweak] END (${Date.now() - startTime}ms) - Intent: shrink_step (Micro-steps: ${microSteps.length})`
@@ -453,7 +441,7 @@ export async function interpretUserIntentWithAI(
     if (signal?.aborted) {
       throw error;
     }
-    console.warn(`[Tweak] Offline Fallback (${Date.now() - startTime}ms):`, error);
-    return interpretUserIntent(input, activeSteps, level);
+    console.error(`[Tweak] Failed (${Date.now() - startTime}ms):`, error);
+    throw error;
   }
 }

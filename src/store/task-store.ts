@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { TaskState, Task, EnergyLevel, Step } from '@/types/task';
-import { generateMicroSteps } from '@/lib/assistant-engine';
 
 export const useTaskStore = create<TaskState>()(
   persist(
@@ -172,17 +171,16 @@ export const useTaskStore = create<TaskState>()(
         }));
       },
 
-      shrinkStep: (taskId: string, stepIndex: number, subSteps?: Step[]) => {
+      shrinkStep: (taskId: string, stepIndex: number, subSteps: Step[]) => {
         set((state) => ({
           tasks: state.tasks.map((task) => {
             if (task.id !== taskId || !task.steps[stepIndex]) return task;
             const original = task.steps[stepIndex];
-            const microSteps = subSteps ?? generateMicroSteps(original.text);
 
             const updatedSteps = [...task.steps];
             updatedSteps[stepIndex] = {
               ...original,
-              subSteps: microSteps,
+              subSteps,
               canSplit: false,
             };
             return { ...task, steps: updatedSteps, updatedAt: Date.now() };

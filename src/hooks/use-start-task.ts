@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
-import { decomposeTask, type BreakdownResult } from '@/lib/assistant-engine';
+import type { BreakdownResult } from '@/types/task';
 import {
   generateTaskBreakdown,
   MAX_BREAKDOWN_WAIT_MS,
@@ -61,8 +61,6 @@ export function useStartTask() {
           generateTaskBreakdown(trimmed, granularity, controller.signal),
           timeoutPromise,
         ]);
-      } catch {
-        breakdown = decomposeTask(trimmed, granularity);
       } finally {
         clearTimeout(timeoutId!);
       }

@@ -142,6 +142,7 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
       }
     } catch (err) {
       console.error('Failed to interpret intent:', err);
+      showFeedback('The assistant needs a moment. Please try again.');
     } finally {
       setIsTyping(false);
     }
@@ -196,13 +197,18 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
               if (!targetStep) return;
               const prevStep = steps[stepIdx - 1]?.text;
               const nextStep = steps[stepIdx + 1]?.text;
-              const { microSteps } = await shrinkStepWithAI(
-                targetStep.text,
-                currentTask.title,
-                prevStep,
-                nextStep
-              );
-              shrinkStep(currentTask.id, stepIdx, microSteps);
+              try {
+                const { microSteps } = await shrinkStepWithAI(
+                  targetStep.text,
+                  currentTask.title,
+                  prevStep,
+                  nextStep
+                );
+                shrinkStep(currentTask.id, stepIdx, microSteps);
+              } catch (err) {
+                console.error('Failed to shrink step:', err);
+                showFeedback('Could not break down this step right now. Please try again.');
+              }
             }}
             onToggleSubStep={(parentStepId, subStepId) => {
               toggleSubStepCompletion(
