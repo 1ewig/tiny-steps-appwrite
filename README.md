@@ -27,6 +27,14 @@ You can use it as a guest. Tasks stay in your browser, and if you sign in with G
 - Vercel AI SDK and AI Gateway, default model `google/gemini-2.5-flash-lite`
 - Appwrite TablesDB for optional cloud sync
 
+## Database & Sync Architecture
+
+Tiny Steps uses **Appwrite TablesDB** for relational, multi-device cloud synchronization:
+
+- **Relational Tables**: Normalized into `tasks` and linked `steps` with explicit order indexing.
+- **Row-Level Security (RLS)**: Enforces `Permission.read/update/delete(Role.user(userId))` per row on all cloud operations.
+- **Local-First & Auto-Migration**: Operates 100% offline via `localStorage`. Signing in with Google OAuth reconciles timestamps and migrates local guest tasks into TablesDB without data loss.
+
 ## Getting started
 
 You need [Bun](https://bun.sh/) installed.
@@ -56,9 +64,9 @@ Open http://localhost:3000.
 | `AI_GATEWAY_API_KEY` | Yes, for AI features | Without it, breakdown, shrink, and assistant calls return an error. Saved tasks still open. |
 | `AI_MODEL` | No | Defaults to `google/gemini-2.5-flash-lite`. |
 | `AI_REASONING_EFFORT` | No | `low` or `high`; defaults to `low`. |
-| Appwrite variables | No | See `.env.example`; needed for cloud sync. |
-
-Cloud sync uses Appwrite TablesDB with `tasks` and `steps` tables. Sign-in is optional; guest tasks stay in `localStorage`.
+| `NEXT_PUBLIC_APPWRITE_ENDPOINT` | No | Appwrite Cloud endpoint (defaults to `https://sfo.cloud.appwrite.io/v1`). |
+| `NEXT_PUBLIC_APPWRITE_PROJECT_ID` | No | Appwrite project ID for TablesDB and Auth. |
+| `NEXT_PUBLIC_APPWRITE_DATABASE_ID` | No | Database ID containing the `tasks` and `steps` tables. |
 
 ## Scripts
 
