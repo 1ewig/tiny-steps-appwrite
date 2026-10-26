@@ -1,4 +1,4 @@
-import { Query, ID } from 'appwrite';
+import { Query, ID, Permission, Role } from 'appwrite';
 import { getBrowserTablesDB } from './client';
 import { APPWRITE_CONFIG } from './config';
 import type { Task, Step, EnergyLevel } from '@/types/task';
@@ -13,7 +13,14 @@ const STEPS_TABLE = APPWRITE_CONFIG.tables.steps;
 export async function saveTaskToDb(task: Task, userId: string): Promise<void> {
   const tablesDB = getBrowserTablesDB();
 
-  // 1. Upsert the task row
+  // Explicit Row-Level Security (RLS): Only this authenticated user can read, update, or delete
+  const rowPermissions = [
+    Permission.read(Role.user(userId)),
+    Permission.update(Role.user(userId)),
+    Permission.delete(Role.user(userId)),
+  ];
+
+  // 1. Upsert the task row with strict RLS permissions
   await tablesDB.upsertRow({
     databaseId: DB_ID,
     tableId: TASKS_TABLE,
@@ -26,6 +33,7 @@ export async function saveTaskToDb(task: Task, userId: string): Promise<void> {
       introSeen: Boolean(task.introSeen),
       userId: userId.slice(0, 36),
     },
+    permissions: rowPermissions,
   });
 
   // 2. Fetch existing step rows for this task
@@ -66,6 +74,7 @@ export async function saveTaskToDb(task: Task, userId: string): Promise<void> {
             canSplit: st.canSplit ?? true,
             subSteps: subStepsStr.slice(0, 5000),
           },
+          permissions: rowPermissions,
         });
       })
     );

@@ -5,7 +5,15 @@ import { useTaskStore } from '@/store/task-store';
 import { getCurrentUser, loginWithGoogle, logoutUser } from '@/lib/appwrite/auth';
 
 export function useAuth() {
-  const { user, setUser, isAuthLoading, setAuthLoading } = useTaskStore();
+  const {
+    user,
+    setUser,
+    isAuthLoading,
+    setAuthLoading,
+    setTasks,
+    setLastSyncedAt,
+    closeFocusTunnel,
+  } = useTaskStore();
   const [error, setError] = useState<string | null>(null);
 
   const checkSession = useCallback(async () => {
@@ -40,6 +48,9 @@ export function useAuth() {
     try {
       await logoutUser();
       setUser(null);
+      setTasks([]);
+      setLastSyncedAt(null);
+      closeFocusTunnel();
     } catch (err: any) {
       console.error('[Auth] Logout error:', err);
     } finally {
