@@ -1,18 +1,54 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Query, Permission, Role } from 'node-appwrite';
+import { Client as ServerClient, Account as ServerAccount, Query, Permission, Role } from 'node-appwrite';
 import { getServerTablesDB } from '@/lib/appwrite/server';
 import { APPWRITE_CONFIG } from '@/lib/appwrite/config';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { fromUserId, toUserId } = body || {};
+    const { fromUserId } = body || {};
 
-    if (!fromUserId || !toUserId || typeof fromUserId !== 'string' || typeof toUserId !== 'string') {
+    if (!fromUserId || typeof fromUserId !== 'string') {
       return NextResponse.json(
-        { error: 'Missing or invalid fromUserId or toUserId' },
+        { error: 'Missing or invalid fromUserId' },
         { status: 400 }
       );
+    }
+
+    // 1. Authenticate caller session - derive toUserId directly from authenticated session
+    const sessionCookie =
+      req.cookies.get(`a_session_${APPWRITE_CONFIG.projectId}`)?.value ||
+      req.cookies.get(`a_session_${APPWRITE_CONFIG.projectId}_legacy`)?.value ||
+      req.headers.get('x-appwrite-session') ||
+      req.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+
+    if (!sessionCookie) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Session missing' },
+        { status: 401 }
+      );
+    }
+
+    const sessionClient = new ServerClient()
+      .setEndpoint(APPWRITE_CONFIG.endpoint)
+      .setProject(APPWRITE_CONFIG.projectId)
+      .setSession(sessionCookie);
+
+    const sessionAccount = new ServerAccount(sessionClient);
+    let authenticatedUser;
+    try {
+      authenticatedUser = await sessionAccount.get();
+    } catch {
+      return NextResponse.json(
+        { error: 'Unauthorized: Invalid session' },
+        { status: 401 }
+      );
+    }
+
+    const toUserId = authenticatedUser.$id;
+
+    if (fromUserId === toUserId) {
+      return NextResponse.json({ ok: true, migratedCount: 0 });
     }
 
     if (!process.env.APPWRITE_API_KEY) {
@@ -28,7 +64,7 @@ export async function POST(req: NextRequest) {
     const TASKS_TABLE = APPWRITE_CONFIG.tables.tasks;
     const STEPS_TABLE = APPWRITE_CONFIG.tables.steps;
 
-    // 1. Fetch all tasks belonging to fromUserId
+    // 2. Fetch all tasks belonging to fromUserId
     const tasksRes = await serverTablesDB.listRows({
       databaseId: DB_ID,
       tableId: TASKS_TABLE,
@@ -45,7 +81,7 @@ export async function POST(req: NextRequest) {
       Permission.delete(Role.user(toUserId)),
     ];
 
-    // 2. Reassign each task and its steps with the new owner's RLS permissions
+    // 3. Reassign each task and its steps with the new owner's RLS permissions
     for (const taskRow of tasksRes.rows) {
       await serverTablesDB.updateRow({
         databaseId: DB_ID,

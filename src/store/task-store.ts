@@ -32,7 +32,18 @@ export const useTaskStore = create<TaskState>()(
         user: state.user,
         hasSeenOnboarding: state.hasSeenOnboarding,
       }),
-      onRehydrateStorage: () => (state) => {
+      onRehydrateStorage: () => (state, error) => {
+        if (error) {
+          console.warn('[TaskStore] Rehydration failed, clearing storage:', error);
+          try {
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('tinysteps_zustand_store');
+            }
+          } catch {
+            // Storage access error
+          }
+          return;
+        }
         if (typeof document !== 'undefined' && state?.theme === 'dark') {
           document.documentElement.classList.add('dark');
         }

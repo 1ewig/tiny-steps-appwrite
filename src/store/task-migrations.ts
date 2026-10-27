@@ -36,7 +36,7 @@ export function mergePersistedTaskState(
       .filter(Boolean) as Task[];
   }
 
-  const validTasks = tasks.filter((t) => t.steps && t.steps.length > 0);
+  const validTasks = tasks.filter((t) => t && typeof t === 'object' && t.id);
 
   return {
     ...currentState,

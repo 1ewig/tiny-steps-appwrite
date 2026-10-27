@@ -9,6 +9,8 @@ import {
 } from '@/lib/appwrite/tasks';
 import type { Task } from '@/types/task';
 
+let reconcileGeneration = 0;
+
 /**
  * Reconciles local and cloud tasks:
  * 1. Migrates unassigned local tasks to the authenticated user's TablesDB.
@@ -16,6 +18,7 @@ import type { Task } from '@/types/task';
  * 3. Merges local and remote tasks cleanly by timestamp.
  */
 async function performReconcile(userId: string) {
+  const currentGen = ++reconcileGeneration;
   const { tasks: currentLocal, setTasks, setIsSyncing, setLastSyncedAt } = useTaskStore.getState();
   setIsSyncing(true);
 
@@ -30,8 +33,18 @@ async function performReconcile(userId: string) {
       );
     }
 
+    // Abort if another reconcile started or user logged out/switched while saving
+    if (currentGen !== reconcileGeneration || useTaskStore.getState().user?.id !== userId) {
+      return null;
+    }
+
     // 2. Fetch all cloud tasks from TablesDB
     const cloudTasks = await fetchUserTasksFromDb(userId);
+
+    // Abort if another reconcile started or user logged out/switched while fetching
+    if (currentGen !== reconcileGeneration || useTaskStore.getState().user?.id !== userId) {
+      return null;
+    }
 
     // 3. Merge local + cloud tasks
     const cloudMap = new Map<string, Task>();
@@ -41,6 +54,10 @@ async function performReconcile(userId: string) {
 
     // Process local tasks
     currentLocal.forEach((lt) => {
+      // NEVER claim tasks belonging to another account
+      if (lt.userId && lt.userId !== userId) {
+        return;
+      }
       const cloudVersion = cloudMap.get(lt.id);
       if (cloudVersion) {
         // Keep the more recently updated version
@@ -64,6 +81,11 @@ async function performReconcile(userId: string) {
       (a, b) => (b.createdAt || 0) - (a.createdAt || 0)
     );
 
+    // Final guard before updating store
+    if (currentGen !== reconcileGeneration || useTaskStore.getState().user?.id !== userId) {
+      return null;
+    }
+
     setTasks(mergedList);
     setLastSyncedAt(Date.now());
     return mergedList;
@@ -71,7 +93,9 @@ async function performReconcile(userId: string) {
     console.warn('[Sync] Reconcile error:', err);
     return null;
   } finally {
-    setIsSyncing(false);
+    if (currentGen === reconcileGeneration) {
+      setIsSyncing(false);
+    }
   }
 }
 
@@ -168,9 +192,28 @@ export function useTaskSyncSubscription() {
         const { setIsSyncing, setLastSyncedAt } = useTaskStore.getState();
         setIsSyncing(true);
         try {
-          await Promise.allSettled(
+          const results = await Promise.allSettled(
             tasksToSave.map((ct) => saveTaskToDb(ct, user.id))
           );
+
+          // Check if any fresh ID was returned due to permission conflict
+          const idRemaps = new Map<string, string>();
+          results.forEach((res, idx) => {
+            if (res.status === 'fulfilled' && res.value !== tasksToSave[idx].id) {
+              idRemaps.set(tasksToSave[idx].id, res.value);
+            }
+          });
+
+          if (idRemaps.size > 0) {
+            const currentTasks = useTaskStore.getState().tasks;
+            useTaskStore.getState().setTasks(
+              currentTasks.map((t) => {
+                const remappedId = idRemaps.get(t.id);
+                return remappedId ? { ...t, id: remappedId } : t;
+              })
+            );
+          }
+
           setLastSyncedAt(Date.now());
         } catch (err) {
           console.warn('[Sync] Background sync failed:', err);

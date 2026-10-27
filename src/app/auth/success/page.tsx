@@ -47,7 +47,7 @@ function OAuthSuccessContent() {
           try {
             const anonId = sessionStorage.getItem('tinysteps_anon_migration_id');
             if (anonId && anonId !== user.$id) {
-              await reassignGuestTasksInDb(anonId, user.$id);
+              await reassignGuestTasksInDb(anonId, user.$id, secret);
               sessionStorage.removeItem('tinysteps_anon_migration_id');
             }
           } catch (migErr) {
@@ -74,7 +74,7 @@ function OAuthSuccessContent() {
               try {
                 const anonId = sessionStorage.getItem('tinysteps_anon_migration_id');
                 if (anonId && anonId !== user.$id) {
-                  await reassignGuestTasksInDb(anonId, user.$id);
+                  await reassignGuestTasksInDb(anonId, user.$id, secret || undefined);
                   sessionStorage.removeItem('tinysteps_anon_migration_id');
                 }
               } catch (migErr) {

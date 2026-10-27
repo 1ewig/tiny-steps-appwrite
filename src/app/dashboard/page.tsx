@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useReducedMotion } from 'framer-motion';
 import { getAccount } from '@/lib/appwrite/client';
 import { useTaskStore } from '@/store/task-store';
+import { useAuth } from '@/hooks/use-auth';
 import { AppIcon } from '@/components/shared/app-icon';
 import { CloudCheck, SignOut, ArrowRight, SpinnerGap } from '@phosphor-icons/react';
 
@@ -19,6 +20,7 @@ export default function DashboardPage() {
   const reduceMotion = useReducedMotion();
   const setUser = useTaskStore((s) => s.setUser);
   const tasks = useTaskStore((s) => s.tasks);
+  const { logout } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [signingOut, setSigningOut] = useState(false);
@@ -49,14 +51,13 @@ export default function DashboardPage() {
   const handleSignOut = async () => {
     setSigningOut(true);
     try {
-      const account = getAccount();
-      await account.deleteSession({ sessionId: 'current' });
-      setUser(null);
+      await logout();
       router.replace('/auth');
     } catch (err) {
       console.error('[Dashboard] Error during sign out:', err);
-      setUser(null);
       router.replace('/auth');
+    } finally {
+      setSigningOut(false);
     }
   };
 

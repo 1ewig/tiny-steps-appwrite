@@ -115,7 +115,9 @@ export const createTaskSlice: StateCreator<TaskState, [], [], TaskSlice> = (set,
   markIntroSeen: (taskId: string) => {
     set((state) => ({
       tasks: state.tasks.map((t) =>
-        t.id === taskId && t.introSeen !== true ? { ...t, introSeen: true } : t
+        t.id === taskId && t.introSeen !== true
+          ? { ...t, introSeen: true, updatedAt: Date.now() }
+          : t
       ),
     }));
   },
