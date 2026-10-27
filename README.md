@@ -1,12 +1,11 @@
 # Tiny Steps
 
-> 🌐 **Live Demo:** [tiny-steps-gules.vercel.app](https://tiny-steps-gules.vercel.app)
+> 🏆 **Appwrite Databases Hackathon (October 2026)**  
+> 🌐 **Live Demo:** [tiny-steps-gules.vercel.app](https://tiny-steps-gules.vercel.app) · 📖 **Technical Architecture:** [docs/architecture.md](docs/architecture.md)
 
-Tiny Steps turns a vague or overwhelming task into a few concrete steps you can start right away. It is built for low-energy days: one task at a time, no streaks, no guilt, and no pressure to plan everything upfront.
+Tiny Steps turns vague or overwhelming tasks into a few concrete micro-actions you can start right away. It is built for low-energy days: one task at a time, no streaks, no guilt, and no pressure to plan everything upfront.
 
-See [docs/architecture.md](docs/architecture.md) for a deeper look at the internals.
-
-You can use it as a guest. Tasks stay in your browser, and if you sign in with Google they sync to Appwrite.
+It is local-first: you can use it immediately as a guest with tasks stored in your browser. When you sign in with Google, your tasks seamlessly sync to **Appwrite TablesDB**.
 
 ## Product Demo
 
@@ -68,24 +67,33 @@ Tiny Steps breaks down execution for humans—it refuses to do academic ghostwri
 - **Non-Destructive Assistant**: Surgical step surgery (modify, add, remove, reroute) preserving task immutability.
 - **Clear Execution Boundaries**: Calm refusal notices that prevent machine labor substitution while safeguarding crisis inputs.
 - **Sensory-Friendly Design**: Warm oatmeal canvas, calming sage accents, dim mode toggle, and reduced-motion support.
-- **Guest-First & Cloud-Synced**: Full offline capability via `localStorage`, with optional Appwrite TablesDB sync.
+- **Guest-First Cloud Storage**: Direct Appwrite TablesDB storage for guests via Anonymous Sessions, syncing to Google OAuth upon sign-in.
+
+---
+
+## Architecture & Appwrite TablesDB
+
+Tiny Steps combines instant client-side interaction with a relational Appwrite cloud backbone:
+
+- **Direct TablesDB Writes for Guests**: Every visitor immediately gets an Appwrite Anonymous Session, saving guest tasks directly to TablesDB with native Row-Level Security (`Role.user(anonUserId)`).
+- **Relational Schema**: Data is modeled as normalized `tasks` and linked `steps` with explicit order indexing on `taskId`.
+- **Seamless Account Migration**: Signing in with Google OAuth reassigns existing guest tasks in TablesDB to the permanent account and cleanly merges prior cloud tasks by `updatedAt`.
+- **Optimistic Zustand Core**: Mutations update the UI instantly (0ms latency) while syncing debounced changes to TablesDB in the background.
+- **AI Safety & Eval Suite**: A 29-scenario automated test suite ([`scripts/eval-suite.ts`](scripts/eval-suite.ts)) benchmarks task breakdowns, crisis safeguards, and refusal boundaries against the AI Gateway.
+
+*For complete system diagrams, data schemas, and internal mechanisms, see [docs/architecture.md](docs/architecture.md).*
 
 ---
 
 ## Stack
 
-- Next.js 16 (App Router), React 19, TypeScript
-- Tailwind CSS v4, Zustand, Framer Motion, Phosphor Icons
-- Vercel AI SDK and AI Gateway, default model `google/gemini-2.5-flash-lite`
-- Appwrite TablesDB for optional cloud sync
+- **Framework**: Next.js 16 (App Router), React 19, TypeScript
+- **Styling & Motion**: Tailwind CSS v4, Framer Motion, Phosphor Icons
+- **State**: Zustand (with persistent localStorage middleware)
+- **Database & Auth**: Appwrite TablesDB (relational with RLS) & Appwrite Google OAuth
+- **AI Engine**: Vercel AI SDK and AI Gateway (`google/gemini-2.5-flash-lite`)
 
-## Database & Sync Architecture
-
-Tiny Steps uses **Appwrite TablesDB** for relational, multi-device cloud synchronization:
-
-- **Relational Tables**: Normalized into `tasks` and linked `steps` with explicit order indexing.
-- **Row-Level Security (RLS)**: Enforces `Permission.read/update/delete(Role.user(userId))` per row on all cloud operations.
-- **Local-first storage**: Tasks persist in `localStorage`. Signing in with Google OAuth migrates guest tasks into TablesDB and merges changes by `updatedAt`.
+---
 
 ## Getting started
 
@@ -107,12 +115,14 @@ Then start the app:
 bun run dev
 ```
 
-Open http://localhost:3000.
+Open [http://localhost:3000](http://localhost:3000).
+
+---
 
 ## Environment
 
 | Variable | Required | Notes |
-| --- | --- | --- |
+| :--- | :---: | :--- |
 | `AI_GATEWAY_API_KEY` | Yes, for AI features | Without it, breakdown, shrink, and assistant calls return an error. Saved tasks still open. |
 | `AI_MODEL` | No | Defaults to `google/gemini-2.5-flash-lite`. |
 | `AI_REASONING_EFFORT` | No | `low` or `high`; defaults to `low`. |
@@ -122,10 +132,12 @@ Open http://localhost:3000.
 | `APPWRITE_API_KEY` | No | Server-side admin key for backend operations (never exposed to browser). |
 | `NEXT_PUBLIC_APP_URL` | No | Public deployment URL for metadataBase and OpenGraph SEO. |
 
+---
+
 ## Scripts
 
 | Command | What it does |
-| --- | --- |
+| :--- | :--- |
 | `bun run dev` | Start the development server. |
 | `bun run build` | Create a production build. |
 | `bun run start` | Run the production build. |
@@ -134,6 +146,8 @@ Open http://localhost:3000.
 | `bun run scripts/eval-suite.ts` | Run the 29-scenario AI eval suite. |
 | `bun run scripts/eval-suite.ts --relevant` | Run the real-world task scenarios only. |
 | `bun run scripts/eval-suite.ts --stress` | Run the adversarial stress scenarios only. |
+
+---
 
 ## Project layout
 
@@ -146,6 +160,8 @@ src/
 ├── lib/          AI, Appwrite, and utilities
 └── types/        shared data models
 ```
+
+---
 
 ## License
 

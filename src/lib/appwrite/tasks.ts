@@ -21,20 +21,45 @@ export async function saveTaskToDb(task: Task, userId: string): Promise<void> {
   ];
 
   // 1. Upsert the task row with strict RLS permissions
-  await tablesDB.upsertRow({
-    databaseId: DB_ID,
-    tableId: TASKS_TABLE,
-    rowId: task.id,
-    data: {
-      title: (task.title || 'Untitled task').slice(0, 255),
-      prompt: (task.prompt || '').slice(0, 2000),
-      guidance: (task.guidance || '').slice(0, 1500),
-      energyLevel: task.energyLevel || 2,
-      introSeen: Boolean(task.introSeen),
-      userId: userId.slice(0, 36),
-    },
-    permissions: rowPermissions,
-  });
+  try {
+    await tablesDB.upsertRow({
+      databaseId: DB_ID,
+      tableId: TASKS_TABLE,
+      rowId: task.id,
+      data: {
+        title: (task.title || 'Untitled task').slice(0, 255),
+        prompt: (task.prompt || '').slice(0, 2000),
+        guidance: (task.guidance || '').slice(0, 1500),
+        energyLevel: task.energyLevel || 2,
+        introSeen: Boolean(task.introSeen),
+        userId: userId.slice(0, 36),
+      },
+      permissions: rowPermissions,
+    });
+  } catch (upsertErr: any) {
+    // If permissions denied or ID conflict from an earlier anonymous session,
+    // generate a fresh ID and create row for the authenticated user
+    if (upsertErr?.code === 401 || upsertErr?.code === 403) {
+      const freshId = 'task_' + Date.now();
+      task.id = freshId;
+      await tablesDB.createRow({
+        databaseId: DB_ID,
+        tableId: TASKS_TABLE,
+        rowId: freshId,
+        data: {
+          title: (task.title || 'Untitled task').slice(0, 255),
+          prompt: (task.prompt || '').slice(0, 2000),
+          guidance: (task.guidance || '').slice(0, 1500),
+          energyLevel: task.energyLevel || 2,
+          introSeen: Boolean(task.introSeen),
+          userId: userId.slice(0, 36),
+        },
+        permissions: rowPermissions,
+      });
+    } else {
+      throw upsertErr;
+    }
+  }
 
   // 2. Fetch existing step rows for this task
   const existingSteps = await tablesDB.listRows({
@@ -119,6 +144,28 @@ export async function deleteTaskFromDb(taskId: string): Promise<void> {
     });
   } catch (err) {
     console.warn(`[TablesDB] Could not delete task row ${taskId}:`, err);
+  }
+}
+
+/**
+ * Reassigns tasks and steps in Appwrite TablesDB from an anonymous user ID to a permanent user ID.
+ * Calls the server migration API endpoint (which has admin privileges) or falls back gracefully.
+ */
+export async function reassignGuestTasksInDb(fromUserId: string, toUserId: string): Promise<void> {
+  if (!fromUserId || !toUserId || fromUserId === toUserId) return;
+
+  try {
+    const res = await fetch('/api/auth/reassign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fromUserId, toUserId }),
+    });
+
+    if (!res.ok) {
+      console.warn('[Sync] Server reassign returned status:', res.status);
+    }
+  } catch (err) {
+    console.warn('[Sync] Failed to reassign tasks via server route:', err);
   }
 }
 

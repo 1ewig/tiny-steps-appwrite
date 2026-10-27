@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getAccount } from '@/lib/appwrite/client';
+import { reassignGuestTasksInDb } from '@/lib/appwrite/tasks';
 import { useTaskStore } from '@/store/task-store';
 import { AppIcon } from '@/components/shared/app-icon';
 
@@ -38,7 +39,21 @@ function OAuthSuccessContent() {
           id: user.$id,
           email: user.email,
           name: user.name || user.email.split('@')[0],
+          isAnonymous: false,
         });
+
+        // Reassign any guest tasks created during the pre-OAuth anonymous session
+        if (typeof window !== 'undefined') {
+          try {
+            const anonId = sessionStorage.getItem('tinysteps_anon_migration_id');
+            if (anonId && anonId !== user.$id) {
+              await reassignGuestTasksInDb(anonId, user.$id);
+              sessionStorage.removeItem('tinysteps_anon_migration_id');
+            }
+          } catch (migErr) {
+            console.warn('[OAuth Success] Guest task reassignment error:', migErr);
+          }
+        }
 
         // Always await account calls before navigating
         router.replace('/tasks');
@@ -52,7 +67,21 @@ function OAuthSuccessContent() {
               id: user.$id,
               email: user.email,
               name: user.name || user.email.split('@')[0],
+              isAnonymous: false,
             });
+
+            if (typeof window !== 'undefined') {
+              try {
+                const anonId = sessionStorage.getItem('tinysteps_anon_migration_id');
+                if (anonId && anonId !== user.$id) {
+                  await reassignGuestTasksInDb(anonId, user.$id);
+                  sessionStorage.removeItem('tinysteps_anon_migration_id');
+                }
+              } catch (migErr) {
+                console.warn('[OAuth Success] Guest task reassignment error:', migErr);
+              }
+            }
+
             router.replace('/tasks');
             return;
           }

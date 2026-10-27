@@ -20,8 +20,8 @@ async function performReconcile(userId: string) {
   setIsSyncing(true);
 
   try {
-    // 1. Identify local tasks that need cloud migration (unassigned or belonging to this user)
-    const unassignedLocal = currentLocal.filter((t) => !t.userId);
+    // 1. Identify local tasks that need cloud migration (unassigned or transitioning from anonymous session)
+    const unassignedLocal = currentLocal.filter((t) => !t.userId || t.userId !== userId);
     if (unassignedLocal.length > 0) {
       await Promise.allSettled(
         unassignedLocal.map((task) =>
@@ -94,12 +94,15 @@ export function useTaskSyncSubscription() {
     if (isInitialSyncRef.current) return;
     isInitialSyncRef.current = true;
 
-    performReconcile(user.id).then((merged) => {
-      if (merged) {
-        prevTasksRef.current = merged;
-      }
-      isInitialSyncRef.current = false;
-    });
+    performReconcile(user.id)
+      .then((merged) => {
+        if (merged) {
+          prevTasksRef.current = merged;
+        }
+      })
+      .finally(() => {
+        isInitialSyncRef.current = false;
+      });
   }, [user?.id]);
 
   // Subscribe to subsequent task changes and sync to TablesDB in background
