@@ -10,6 +10,7 @@ import { TaskCard } from '@/components/task-breakdown/task-card';
 import { PeekToggle } from '@/components/task-breakdown/peek-toggle';
 import { ChatInput } from '@/components/shared/chat-input';
 import { AppIcon } from '@/components/shared/app-icon';
+import { getTaskDraftKey } from '@/lib/chat-drafts';
 import { MagnifyingGlass } from '@phosphor-icons/react';
 
 interface TaskBreakdownClientProps {
@@ -131,7 +132,12 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
       </AnimatePresence>
 
       {/* Collapsed Chat Chip at Bottom (expands on demand for venting/tweaking) */}
-      <ChatInput disabled={isTyping} onSubmit={sendMessage} collapsible />
+      <ChatInput
+        disabled={isTyping}
+        onSubmit={sendMessage}
+        collapsible
+        draftKey={getTaskDraftKey(currentTask.id)}
+      />
 
       {/* Floating Round Blur/Peek Toggle (Bottom-Right) */}
       {steps.length > 0 && !focusTunnelOpen && (

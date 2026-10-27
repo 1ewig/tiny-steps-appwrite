@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { ChatCircleDots, X, SpinnerGap } from '@phosphor-icons/react';
 import { tactileButtonVariants, tactileIconVariants } from '@/constants/animation';
+import { useChatDraft } from '@/hooks/use-chat-draft';
 
 interface ChatInputProps {
   disabled?: boolean;
@@ -11,6 +12,7 @@ interface ChatInputProps {
   isCentered?: boolean;
   collapsible?: boolean;
   initialText?: string;
+  draftKey?: string;
 }
 
 export function ChatInput({
@@ -19,13 +21,17 @@ export function ChatInput({
   isCentered = false,
   collapsible = false,
   initialText = '',
+  draftKey,
 }: ChatInputProps) {
   const reduceMotion = useReducedMotion();
-  const [text, setText] = useState(initialText);
+  const { text, setText, clearDraft, preserveForSubmit, releaseSubmit } =
+    useChatDraft({ storageKey: draftKey, initialText });
   const [isMultiline, setIsMultiline] = useState(
-    initialText.includes('\n') || initialText.length > 36
+    () => text.includes('\n') || text.length > 36
   );
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(
+    () => collapsible && Boolean(text.trim())
+  );
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -53,6 +59,7 @@ export function ChatInput({
     const trimmed = text.trim();
     if (!trimmed || disabled) return;
     const submittedText = trimmed;
+    preserveForSubmit(submittedText);
     setText('');
     setIsMultiline(false);
     if (textareaRef.current) {
@@ -60,10 +67,14 @@ export function ChatInput({
     }
     try {
       await onSubmit(submittedText);
-    } finally {
+      clearDraft();
       if (collapsible) {
         setIsExpanded(false);
       }
+    } catch {
+      // Keep the words safe so the user can retry after a failed send.
+      releaseSubmit();
+      setText(submittedText);
     }
   };
 
@@ -198,6 +209,7 @@ export function ChatInput({
                   onClick={() => {
                     setIsExpanded(false);
                     setText('');
+                    clearDraft();
                   }}
                   variants={reduceMotion ? undefined : tactileButtonVariants}
                   initial="rest"

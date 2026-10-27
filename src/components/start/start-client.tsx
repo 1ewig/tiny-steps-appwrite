@@ -6,6 +6,7 @@ import { ClockCounterClockwise } from '@phosphor-icons/react';
 import { useTaskStore } from '@/store/task-store';
 import { useHydrated } from '@/hooks/use-hydrated';
 import { useStartTask } from '@/hooks/use-start-task';
+import { START_DRAFT_KEY } from '@/lib/chat-drafts';
 import { HeroWelcome } from '@/components/start/hero-welcome';
 import { EnergySelector } from '@/components/start/energy-selector';
 import { ChatInput } from '@/components/shared/chat-input';
@@ -46,6 +47,7 @@ export function StartClient() {
               disabled={isGeneratingTask}
               onSubmit={startTask}
               initialText={restoreText ?? ''}
+              draftKey={START_DRAFT_KEY}
               isCentered
             />
           </motion.div>

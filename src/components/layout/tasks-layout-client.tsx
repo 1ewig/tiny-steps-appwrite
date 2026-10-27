@@ -7,6 +7,7 @@ import { useHydrated } from '@/hooks/use-hydrated';
 import { shrinkStepWithAI } from '@/lib/ai/client';
 import { MAX_BREAKDOWN_WAIT_MS } from '@/constants/timing';
 import { getActiveStep, getActiveStepIndex } from '@/lib/task-utils';
+import { getTaskDraftKey, removeChatDraft } from '@/lib/chat-drafts';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { useShrinkStep } from '@/hooks/use-shrink-step';
 import { useTaskSyncSubscription } from '@/hooks/use-task-sync';
@@ -267,6 +268,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
             closeFocusTunnel();
           }
           deleteTask(id);
+          removeChatDraft(getTaskDraftKey(id));
           if (id === activeTaskId) {
             router.push('/tasks');
           }
