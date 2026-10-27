@@ -36,9 +36,14 @@ const SLIDES: OnboardingSlide[] = [
     buttonLabel: 'Next',
   },
   {
-    headline: 'Work with blinders on.',
+    headline: (
+      <>
+        <span className="block sm:inline">Built for when</span>{' '}
+        <span className="block sm:inline">motivation is zero.</span>
+      </>
+    ),
     description:
-      'Focus Tunnel hides the mountain so you never look at a giant checklist—just one single step at a time.',
+      'Traditional lists demand high energy. We adapt to your battery—breaking resistance down into microscopic actions until friction vanishes.',
     buttonLabel: 'Let’s begin',
   },
 ];
