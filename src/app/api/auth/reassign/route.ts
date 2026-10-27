@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     const tasksRes = await serverTablesDB.listRows({
       databaseId: DB_ID,
       tableId: TASKS_TABLE,
-      queries: [Query.equal('userId', fromUserId)],
+      queries: [Query.equal('userId', fromUserId), Query.limit(100)],
     });
 
     if (tasksRes.rows.length === 0) {
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
         const stepsRes = await serverTablesDB.listRows({
           databaseId: DB_ID,
           tableId: STEPS_TABLE,
-          queries: [Query.equal('taskId', taskRow.$id)],
+          queries: [Query.equal('taskId', taskRow.$id), Query.limit(100)],
         });
 
         for (const stepRow of stepsRes.rows) {

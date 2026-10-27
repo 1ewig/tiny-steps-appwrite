@@ -126,6 +126,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | `AI_GATEWAY_API_KEY` | Yes, for AI features | Without it, breakdown, shrink, and assistant calls return an error. Saved tasks still open. |
 | `AI_MODEL` | No | Defaults to `google/gemini-2.5-flash-lite`. |
 | `AI_REASONING_EFFORT` | No | `low` or `high`; defaults to `low`. |
+| `AI_GATEWAY_BASE_URL` | No | Custom Gateway endpoint (defaults to `https://ai-gateway.vercel.sh/v4/ai`). |
 | `NEXT_PUBLIC_APPWRITE_ENDPOINT` | No | Appwrite Cloud endpoint (defaults to `https://sfo.cloud.appwrite.io/v1`). |
 | `NEXT_PUBLIC_APPWRITE_PROJECT_ID` | No | Appwrite project ID for TablesDB and Auth. |
 | `NEXT_PUBLIC_APPWRITE_DATABASE_ID` | No | Database ID containing the `tasks` and `steps` tables. |
