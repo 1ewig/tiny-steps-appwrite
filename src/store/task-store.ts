@@ -30,6 +30,7 @@ export const useTaskStore = create<TaskState>()(
         peekFuture: state.peekFuture,
         theme: state.theme,
         user: state.user,
+        hasSeenOnboarding: state.hasSeenOnboarding,
       }),
       onRehydrateStorage: () => (state) => {
         if (typeof document !== 'undefined' && state?.theme === 'dark') {

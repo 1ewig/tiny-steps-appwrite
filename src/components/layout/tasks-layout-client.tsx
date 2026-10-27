@@ -16,6 +16,7 @@ import { HistoryDrawer } from '@/components/layout/history-drawer';
 import { ThemeToggleFab } from '@/components/shared/theme-toggle-fab';
 import { FocusTunnelModal } from '@/components/task-breakdown/focus-tunnel-modal';
 import { FocusLoader } from '@/components/shared/focus-loader';
+import { OnboardingModal } from '@/components/onboarding/onboarding-modal';
 
 export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -34,11 +35,16 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     isGeneratingTask,
     generationNotice,
     isHistoryOpen,
+    isOnboardingOpen,
+    hasSeenOnboarding,
     theme,
     deleteTask,
     markIntroSeen,
     openFocusTunnel,
     closeFocusTunnel,
+    openOnboarding,
+    closeOnboarding,
+    completeOnboarding,
     setGeneratingTask,
     setGenerationNotice,
     toggleTheme,
@@ -67,6 +73,12 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
 
   const focusTunnelOpen = Boolean(
     activeTaskId && focusTunnelTaskId === activeTaskId
+  );
+
+  const showOnboarding = Boolean(
+    hasHydrated &&
+      (isOnboardingOpen ||
+        (!hasSeenOnboarding && tasks.length === 0 && !routeTaskId && !isGeneratingTask))
   );
 
   const steps = activeTask?.steps ?? [];
@@ -214,6 +226,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
           hasActiveSteps={Boolean(activeTask && steps.length > 0)}
           hasBorder={Boolean(activeTaskId)}
           onToggleHistory={toggleHistory}
+          onOpenOnboarding={openOnboarding}
           onOpenFocusTunnel={
             activeTask && activeTaskId && steps.length > 0
               ? () => openFocusTunnel(activeTaskId)
@@ -287,6 +300,13 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
           setGenerationNotice(null);
           setGeneratingTask(false);
         }}
+      />
+
+      {/* First-Time Gentle Onboarding Modal */}
+      <OnboardingModal
+        isOpen={showOnboarding}
+        onClose={closeOnboarding}
+        onComplete={completeOnboarding}
       />
     </div>
   );

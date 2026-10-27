@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useReducedMotion } from 'framer-motion';
-import { House, ClockCounterClockwise } from '@phosphor-icons/react';
+import { House, ClockCounterClockwise, Question } from '@phosphor-icons/react';
 import { AuthButton } from '@/components/shared/auth-button';
 import {
   tactileButtonVariants,
@@ -20,6 +20,7 @@ interface AppHeaderProps {
   sessionTitle?: string;
   showNewTaskButton?: boolean;
   onNewTask?: () => void;
+  onOpenOnboarding?: () => void;
 }
 
 export function AppHeader({
@@ -31,6 +32,7 @@ export function AppHeader({
   onHome,
   showNewTaskButton,
   onNewTask,
+  onOpenOnboarding,
   hasBorder = true,
 }: AppHeaderProps) {
   const reduceMotion = useReducedMotion();
@@ -91,6 +93,29 @@ export function AppHeader({
               ◎
             </motion.span>
             <span>Focus Tunnel</span>
+          </motion.button>
+        )}
+
+        {/* Onboarding / Guide Trigger Button */}
+        {onOpenOnboarding && (
+          <motion.button
+            onClick={onOpenOnboarding}
+            variants={reduceMotion ? undefined : tactileButtonVariants}
+            initial="rest"
+            animate="rest"
+            whileHover={reduceMotion ? undefined : 'hover'}
+            whileTap={reduceMotion ? undefined : 'tap'}
+            className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            title="How Tiny Steps works"
+            aria-label="How Tiny Steps works"
+          >
+            <motion.span
+              variants={reduceMotion ? undefined : tactileIconVariants}
+              className="shrink-0 flex items-center"
+            >
+              <Question size={15} weight="bold" className="text-accent" />
+            </motion.span>
+            <span className="hidden sm:inline">Guide</span>
           </motion.button>
         )}
 

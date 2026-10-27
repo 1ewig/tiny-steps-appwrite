@@ -144,6 +144,8 @@ export interface TaskState {
   isGeneratingTask: boolean;
   generationNotice: string | null;
   isHistoryOpen: boolean;
+  isOnboardingOpen: boolean;
+  hasSeenOnboarding: boolean;
   theme: 'light' | 'dark';
 
   // Auth & Sync State
@@ -181,6 +183,9 @@ export interface TaskState {
   openHistory: () => void;
   closeHistory: () => void;
   toggleHistory: () => void;
+  openOnboarding: () => void;
+  closeOnboarding: () => void;
+  completeOnboarding: () => void;
   toggleTheme: () => void;
 
   // Step Actions (Clean 2-level addressing: taskId + stepId)

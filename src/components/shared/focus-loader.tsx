@@ -156,8 +156,8 @@ function FocusLoaderContent({
       </span>
 
       <div className="relative w-full max-w-4xl mx-auto flex items-center justify-center">
-        <AnimatePresence mode="wait">
-          {noticeMessage ? (
+        {noticeMessage ? (
+          <AnimatePresence>
             <motion.div
               key="notice-card"
               variants={reduceMotion ? undefined : subtleMorphVariants}
@@ -215,22 +215,26 @@ function FocusLoaderContent({
                 </span>
               </div>
             </motion.div>
-          ) : (
-            showText && (
-              <motion.p
-                key={reduceMotion ? 'static' : lineIndex}
-                variants={textMorphVariants}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                style={{ willChange: reduceMotion ? undefined : 'filter, opacity, transform' }}
-                className="absolute inset-0 flex items-center justify-center text-2xl sm:text-4xl md:text-5xl font-bold text-text-primary leading-snug sm:leading-tight tracking-tight text-center max-w-2xl mx-auto"
-              >
-                {reduceMotion ? LOADING_LINES[0] : LOADING_LINES[lineIndex]}
-              </motion.p>
-            )
-          )}
-        </AnimatePresence>
+          </AnimatePresence>
+        ) : (
+          <div className="relative grid grid-cols-1 grid-rows-1 place-items-center w-full max-w-3xl mx-auto min-h-[140px]">
+            <AnimatePresence initial={false}>
+              {showText && (
+                <motion.p
+                  key={reduceMotion ? 'static' : lineIndex}
+                  variants={textMorphVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  style={{ willChange: reduceMotion ? undefined : 'filter, opacity, transform' }}
+                  className="col-start-1 row-start-1 w-full flex items-center justify-center text-2xl sm:text-4xl md:text-5xl font-bold text-text-primary leading-snug sm:leading-tight tracking-tight text-center max-w-2xl mx-auto"
+                >
+                  {reduceMotion ? LOADING_LINES[0] : LOADING_LINES[lineIndex]}
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
       </div>
     </motion.div>
   );

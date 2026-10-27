@@ -148,7 +148,7 @@ export function FocusTunnelModal({
               transition={{ layout: { duration: reduceMotion ? 0 : 0.35, ease: CALM_EASE } }}
               className="relative grid grid-cols-1 grid-rows-1 place-items-center w-full max-w-4xl mx-auto"
             >
-              <AnimatePresence initial={false} mode="popLayout">
+              <AnimatePresence initial={false}>
                 <motion.div
                   layout
                   key={
