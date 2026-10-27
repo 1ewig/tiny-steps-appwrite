@@ -94,28 +94,28 @@ export function AppIcon({
       {...props}
     >
       {/* App Icon Squircle Background */}
-      <rect width="64" height="64" rx="15" fill="var(--color-surface, #1B241C)" />
+      <rect width="64" height="64" rx="15" fill="#1B241C" />
       <g className="cairn-group">
         {/* Base Stone */}
         <motion.g
           variants={baseVariants}
           style={{ transformBox: 'view-box', transformOrigin: '32px 45.5px' }}
         >
-          <rect x="16" y="40" width="32" height="11" rx="5.5" fill="var(--color-accent-primary, #465940)" />
+          <rect x="16" y="40" width="32" height="11" rx="5.5" fill="#465940" />
         </motion.g>
         {/* Middle Offset Stone */}
         <motion.g
           variants={midVariants}
           style={{ transformBox: 'view-box', transformOrigin: '31px 32px' }}
         >
-          <rect x="20" y="27" width="22" height="10" rx="5" transform="rotate(-4 20 27)" fill="var(--color-accent-border, #76A97D)" />
+          <rect x="20" y="27" width="22" height="10" rx="5" transform="rotate(-4 20 27)" fill="#76A97D" />
         </motion.g>
         {/* Top Tiny Crown Stone */}
         <motion.g
           variants={topVariants}
           style={{ transformBox: 'view-box', transformOrigin: '33px 18px' }}
         >
-          <circle cx="33" cy="18" r="5" fill="var(--color-text-inverse, #FDFBF0)" />
+          <circle cx="33" cy="18" r="5" fill="#FDFBF0" />
         </motion.g>
       </g>
     </motion.svg>
