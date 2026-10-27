@@ -18,9 +18,7 @@ It is cloud-first and guest-friendly: visitors get an instant **Appwrite Anonymo
 
 ## Product Demo
 
-A full 2-minute product walkthrough is available in the repository at [`public/video/tiny-steps-demo.mp4`](public/video/tiny-steps-demo.mp4).
-
-<video src="public/video/tiny-steps-demo.mp4" controls="controls" width="100%"></video>
+https://github.com/user-attachments/assets/c8b16b05-93e3-4078-abf8-a2fe9636cb72
 
 > This video showcases the user flow of a minimalist productivity and task-management web application designed to help overwhelmed users overcome executive dysfunction by breaking down intimidating tasks into manageable micro-steps.
 
