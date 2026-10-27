@@ -14,6 +14,7 @@ interface OnboardingModalProps {
   isOpen: boolean;
   onClose: () => void;
   onComplete: () => void;
+  focusInputOnClose?: boolean;
 }
 
 interface OnboardingSlide {
@@ -46,11 +47,16 @@ export function OnboardingModal({
   isOpen,
   onClose,
   onComplete,
+  focusInputOnClose,
 }: OnboardingModalProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <OnboardingModalContent onClose={onClose} onComplete={onComplete} />
+        <OnboardingModalContent
+          onClose={onClose}
+          onComplete={onComplete}
+          focusInputOnClose={focusInputOnClose}
+        />
       )}
     </AnimatePresence>
   );
@@ -59,13 +65,16 @@ export function OnboardingModal({
 function OnboardingModalContent({
   onClose,
   onComplete,
+  focusInputOnClose,
 }: {
   onClose: () => void;
   onComplete: () => void;
+  focusInputOnClose?: boolean;
 }) {
   const {
     currentPage,
     setCurrentPage,
+    isFirstPage,
     isLastPage,
     modalRef,
     reduceMotion,
@@ -77,6 +86,7 @@ function OnboardingModalContent({
     totalSlides: SLIDES.length,
     onClose,
     onComplete,
+    focusInputOnClose,
   });
 
   const activeSlide = SLIDES[currentPage];
@@ -105,7 +115,7 @@ function OnboardingModalContent({
         {/* Stepper Dots */}
         <div
           className="flex items-center gap-1.5"
-          role="tablist"
+          role="group"
           aria-label="Onboarding progress"
         >
           {SLIDES.map((_, idx) => {
@@ -116,7 +126,7 @@ function OnboardingModalContent({
                 type="button"
                 onClick={() => setCurrentPage(idx)}
                 aria-label={`Go to slide ${idx + 1}`}
-                aria-selected={isActive}
+                aria-current={isActive ? 'step' : undefined}
                 className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                   isActive
                     ? 'w-6 bg-accent'
@@ -136,7 +146,7 @@ function OnboardingModalContent({
           animate="rest"
           whileHover={reduceMotion ? undefined : 'hover'}
           whileTap={reduceMotion ? undefined : 'tap'}
-          className="p-1 sm:px-2.5 sm:py-1 rounded-lg text-xs font-medium text-text-tertiary hover:text-text-primary hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex items-center justify-center h-9 w-9 sm:h-auto sm:w-auto sm:px-2.5 sm:py-1 rounded-lg text-xs font-medium text-text-tertiary hover:text-text-primary hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           title="Skip guide (Esc)"
           aria-label="Skip guide"
         >
@@ -165,6 +175,8 @@ function OnboardingModalContent({
               initial="initial"
               animate="animate"
               exit="exit"
+              aria-live="polite"
+              aria-atomic="true"
               style={{ willChange: reduceMotion ? undefined : 'filter, opacity, transform' }}
               className="col-start-1 row-start-1 w-full flex flex-col items-center justify-center text-center px-2 space-y-3 sm:space-y-4"
             >
@@ -185,7 +197,7 @@ function OnboardingModalContent({
       {/* Footer Controls: Back, Next/Begin, Keyboard Hints */}
       <footer className="w-full flex flex-col items-center gap-2.5 pb-2 shrink-0">
         <div className="flex items-center gap-3">
-          {currentPage > 0 && (
+          {!isFirstPage && (
             <motion.button
               type="button"
               onClick={handlePrev}

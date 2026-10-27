@@ -307,6 +307,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
         isOpen={showOnboarding}
         onClose={closeOnboarding}
         onComplete={completeOnboarding}
+        focusInputOnClose={!isOnboardingOpen}
       />
     </div>
   );

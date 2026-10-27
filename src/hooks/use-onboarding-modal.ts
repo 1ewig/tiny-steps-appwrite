@@ -1,19 +1,31 @@
 'use client';
 
-import { useState, useRef, type RefObject } from 'react';
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type Dispatch,
+  type RefObject,
+  type SetStateAction,
+} from 'react';
 import { useReducedMotion, type Variants } from 'framer-motion';
 import { useFocusTrap } from '@/hooks/use-focus-trap';
 import { opticalMorphVariants } from '@/constants/animation';
+
+const INTERACTIVE_SELECTOR =
+  'button, a, input, textarea, select, summary, [role="button"], [role="tab"], [contenteditable="true"]';
 
 export interface UseOnboardingModalOptions {
   totalSlides: number;
   onClose: () => void;
   onComplete: () => void;
+  focusInputOnClose?: boolean;
 }
 
 export interface UseOnboardingModalReturn {
   currentPage: number;
-  setCurrentPage: (page: number) => void;
+  setCurrentPage: Dispatch<SetStateAction<number>>;
   isFirstPage: boolean;
   isLastPage: boolean;
   modalRef: RefObject<HTMLDivElement | null>;
@@ -29,71 +41,87 @@ export function useOnboardingModal({
   totalSlides,
   onClose,
   onComplete,
+  focusInputOnClose = false,
 }: UseOnboardingModalOptions): UseOnboardingModalReturn {
   const [currentPage, setCurrentPage] = useState(0);
   const modalRef = useRef<HTMLDivElement>(null);
   const reduceMotion = Boolean(useReducedMotion());
 
-  const morphVariants: Variants = reduceMotion
-    ? {
-        initial: { opacity: 0 },
-        animate: { opacity: 1, transition: { duration: 0.15 } },
-        exit: { opacity: 0, transition: { duration: 0.15 } },
-      }
-    : opticalMorphVariants;
+  const morphVariants: Variants = useMemo(
+    () =>
+      reduceMotion
+        ? {
+            initial: { opacity: 0 },
+            animate: { opacity: 1, transition: { duration: 0.15 } },
+            exit: { opacity: 0, transition: { duration: 0.15 } },
+          }
+        : opticalMorphVariants,
+    [reduceMotion]
+  );
 
   const isFirstPage = currentPage === 0;
   const isLastPage = currentPage === totalSlides - 1;
 
-  const handleComplete = () => {
-    onComplete();
-    requestAnimationFrame(() => {
-      const textarea = document.querySelector('textarea');
-      if (textarea instanceof HTMLTextAreaElement) {
-        textarea.focus();
-      }
-    });
-  };
+  const dismiss = useCallback(
+    (action: () => void) => {
+      action();
+      if (!focusInputOnClose) return;
 
-  const handleSkip = () => {
-    onClose();
-    requestAnimationFrame(() => {
-      const textarea = document.querySelector('textarea');
-      if (textarea instanceof HTMLTextAreaElement) {
-        textarea.focus();
-      }
-    });
-  };
+      requestAnimationFrame(() => {
+        const textarea = document.querySelector('textarea');
+        if (textarea instanceof HTMLTextAreaElement) {
+          textarea.focus();
+        }
+      });
+    },
+    [focusInputOnClose]
+  );
 
-  const handleNext = () => {
+  const handleComplete = useCallback(() => {
+    dismiss(onComplete);
+  }, [dismiss, onComplete]);
+
+  const handleSkip = useCallback(() => {
+    dismiss(onClose);
+  }, [dismiss, onClose]);
+
+  const handleNext = useCallback(() => {
     if (isLastPage) {
       handleComplete();
     } else {
       setCurrentPage((prev) => Math.min(prev + 1, totalSlides - 1));
     }
-  };
+  }, [handleComplete, isLastPage, totalSlides]);
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     setCurrentPage((prev) => Math.max(prev - 1, 0));
-  };
+  }, []);
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest(INTERACTIVE_SELECTOR)) return;
+
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        handleNext();
+      } else if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        handlePrev();
+      } else if (event.code === 'Space' || event.key === 'Enter') {
+        event.preventDefault();
+        handleNext();
+      }
+    },
+    [handleNext, handlePrev]
+  );
 
   useFocusTrap({
     isOpen: true,
     containerRef: modalRef,
     isBusy: false,
     onClose: handleSkip,
-    onKeyDown: (e) => {
-      if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        handleNext();
-      } else if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        handlePrev();
-      } else if (e.code === 'Space' || e.key === 'Enter') {
-        e.preventDefault();
-        handleNext();
-      }
-    },
+    onKeyDown: handleKeyDown,
   });
 
   return {
