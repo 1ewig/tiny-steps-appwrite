@@ -1,7 +1,16 @@
 # Tiny Steps
 
+[![Appwrite TablesDB](https://img.shields.io/badge/Appwrite_TablesDB-FD366E?style=flat-square&logo=appwrite&logoColor=white)](https://appwrite.io/)
+[![Next.js 16](https://img.shields.io/badge/Next.js_16-000000?style=flat-square&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![React 19](https://img.shields.io/badge/React_19-20232A?style=flat-square&logo=react&logoColor=61DAFB)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS_v4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Zustand](https://img.shields.io/badge/Zustand-443E38?style=flat-square&logo=react&logoColor=white)](https://zustand.docs.pmnd.rs/)
+[![Bun](https://img.shields.io/badge/Bun-000000?style=flat-square&logo=bun&logoColor=white)](https://bun.sh/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+
 > 🏆 **Appwrite Databases Hackathon (October 2026)**  
-> 🌐 **Live Demo:** [tiny-steps-gules.vercel.app](https://tiny-steps-gules.vercel.app) · 📖 **Technical Architecture:** [docs/architecture.md](docs/architecture.md)
+> 🌐 **Live Demo:** [tiny-steps-gules.vercel.app/tasks](https://tiny-steps-gules.vercel.app/tasks) · 💻 **GitHub:** [github.com/1ewig/tiny-steps-appwrite](https://github.com/1ewig/tiny-steps-appwrite) · 📖 **Technical Architecture:** [docs/architecture.md](docs/architecture.md)
 
 Tiny Steps turns vague or overwhelming tasks into a few concrete micro-actions you can start right away. It is built for low-energy days: one task at a time, no streaks, no guilt, and no pressure to plan everything upfront.
 
@@ -9,15 +18,13 @@ It is cloud-first and guest-friendly: visitors get an instant **Appwrite Anonymo
 
 ## Product Demo
 
-https://github.com/user-attachments/assets/demo (local file: `public/video/tiny-steps-demo.mp4`)
+A full 2-minute product walkthrough is available in the repository at [`public/video/tiny-steps-demo.mp4`](public/video/tiny-steps-demo.mp4).
 
 <video src="public/video/tiny-steps-demo.mp4" controls="controls" width="100%"></video>
 
 > This video showcases the user flow of a minimalist productivity and task-management web application designed to help overwhelmed users overcome executive dysfunction by breaking down intimidating tasks into manageable micro-steps.
 
 ---
-
-![Tiny Steps — Home](public/screenshots/01-home.webp)
 
 ## The Flow
 
@@ -26,6 +33,8 @@ Describe what's on your mind and choose how much energy you have today:
 - **A little stuck** (3–6 steps)
 - **Overwhelmed** (3–5 gentle starter steps)
 - **Full paralysis** (2–4 micro-actions, never more than 4)
+
+![Tiny Steps — Home](public/screenshots/01-home.webp)
 
 ### 2. Enter the Focus Tunnel
 New tasks open directly into a full-screen, distraction-free tunnel isolating just one step at a time so you don't scan ahead and freeze. Advance through steps with minimal keystrokes: press `Space` or `Enter` to complete a step, `S` to break it down, or `Esc` to view the full workspace.
