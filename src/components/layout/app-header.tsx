@@ -62,9 +62,6 @@ export function AppHeader({
       </div>
 
       <div className="flex items-center gap-1.5 sm:gap-2">
-        {/* Google OAuth & Cloud Sync Pill */}
-        <AuthButton />
-
         {/* Focus Tunnel Launcher Button */}
         {hasActiveSteps && onOpenFocusTunnel && (
           <motion.button
@@ -83,6 +80,9 @@ export function AppHeader({
             <span>Focus Tunnel</span>
           </motion.button>
         )}
+
+        {/* Google OAuth & Cloud Sync Pill */}
+        <AuthButton />
 
         {/* Onboarding / Guide Trigger Button */}
         {onOpenOnboarding && (
