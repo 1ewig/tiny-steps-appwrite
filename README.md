@@ -84,9 +84,9 @@ Tiny Steps breaks down execution for humans—it refuses to do academic ghostwri
 Tiny Steps combines instant client-side interaction with a relational Appwrite cloud backbone:
 
 - **Direct TablesDB Writes for Guests**: Every visitor immediately gets an Appwrite Anonymous Session, saving guest tasks directly to TablesDB with native Row-Level Security (`Role.user(anonUserId)`).
-- **Relational Schema**: Data is modeled as normalized `tasks` and linked `steps` with explicit order indexing on `taskId`.
-- **Seamless Account Migration**: Signing in with Google OAuth reassigns existing guest tasks in TablesDB to the permanent account and cleanly merges prior cloud tasks by `updatedAt`.
-- **Optimistic Zustand Core**: Mutations update the UI instantly (0ms latency) while syncing debounced changes to TablesDB in the background.
+- **Relational Schema & Insert-Before-Delete Safety**: Data is modeled as normalized `tasks` and linked `steps` with explicit order indexing on `taskId`. Step persistence uses an insert-before-delete lifecycle so network interruptions never wipe existing steps.
+- **Session-Verified Account Migration**: Signing in with Google OAuth verifies caller credentials on `/api/auth/reassign`, confirms the source is an anonymous guest, and paginates through TablesDB rows to reassign ownership with zero data loss.
+- **Optimistic Zustand Core**: Mutations update the UI instantly (0ms latency) while syncing debounced changes to TablesDB in the background, isolated by monotonic generation tokens against race conditions.
 - **AI Safety & Eval Suite**: A 29-scenario automated test suite ([`scripts/eval-suite.ts`](scripts/eval-suite.ts)) benchmarks task breakdowns, crisis safeguards, and refusal boundaries against the AI Gateway.
 
 *For complete system diagrams, data schemas, and internal mechanisms, see [docs/architecture.md](docs/architecture.md).*

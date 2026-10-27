@@ -165,16 +165,21 @@ await tablesDB.upsertRow({
 ### Guest Anonymous Sessions & Account Migration Lifecycle
 1. **First-Visit Anonymous Session**: When a guest opens Tiny Steps, `ensureSession()` calls `account.createAnonymousSession()`. The visitor receives an Appwrite session and a distinct `userId` without entering an email or password.
 2. **Immediate Cloud Storage**: Any tasks and steps created by the guest are immediately saved to Appwrite TablesDB with native Row-Level Security (`Role.user(anonUserId)`).
-3. **Google Sign-In Reassignment**: When an anonymous user signs in with Google, `signInWithGoogle` stashes the anonymous user ID. Upon completing OAuth at `/auth/success`, `reassignGuestTasksInDb` calls the `/api/auth/reassign` endpoint (or client reconciliation fallback) to update row ownership and permissions to the new authenticated `userId`.
-4. **Account Reconciliation**: `performReconcile(userId)` runs, fetching any existing cloud tasks the user previously had under their account, merging them with the newly claimed guest tasks by `updatedAt`, and updating Zustand.
+3. **Session-Verified Reassignment**: When an anonymous user signs in with Google, `signInWithGoogle` stashes the anonymous user ID in session storage. Upon completing OAuth at `/auth/success`, `reassignGuestTasksInDb` sends the session secret to `/api/auth/reassign`. The server verifies the active session via `ServerAccount.get()`, derives the authenticated target user ID, verifies the source user is an anonymous guest via `ServerUsers.get(fromUserId)` (preventing registered account hijacking), and iterates through paginated offset queries (`Query.limit(100)`, `Query.offset(n)`) to transfer rows and update RLS permissions.
+4. **Account Reconciliation & Generation Isolation**: `performReconcile(userId)` runs with a monotonic `reconcileGeneration` token, ensuring that any stale reconciliation is safely aborted across async boundaries if the user logs out or switches accounts. It merges newly claimed guest tasks with prior cloud tasks by `updatedAt` and updates Zustand.
 
-Subsequent task changes are debounced for 600ms and written in the background. Deletions go to TablesDB immediately. Signing out clears the local user, tasks, sync timestamp, and Focus Tunnel, and automatically provisions a fresh anonymous session for subsequent guest interactions. Saving a task deletes its existing step rows and recreates them to maintain simple ordering without orphaned sub-steps.
+Subsequent task changes are debounced for 600ms and written in the background. Deletions go to TablesDB immediately. Signing out flushes any pending local changes owned by the user before clearing the store, then automatically provisions a fresh anonymous session for subsequent guest interactions.
+
+### Step Write Integrity (Insert-Before-Delete)
+To prevent step data loss during network hiccups or aborted sync requests, `saveTaskToDb` creates current step rows **first** (with validated and sanitized `subSteps` JSON). Only after new rows are safely committed does it delete obsolete step rows. If an ID permission conflict arises, a fresh ID is generated without mutating the caller's task object, and the updated ID is reactively remapped in the store.
 
 ## UI layers
 
-Route pages stay thin. `src/app/tasks/[id]/page.tsx` reads the route param and renders `TaskBreakdownClient`. The client orchestrator connects hooks and store actions, while cards and smaller components receive data and callbacks as props.
+Route pages stay thin. `src/app/tasks/[id]/page.tsx` reads the route param and renders `TaskBreakdownClient`. The client orchestrator connects hooks and store actions, while cards and smaller components receive data and callbacks as props. Shared step operations (AI step shrinking and hierarchical sub-step completion cascading) are encapsulated in `useFocusStepActions` (`src/hooks/use-focus-step-actions.ts`), consumed by both client orchestrators to eliminate duplication.
 
-`TasksLayoutClient` is mounted once for the tasks area. It owns the header, history drawer, theme toggle, Focus Tunnel, loader, first-time onboarding modal, keyboard shortcuts, and the single sync subscription.
+`TasksLayoutClient` is mounted once for the tasks area. It owns the header, history drawer, theme toggle, Focus Tunnel, loader, first-time onboarding modal, keyboard shortcuts, and the single sync subscription. In the header action cluster, the Focus Tunnel launcher is positioned first (`[ Focus Tunnel ]` → `[ Auth / User ]` → `[ Guide ]` → `[ History ]`).
+
+Overlays such as `AuthOverlay` and `ConfirmDialog` use React `createPortal(..., document.body)` with hydration guards, completely isolating modals from ancestor CSS stacking contexts (such as `AppHeader`'s `z-header: 20`). The full-screen `FocusLoader` promotes interactive guidance and crisis notices to `role="alertdialog"` with active focus trapping via `useFocusTrap` and scoped Enter-key handling.
 
 Focus Tunnel shows the active step and advances through incomplete sub-steps before completing the parent step. On initial entry, it displays the session title in `h1` and acknowledgment guidance in `p` to eliminate layout shift before step 1. Transitions rely on CSS Grid cell stacking (`col-start-1 row-start-1`) for true in-place dissolving optical morphs without layout snapping. Space or Enter advances, S shrinks, and Escape closes.
 
@@ -201,6 +206,8 @@ Colors, spacing, radii, and typography come from semantic tokens in `src/app/glo
 - `src/lib/appwrite/tasks.ts` — TablesDB reads and writes
 - `src/app/api/auth/reassign/route.ts` — Guest task reassignment and RLS migration
 - `src/hooks/use-task-sync.ts` — local/cloud reconciliation
+- `src/hooks/use-focus-step-actions.ts` — shared focus step actions & AI shrink orchestration
+- `src/components/shared/google-icon.tsx` — standalone Google icon component
 - `src/components/layout/tasks-layout-client.tsx` — client shell
 - `src/components/onboarding/onboarding-modal.tsx` — first-time user onboarding modal
 - `src/hooks/use-onboarding-modal.ts` — onboarding navigation, focus trap, and keyboard shortcuts
