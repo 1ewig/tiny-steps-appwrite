@@ -43,7 +43,7 @@ const SLIDES: OnboardingSlide[] = [
       </>
     ),
     description:
-      'Traditional lists demand high energy. We adapt to your battery—breaking resistance down into microscopic actions until friction vanishes.',
+      'Traditional lists demand high energy. We adapt to your battery—breaking steps down until friction disappears.',
     buttonLabel: 'Let’s begin',
   },
 ];
