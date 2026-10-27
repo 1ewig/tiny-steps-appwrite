@@ -69,6 +69,7 @@ Tiny Steps breaks down execution for humans—it refuses to do academic ghostwri
 ## Features at a Glance
 
 - **Distraction-Free Focus Tunnel**: Full-screen monotasking with smooth optical morphs.
+- **Zero-Friction First-Time Onboarding**: Minimalist 2-step sensory introduction communicating the brain-dump input engine and adaptive friction reduction thesis.
 - **3-Column Workspace**: Spatial Now / Next / Later organization with anti-scan progressive disclosure.
 - **On-Demand Micro-Actions**: Dynamically break intimidating steps into 2–3 smaller pieces.
 - **Non-Destructive Assistant**: Surgical step surgery (modify, add, remove, reroute) preserving task immutability.

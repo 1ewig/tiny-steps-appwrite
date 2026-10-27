@@ -98,7 +98,7 @@ The UI uses the first incomplete step as the active step. A selected step can be
 
 ## State and persistence
 
-The Zustand store is split into three slices: tasks, UI, and auth. `persist` writes `tasks`, `granularity`, `peekFuture`, `theme`, and `user` to `tinysteps_zustand_store`; transient flags such as loaders and drawers stay in memory.
+The Zustand store is split into three slices: tasks, UI, and auth. `persist` writes `tasks`, `granularity`, `peekFuture`, `theme`, `user`, and `hasSeenOnboarding` to `tinysteps_zustand_store`; transient flags such as loaders and drawers stay in memory.
 
 `mergePersistedTaskState` handles older saved shapes. The layout waits for hydration before rendering task content, and a small inline script applies the dark class before paint to avoid a theme flash.
 
@@ -174,9 +174,9 @@ Subsequent task changes are debounced for 600ms and written in the background. D
 
 Route pages stay thin. `src/app/tasks/[id]/page.tsx` reads the route param and renders `TaskBreakdownClient`. The client orchestrator connects hooks and store actions, while cards and smaller components receive data and callbacks as props.
 
-`TasksLayoutClient` is mounted once for the tasks area. It owns the header, history drawer, theme toggle, Focus Tunnel, loader, keyboard shortcuts, and the single sync subscription.
+`TasksLayoutClient` is mounted once for the tasks area. It owns the header, history drawer, theme toggle, Focus Tunnel, loader, first-time onboarding modal, keyboard shortcuts, and the single sync subscription.
 
-Focus Tunnel shows the active step and advances through incomplete sub-steps before completing the parent step. On initial entry, it displays the session title in `h1` and acknowledgment guidance in `p` to eliminate layout shift before step 1. Space or Enter advances, S shrinks, and Escape closes.
+Focus Tunnel shows the active step and advances through incomplete sub-steps before completing the parent step. On initial entry, it displays the session title in `h1` and acknowledgment guidance in `p` to eliminate layout shift before step 1. Transitions rely on CSS Grid cell stacking (`col-start-1 row-start-1`) for true in-place dissolving optical morphs without layout snapping. Space or Enter advances, S shrinks, and Escape closes.
 
 ## Design system
 
@@ -202,4 +202,6 @@ Colors, spacing, radii, and typography come from semantic tokens in `src/app/glo
 - `src/app/api/auth/reassign/route.ts` — Guest task reassignment and RLS migration
 - `src/hooks/use-task-sync.ts` — local/cloud reconciliation
 - `src/components/layout/tasks-layout-client.tsx` — client shell
+- `src/components/onboarding/onboarding-modal.tsx` — first-time user onboarding modal
+- `src/hooks/use-onboarding-modal.ts` — onboarding navigation, focus trap, and keyboard shortcuts
 - `scripts/eval-suite.ts` — AI evaluation scenarios
