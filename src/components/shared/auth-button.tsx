@@ -7,7 +7,6 @@ import {
   SignIn,
   ArrowsClockwise,
   CloudCheck,
-  Check,
   SpinnerGap,
 } from '@phosphor-icons/react';
 import { useAuth } from '@/hooks/use-auth';
@@ -47,10 +46,8 @@ export function AuthButton() {
     isSigningOut,
     logout,
   } = useAuth();
-  const { isSyncing, lastSyncedAt, syncNow } = useTaskSync();
+  const { isSyncing } = useTaskSync();
   const [isOpen, setIsOpen] = useState(false);
-  const [isManualSyncing, setIsManualSyncing] = useState(false);
-  const [justSynced, setJustSynced] = useState(false);
   const [isSignOutConfirmOpen, setIsSignOutConfirmOpen] = useState(false);
   const [isAuthOverlayOpen, setIsAuthOverlayOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -76,20 +73,6 @@ export function AuthButton() {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen]);
-
-  const handleManualSync = async () => {
-    setIsManualSyncing(true);
-    setJustSynced(false);
-    try {
-      await syncNow();
-      setJustSynced(true);
-      setTimeout(() => setJustSynced(false), 2000);
-    } catch (err) {
-      console.warn('Manual sync failed:', err);
-    } finally {
-      setIsManualSyncing(false);
-    }
-  };
 
   const handleConfirmSignOut = async () => {
     try {
@@ -136,7 +119,6 @@ export function AuthButton() {
   // 3. Authenticated State: User Avatar & Menu
   const initial = (user.name || user.email || 'U').charAt(0).toUpperCase();
   const displayName = user.name || user.email.split('@')[0];
-  const syncingActive = isSyncing || isManualSyncing;
 
   return (
     <div className="relative" ref={menuRef}>
@@ -151,7 +133,7 @@ export function AuthButton() {
         className="inline-flex items-center gap-1.5 h-8 pl-1.5 pr-2.5 rounded-md text-xs font-medium text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         aria-expanded={isOpen}
         aria-haspopup="menu"
-        title={`${displayName} (Cloud synced)`}
+        title={`${displayName} (Signed in)`}
       >
         <span className="w-5 h-5 rounded-full bg-accent text-text-inverse flex items-center justify-center text-[10px] font-bold shrink-0">
           {initial}
@@ -161,7 +143,7 @@ export function AuthButton() {
         </span>
         {/* Sync Status Indicator Icon */}
         <span className="shrink-0 flex items-center text-text-tertiary">
-          {syncingActive ? (
+          {isSyncing ? (
             <ArrowsClockwise
               size={12}
               weight="bold"
@@ -169,8 +151,8 @@ export function AuthButton() {
             />
           ) : (
             <span
-              className="w-1.5 h-1.5 rounded-full bg-accent"
-              title="Synced with cloud"
+              className="w-1.5 h-1.5 rounded-full bg-accent/80"
+              title="Saved"
             />
           )}
         </span>
@@ -202,67 +184,24 @@ export function AuthButton() {
               </div>
             </div>
 
-            {/* Cloud Sync Status Section */}
+            {/* Cloud Backup Status Section */}
             <div className="py-2.5 border-b border-border-subtle">
               <div className="flex items-center justify-between text-2xs mb-1">
-                <span className="text-text-secondary flex items-center gap-1 font-medium">
+                <span className="text-text-secondary flex items-center gap-1.5 font-medium">
                   <CloudCheck size={14} className="text-accent" weight="fill" />
-                  Cloud Backup
+                  Cloud backup
                 </span>
                 <span className="text-text-tertiary">
-                  {syncingActive
-                    ? 'Syncing...'
-                    : lastSyncedAt
-                    ? 'Synced'
-                    : 'Connected'}
+                  {isSyncing ? 'Saving...' : 'Saved'}
                 </span>
               </div>
               <p className="text-[11px] text-text-tertiary leading-relaxed">
-                Your tasks and micro-steps are securely backed up in the cloud.
+                Your tasks and steps are automatically saved to your account.
               </p>
             </div>
 
-            {/* Actions: Sync & Sign Out on the same bottom row */}
-            <div className="pt-2.5 flex items-center gap-2">
-              <motion.button
-                type="button"
-                onClick={handleManualSync}
-                disabled={syncingActive}
-                variants={reduceMotion ? undefined : tactileButtonVariants}
-                initial="rest"
-                animate="rest"
-                whileHover={syncingActive || reduceMotion ? undefined : 'hover'}
-                whileTap={syncingActive || reduceMotion ? undefined : 'tap'}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-2xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/80 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer disabled:opacity-50"
-                role="menuitem"
-              >
-                {justSynced ? (
-                  <>
-                    <motion.span
-                      variants={reduceMotion ? undefined : tactileIconVariants}
-                      className="flex items-center shrink-0"
-                    >
-                      <Check size={13} weight="bold" className="text-accent" />
-                    </motion.span>
-                    <span>Up to date</span>
-                  </>
-                ) : (
-                  <>
-                    <motion.span
-                      variants={reduceMotion ? undefined : tactileIconVariants}
-                      className="flex items-center shrink-0"
-                    >
-                      <ArrowsClockwise
-                        size={13}
-                        weight="bold"
-                        className={syncingActive ? 'animate-spin text-accent' : ''}
-                      />
-                    </motion.span>
-                    <span>{syncingActive ? 'Syncing...' : 'Sync now'}</span>
-                  </>
-                )}
-              </motion.button>
-
+            {/* Actions: Sign Out (Full-Width Clean Action) */}
+            <div className="pt-2.5 flex items-center">
               <motion.button
                 type="button"
                 disabled={isSigningOut}
@@ -275,7 +214,7 @@ export function AuthButton() {
                 animate="rest"
                 whileHover={isSigningOut || reduceMotion ? undefined : 'hover'}
                 whileTap={isSigningOut || reduceMotion ? undefined : 'tap'}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-2xs font-medium text-danger-text hover:bg-danger-subtle transition-colors duration-fast cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full inline-flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-2xs font-medium text-danger-text hover:bg-danger-subtle transition-colors duration-fast cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 role="menuitem"
               >
                 <motion.span
