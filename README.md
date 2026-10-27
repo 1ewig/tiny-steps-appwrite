@@ -5,7 +5,7 @@
 
 Tiny Steps turns vague or overwhelming tasks into a few concrete micro-actions you can start right away. It is built for low-energy days: one task at a time, no streaks, no guilt, and no pressure to plan everything upfront.
 
-It is local-first: you can use it immediately as a guest with tasks stored in your browser. When you sign in with Google, your tasks seamlessly sync to **Appwrite TablesDB**.
+It is cloud-first and guest-friendly: visitors get an instant **Appwrite Anonymous Session** saving tasks directly to **Appwrite TablesDB** with zero signup friction. When you sign in with Google, your tasks seamlessly reassign to your permanent account.
 
 ## Product Demo
 

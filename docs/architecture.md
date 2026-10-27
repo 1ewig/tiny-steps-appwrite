@@ -1,8 +1,8 @@
 # Architecture
 
-Tiny Steps is a Next.js App Router app with a client-heavy UI, a small server layer for AI calls, and optional Appwrite sync. The browser owns the task state. The server turns prompts into structured JSON. Appwrite mirrors tasks for signed-in users.
+Tiny Steps is a Next.js App Router app with an optimistic React 19 UI, direct Appwrite TablesDB cloud persistence for all users, and a serverless AI pipeline. Guests receive an Appwrite Anonymous Session on arrival, saving tasks directly to TablesDB with native Row-Level Security. When signing in with Google, guest tasks are automatically claimed and reassigned to permanent accounts.
 
-The app is local-first: everything works without an account, and cloud sync is a background convenience rather than a requirement.
+The app pairs an optimistic Zustand local store (for instant 0ms interactions) with immediate background writes to Appwrite TablesDB.
 
 ## System map
 
@@ -21,7 +21,7 @@ flowchart LR
 - **Browser** holds tasks, steps, UI state, and the current user.
 - **Next server routes** validate input and call the Gateway. They do not store data.
 - **AI Gateway** returns structured output validated by Zod schemas.
-- **Appwrite** stores `tasks` and `steps` rows when a user signs in.
+- **Appwrite** stores `tasks` and `steps` rows in TablesDB for both guest (anonymous sessions) and authenticated users.
 - **localStorage** persists the Zustand store between visits.
 
 ## Creating a task
@@ -199,6 +199,7 @@ Colors, spacing, radii, and typography come from semantic tokens in `src/app/glo
 - `src/lib/ai/schemas.ts` — structured output schemas
 - `src/app/api/*/route.ts` — AI endpoints
 - `src/lib/appwrite/tasks.ts` — TablesDB reads and writes
+- `src/app/api/auth/reassign/route.ts` — Guest task reassignment and RLS migration
 - `src/hooks/use-task-sync.ts` — local/cloud reconciliation
 - `src/components/layout/tasks-layout-client.tsx` — client shell
 - `scripts/eval-suite.ts` — AI evaluation scenarios
