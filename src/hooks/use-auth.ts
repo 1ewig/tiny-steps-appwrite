@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTaskStore } from '@/store/task-store';
 import { ensureSession, loginWithGoogle, logoutUser } from '@/lib/appwrite/auth';
+import { saveTaskToDb } from '@/lib/appwrite/tasks';
 
 export function useAuth() {
   const {
@@ -54,6 +55,13 @@ export function useAuth() {
     setError(null);
     setIsSigningOut(true);
     try {
+      if (user?.id) {
+        const localTasks = useTaskStore.getState().tasks;
+        const userTasks = localTasks.filter((t) => t.userId === user.id);
+        if (userTasks.length > 0) {
+          await Promise.allSettled(userTasks.map((t) => saveTaskToDb(t, user.id)));
+        }
+      }
       await logoutUser();
     } catch (err: unknown) {
       console.warn('[Auth] Remote logout error:', err);

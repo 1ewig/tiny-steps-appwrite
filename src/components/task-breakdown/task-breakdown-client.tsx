@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTaskStore } from '@/store/task-store';
 import { useHydrated } from '@/hooks/use-hydrated';
 import { useAssistantChat } from '@/hooks/use-assistant-chat';
-import { shrinkStepWithAI } from '@/lib/ai/client';
+import { useFocusStepActions } from '@/hooks/use-focus-step-actions';
 import { TaskCard } from '@/components/task-breakdown/task-card';
 import { PeekToggle } from '@/components/task-breakdown/peek-toggle';
 import { ChatInput } from '@/components/shared/chat-input';
@@ -31,7 +31,6 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
     focusTunnelTaskId,
     toggleStepCompletion,
     toggleSubStepCompletion,
-    shrinkStep,
   } = useTaskStore();
 
   const currentTask = tasks.find((t) => t.id === activeId);
@@ -42,6 +41,7 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
     currentTask,
     granularity
   );
+  const { shrinkStepAction } = useFocusStepActions();
 
 
   // While localStorage is rehydrating, show gentle quiet animated cairn instead of flashing "not found"
@@ -91,17 +91,16 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
             }}
             onShrinkStep={async (stepIdx) => {
               if (!steps[stepIdx]) return;
-              try {
-                const { microSteps } = await shrinkStepWithAI(
-                  currentTask.title,
-                  steps,
-                  stepIdx
-                );
-                shrinkStep(currentTask.id, stepIdx, microSteps);
-              } catch (err) {
-                console.error('Failed to shrink step:', err);
-                showFeedback('Could not break down this step right now. Please try again.');
-              }
+              await shrinkStepAction(
+                currentTask.title,
+                currentTask.id,
+                stepIdx,
+                steps,
+                (err) => {
+                  console.error('Failed to shrink step:', err);
+                  showFeedback('Could not break down this step right now. Please try again.');
+                }
+              );
             }}
             onToggleSubStep={(parentStepId, subStepId) => {
               toggleSubStepCompletion(

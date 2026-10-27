@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter, useParams, usePathname } from 'next/navigation';
 import { useTaskStore } from '@/store/task-store';
 import { useHydrated } from '@/hooks/use-hydrated';
-import { shrinkStepWithAI } from '@/lib/ai/client';
+import { useFocusStepActions } from '@/hooks/use-focus-step-actions';
 import { MAX_BREAKDOWN_WAIT_MS } from '@/constants/timing';
 import { getActiveStep, getActiveStepIndex } from '@/lib/task-utils';
 import { getTaskDraftKey, removeChatDraft } from '@/lib/chat-drafts';
@@ -51,9 +51,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     toggleTheme,
     closeHistory,
     toggleHistory,
-    toggleStepCompletion,
-    toggleSubStepCompletion,
-    shrinkStep,
   } = useTaskStore();
 
   const activeTaskId = routeTaskId;
@@ -90,6 +87,9 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     ? steps.findIndex((s) => s.id === activeStep.id) + 1
     : null;
 
+  const { completeStepOrSubStep, completeWholeStep, shrinkStepAction } =
+    useFocusStepActions();
+
   const showIntro = Boolean(
     focusTunnelOpen &&
       activeTask?.introSeen === false &&
@@ -99,37 +99,12 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
 
   const handleCompleteFocusStep = () => {
     if (!activeStep || !activeTask) return;
-    const subSteps = activeStep.subSteps ?? [];
-    const incompleteSubSteps = subSteps.filter((s) => !s.completed);
-
-    if (incompleteSubSteps.length > 0) {
-      const currentSubStep = incompleteSubSteps[0];
-      const isLast = incompleteSubSteps.length === 1;
-      toggleSubStepCompletion(
-        activeTask.id,
-        activeStep.id,
-        currentSubStep.id
-      );
-      if (isLast) {
-        toggleStepCompletion(
-          activeTask.id,
-          activeStep.id
-        );
-      }
-    } else {
-      toggleStepCompletion(
-        activeTask.id,
-        activeStep.id
-      );
-    }
+    completeStepOrSubStep(activeTask, activeStep);
   };
 
   const handleCompleteWholeStep = () => {
     if (!activeStep || !activeTask) return;
-    toggleStepCompletion(
-      activeTask.id,
-      activeStep.id
-    );
+    completeWholeStep(activeTask.id, activeStep.id);
   };
 
   const shrinkFocusStepNow = async () => {
@@ -139,16 +114,13 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
       activeTask &&
       activeStep.canSplit
     ) {
-      try {
-        const { microSteps } = await shrinkStepWithAI(
-          activeTask.title,
-          steps,
-          activeStepIndex
-        );
-        shrinkStep(activeTask.id, activeStepIndex, microSteps);
-      } catch (err) {
-        console.error('Failed to shrink step in Focus Tunnel:', err);
-      }
+      await shrinkStepAction(
+        activeTask.title,
+        activeTask.id,
+        activeStepIndex,
+        steps,
+        (err) => console.error('Failed to shrink step in Focus Tunnel:', err)
+      );
     }
   };
 

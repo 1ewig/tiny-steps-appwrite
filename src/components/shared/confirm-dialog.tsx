@@ -1,9 +1,11 @@
 'use client';
 
 import { useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Trash, Warning, Check, SpinnerGap, X } from '@phosphor-icons/react';
 import { useFocusTrap } from '@/hooks/use-focus-trap';
+import { useHydrated } from '@/hooks/use-hydrated';
 import {
   backdropVariants,
   tactileButtonVariants,
@@ -49,6 +51,8 @@ export function ConfirmDialog({
     useCapture: true,
   });
 
+  const hasHydrated = useHydrated();
+
   const defaultIcon =
     variant === 'danger' ? (
       <Trash size={20} weight="duotone" className="text-danger-text" />
@@ -65,7 +69,9 @@ export function ConfirmDialog({
       ? 'bg-accent-subtle text-accent-text'
       : 'bg-surface-subtle text-text-secondary';
 
-  return (
+  if (!hasHydrated) return null;
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
@@ -195,6 +201,7 @@ export function ConfirmDialog({
           </div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

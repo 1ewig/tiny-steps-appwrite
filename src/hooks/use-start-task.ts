@@ -22,6 +22,7 @@ export function useStartTask() {
   const inFlightRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [restoreText, setRestoreText] = useState<string | null>(null);
+  const [attemptId, setAttemptId] = useState(0);
 
   const {
     granularity,
@@ -76,7 +77,8 @@ export function useStartTask() {
         setGeneratingTask(false);
         setGenerationNotice(ack);
         setRestoreText(trimmed);
-        return;
+        setAttemptId((prev) => prev + 1);
+        throw new Error(ack || 'Generation refused');
       }
 
       const newTaskId = createTask({
@@ -93,8 +95,10 @@ export function useStartTask() {
       console.error(err);
       setGeneratingTask(false);
       setGenerationNotice(ERROR_MESSAGE);
-      setError(null);
+      setError(ERROR_MESSAGE);
       setRestoreText(trimmed);
+      setAttemptId((prev) => prev + 1);
+      throw err;
     } finally {
       inFlightRef.current = false;
     }
@@ -105,5 +109,6 @@ export function useStartTask() {
     isGeneratingTask,
     error,
     restoreText,
+    attemptId,
   };
 }

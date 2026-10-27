@@ -244,7 +244,7 @@ export function HistoryDrawer({
                                       {task.title || 'Untitled task'}
                                     </p>
                                     {isCurrent && (
-                                      <span className="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-accent text-text-inverse tracking-wide uppercase shadow-subtle">
+                                      <span className="shrink-0 px-1.5 py-0.5 rounded text-2xs font-semibold bg-accent text-text-inverse tracking-wide uppercase shadow-subtle">
                                         Active
                                       </span>
                                     )}

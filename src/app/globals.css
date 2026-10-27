@@ -325,8 +325,15 @@
   --shadow-modal: var(--shadow-modal);
   --shadow-inset: var(--shadow-inset);
 
+  /* Breakpoints */
+  --breakpoint-xs: 26.25rem;
+
   /* Transitions */
   --ease-calm: var(--ease-calm);
+  --transition-duration-instant: var(--duration-instant);
+  --transition-duration-fast: var(--duration-fast);
+  --transition-duration-normal: var(--duration-normal);
+  --transition-duration-slow: var(--duration-slow);
 
   /* Typography */
   --text-2xs: var(--text-2xs);
@@ -445,13 +452,17 @@ body {
 }
 
 .future-step-blur:hover,
+.future-step-blur:focus-visible,
+.future-step-blur:focus-within,
 .peek-enabled .future-step-blur {
   filter: blur(0px);
   opacity: 0.85;
   user-select: auto;
 }
 
-.future-step-blur:hover {
+.future-step-blur:hover,
+.future-step-blur:focus-visible,
+.future-step-blur:focus-within {
   transition-duration: var(--duration-fast);
   transition-delay: var(--delay-hover-reveal), 0ms, 0ms, 0ms, 0ms, 0ms;
 }

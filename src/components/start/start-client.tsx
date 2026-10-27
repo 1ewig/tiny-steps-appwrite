@@ -20,7 +20,7 @@ export function StartClient() {
   const hasHydrated = useHydrated();
   const pathname = usePathname();
   const { granularity, setGranularity, tasks, openHistory, openOnboarding } = useTaskStore();
-  const { startTask, isGeneratingTask, error, restoreText } = useStartTask();
+  const { startTask, isGeneratingTask, error, restoreText, attemptId } = useStartTask();
   const reduceMotion = useReducedMotion();
 
   const displayedGranularity = hasHydrated ? granularity : 2;
@@ -43,7 +43,7 @@ export function StartClient() {
         <div className="space-y-4">
           <motion.div variants={reduceMotion ? undefined : unblurFadeInVariants}>
             <ChatInput
-              key={restoreText ?? 'fresh'}
+              key={attemptId > 0 ? `attempt-${attemptId}` : (restoreText ?? 'fresh')}
               disabled={isGeneratingTask}
               onSubmit={startTask}
               initialText={restoreText ?? ''}

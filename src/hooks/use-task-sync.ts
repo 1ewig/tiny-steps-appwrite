@@ -20,8 +20,8 @@ async function performReconcile(userId: string) {
   setIsSyncing(true);
 
   try {
-    // 1. Identify local tasks that need cloud migration (unassigned or transitioning from anonymous session)
-    const unassignedLocal = currentLocal.filter((t) => !t.userId || t.userId !== userId);
+    // 1. Identify local tasks that need cloud migration (unassigned tasks created in guest/offline state)
+    const unassignedLocal = currentLocal.filter((t) => !t.userId);
     if (unassignedLocal.length > 0) {
       await Promise.allSettled(
         unassignedLocal.map((task) =>

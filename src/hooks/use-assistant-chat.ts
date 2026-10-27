@@ -59,6 +59,7 @@ export function useAssistantChat(task?: Task | null, granularity?: EnergyLevel) 
       } catch (err) {
         console.error('Failed to interpret intent:', err);
         showFeedback('The assistant needs a moment. Please try again.');
+        throw err;
       } finally {
         setIsTyping(false);
       }

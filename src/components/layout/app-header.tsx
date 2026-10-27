@@ -12,14 +12,9 @@ interface AppHeaderProps {
   hasActiveSteps: boolean;
   onOpenFocusTunnel?: () => void;
   onToggleHistory?: () => void;
-  onToggleSidebar?: () => void;
   showHomeButton?: boolean;
   onHome?: () => void;
   hasBorder?: boolean;
-  // Optional backwards-compatibility
-  sessionTitle?: string;
-  showNewTaskButton?: boolean;
-  onNewTask?: () => void;
   onOpenOnboarding?: () => void;
 }
 
@@ -27,19 +22,12 @@ export function AppHeader({
   hasActiveSteps,
   onOpenFocusTunnel,
   onToggleHistory,
-  onToggleSidebar,
-  showHomeButton,
+  showHomeButton = false,
   onHome,
-  showNewTaskButton,
-  onNewTask,
   onOpenOnboarding,
   hasBorder = true,
 }: AppHeaderProps) {
   const reduceMotion = useReducedMotion();
-
-  const isHomeVisible = showHomeButton ?? showNewTaskButton ?? false;
-  const handleHome = onHome ?? onNewTask;
-  const handleToggleHistory = onToggleHistory ?? onToggleSidebar;
 
   return (
     <header
@@ -51,9 +39,9 @@ export function AppHeader({
     >
       <div className="flex items-center gap-2 sm:gap-3 min-w-0">
         {/* Home Button (Far Left) */}
-        {isHomeVisible && handleHome && (
+        {showHomeButton && onHome && (
           <motion.button
-            onClick={handleHome}
+            onClick={onHome}
             variants={reduceMotion ? undefined : tactileButtonVariants}
             initial="rest"
             animate="rest"
@@ -120,9 +108,9 @@ export function AppHeader({
         )}
 
         {/* History Drawer Trigger Button (Far Right) */}
-        {handleToggleHistory && (
+        {onToggleHistory && (
           <motion.button
-            onClick={handleToggleHistory}
+            onClick={onToggleHistory}
             variants={reduceMotion ? undefined : tactileButtonVariants}
             initial="rest"
             animate="rest"

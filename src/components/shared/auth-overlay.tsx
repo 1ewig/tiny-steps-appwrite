@@ -1,12 +1,14 @@
 'use client';
 
 import { useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { X, CloudCheck, SpinnerGap } from '@phosphor-icons/react';
 import { useAuth } from '@/hooks/use-auth';
 import { useFocusTrap } from '@/hooks/use-focus-trap';
+import { useHydrated } from '@/hooks/use-hydrated';
 import { AppIcon } from '@/components/shared/app-icon';
-import { GoogleIcon } from '@/components/shared/auth-button';
+import { GoogleIcon } from '@/components/shared/google-icon';
 import {
   CALM_EASE,
   tactileButtonVariants,
@@ -22,6 +24,7 @@ export function AuthOverlay({ isOpen, onClose }: AuthOverlayProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
   const { isSigningIn, signInWithGoogle } = useAuth();
+  const hasHydrated = useHydrated();
 
   useFocusTrap({
     isOpen,
@@ -31,7 +34,9 @@ export function AuthOverlay({ isOpen, onClose }: AuthOverlayProps) {
     useCapture: true,
   });
 
-  return (
+  if (!hasHydrated) return null;
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div
@@ -148,6 +153,7 @@ export function AuthOverlay({ isOpen, onClose }: AuthOverlayProps) {
           </footer>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

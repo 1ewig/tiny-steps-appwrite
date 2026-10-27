@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, ArrowSquareOut } from '@phosphor-icons/react';
+import { useFocusTrap } from '@/hooks/use-focus-trap';
 import {
   CALM_EASE,
   tactileButtonVariants,
@@ -55,17 +56,34 @@ function FocusLoaderContent({
   const [showText, setShowText] = useState(reduceMotion || Boolean(noticeMessage));
   const [lineIndex, setLineIndex] = useState(0);
   const dismissButtonRef = useRef<HTMLButtonElement>(null);
+  const noticeContainerRef = useRef<HTMLDivElement>(null);
 
   const isCrisis = isCrisisGuidance(noticeMessage);
+
+  useFocusTrap({
+    isOpen: Boolean(noticeMessage),
+    containerRef: noticeContainerRef,
+    onClose: onDismissNotice,
+  });
 
   // Handle keyboard dismissal when notice is active
   useEffect(() => {
     if (!noticeMessage || !onDismissNotice) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' || e.key === 'Enter') {
+      if (e.key === 'Escape') {
         e.preventDefault();
         onDismissNotice();
+      } else if (e.key === 'Enter') {
+        const active = document.activeElement;
+        const isInteractive =
+          active &&
+          (active.tagName === 'A' ||
+            (active.tagName === 'BUTTON' && active !== dismissButtonRef.current));
+        if (!isInteractive) {
+          e.preventDefault();
+          onDismissNotice();
+        }
       }
     };
 
@@ -98,22 +116,16 @@ function FocusLoaderContent({
     if (reduceMotion || !showText || noticeMessage) return;
 
     let timeoutId: ReturnType<typeof setTimeout>;
+    const delay = lineIndex === 0 ? 3000 : 4000;
 
-    const scheduleNext = (delayMs: number) => {
+    if (lineIndex < LOADING_LINES.length - 1) {
       timeoutId = setTimeout(() => {
-        setLineIndex((prev) => {
-          if (prev >= LOADING_LINES.length - 1) return prev;
-          const next = prev + 1;
-          scheduleNext(4000);
-          return next;
-        });
-      }, delayMs);
-    };
-
-    scheduleNext(3000);
+        setLineIndex((prev) => Math.min(prev + 1, LOADING_LINES.length - 1));
+      }, delay);
+    }
 
     return () => clearTimeout(timeoutId);
-  }, [showText, reduceMotion, noticeMessage]);
+  }, [showText, reduceMotion, noticeMessage, lineIndex]);
 
   const overlayVariants = {
     initial: { opacity: 0 },
@@ -148,8 +160,9 @@ function FocusLoaderContent({
       animate="animate"
       exit="exit"
       className="focus-loader fixed inset-0 bg-canvas flex items-center justify-center px-4 sm:px-6 select-none"
-      role="status"
-      aria-live="polite"
+      role={noticeMessage ? 'alertdialog' : 'status'}
+      aria-modal={noticeMessage ? 'true' : undefined}
+      aria-live={noticeMessage ? undefined : 'polite'}
     >
       <span className="sr-only">
         {noticeMessage ? 'Gentle guidance message' : 'Preparing your tiny steps.'}
@@ -159,6 +172,7 @@ function FocusLoaderContent({
         {noticeMessage ? (
           <AnimatePresence>
             <motion.div
+              ref={noticeContainerRef}
               key="notice-card"
               variants={reduceMotion ? undefined : subtleMorphVariants}
               initial="initial"
