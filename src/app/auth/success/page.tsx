@@ -31,7 +31,7 @@ function OAuthSuccessContent() {
       try {
         const account = getAccount();
         // Await session creation with the first-party token
-        await account.createSession({ userId, secret });
+        const session = await account.createSession({ userId, secret });
 
         // Fetch authenticated user profile
         const user = await account.get();
@@ -47,8 +47,7 @@ function OAuthSuccessContent() {
           try {
             const anonId = sessionStorage.getItem('tinysteps_anon_migration_id');
             if (anonId && anonId !== user.$id) {
-              await reassignGuestTasksInDb(anonId, user.$id, secret);
-              sessionStorage.removeItem('tinysteps_anon_migration_id');
+              await reassignGuestTasksInDb(anonId, user.$id, session.secret);
             }
           } catch (migErr) {
             console.warn('[OAuth Success] Guest task reassignment error:', migErr);
@@ -74,8 +73,14 @@ function OAuthSuccessContent() {
               try {
                 const anonId = sessionStorage.getItem('tinysteps_anon_migration_id');
                 if (anonId && anonId !== user.$id) {
-                  await reassignGuestTasksInDb(anonId, user.$id, secret || undefined);
-                  sessionStorage.removeItem('tinysteps_anon_migration_id');
+                  let activeSessionSecret: string | undefined = undefined;
+                  try {
+                    const currentSession = await account.getSession({ sessionId: 'current' });
+                    activeSessionSecret = currentSession.secret;
+                  } catch {
+                    // Ignore session fetch error
+                  }
+                  await reassignGuestTasksInDb(anonId, user.$id, activeSessionSecret);
                 }
               } catch (migErr) {
                 console.warn('[OAuth Success] Guest task reassignment error:', migErr);

@@ -107,6 +107,30 @@ export interface PromptStepTreeItem {
   }>;
 }
 
+/**
+ * Normalizes an unknown step payload safely into PromptStepTreeItem[].
+ * Bounds string length and array sizes to prevent prompt bloat and injection risks.
+ */
+export function normalizePromptStepTree(rawSteps: unknown): PromptStepTreeItem[] {
+  if (!Array.isArray(rawSteps)) return [];
+  return rawSteps.slice(0, 50).map((step: any, index: number): PromptStepTreeItem => ({
+    id: typeof step?.id === 'number' ? step.id : index + 1,
+    title: typeof step?.title === 'string' ? step.title.trim().slice(0, 255) : undefined,
+    text: typeof step?.text === 'string' ? step.text.trim().slice(0, 255) : undefined,
+    instruction: typeof step?.instruction === 'string' ? step.instruction.trim().slice(0, 500) : undefined,
+    completed: Boolean(step?.completed),
+    subSteps: Array.isArray(step?.subSteps)
+      ? step.subSteps.slice(0, 5).map((sub: any, subIndex: number) => ({
+          id: typeof sub?.id === 'number' ? sub.id : subIndex + 1,
+          title: typeof sub?.title === 'string' ? sub.title.trim().slice(0, 255) : undefined,
+          text: typeof sub?.text === 'string' ? sub.text.trim().slice(0, 255) : undefined,
+          instruction: typeof sub?.instruction === 'string' ? sub.instruction.trim().slice(0, 500) : undefined,
+          completed: Boolean(sub?.completed),
+        }))
+      : undefined,
+  }));
+}
+
 interface FormatStepTreeOptions {
   activeStepId?: number | null;
   focusStepId?: number | null;

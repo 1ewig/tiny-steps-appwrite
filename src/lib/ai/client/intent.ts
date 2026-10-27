@@ -232,7 +232,7 @@ export async function interpretUserIntentWithAI(
       };
     }
 
-    if (data.type === 'tweak_steps' || data.type === 'new_task') {
+    if (data.type === 'tweak_steps') {
       const formattedSteps: Step[] = Array.isArray(data.steps)
         ? data.steps.map(
             (s: { title?: string; text?: string; instruction?: string }, i: number) => {
@@ -250,7 +250,36 @@ export async function interpretUserIntentWithAI(
         : [];
 
       console.log(
-        `[Tweak] END (${Date.now() - startTime}ms) - Intent: ${data.type} (Adjusted steps: ${formattedSteps.length})`
+        `[Tweak] END (${Date.now() - startTime}ms) - Intent: tweak_steps (Adjusted steps: ${formattedSteps.length})`
+      );
+      return {
+        type: 'tweak_steps',
+        title: taskTitle,
+        acknowledgment: ack,
+        dialogue: ack,
+        steps: formattedSteps,
+      };
+    }
+
+    if (data.type === 'new_task') {
+      const formattedSteps: Step[] = Array.isArray(data.steps)
+        ? data.steps.map(
+            (s: { title?: string; text?: string; instruction?: string }, i: number) => {
+              const title = s.title?.trim() || s.text?.trim() || 'Next tiny action';
+              return {
+                id: baseTime + i,
+                title,
+                instruction: s.instruction?.trim() || 'Take a calm breath and take just this one physical step.',
+                text: title,
+                completed: false,
+                canSplit: true,
+              };
+            }
+          )
+        : [];
+
+      console.log(
+        `[Tweak] END (${Date.now() - startTime}ms) - Intent: new_task (Adjusted steps: ${formattedSteps.length})`
       );
       return {
         type: 'new_task',
@@ -282,7 +311,7 @@ export async function interpretUserIntentWithAI(
     // Default or encouragement: return dialogue as advice
     console.log(`[Tweak] END (${Date.now() - startTime}ms) - Intent: encouragement`);
     return {
-      type: 'all_complete',
+      type: 'encouragement',
       acknowledgment: ack,
       dialogue: ack,
     };

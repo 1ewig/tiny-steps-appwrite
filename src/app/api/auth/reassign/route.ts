@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Client as ServerClient, Account as ServerAccount, Query, Permission, Role } from 'node-appwrite';
-import { getServerTablesDB } from '@/lib/appwrite/server';
+import { getServerTablesDB, getServerUsers } from '@/lib/appwrite/server';
 import { APPWRITE_CONFIG } from '@/lib/appwrite/config';
 
 export async function POST(req: NextRequest) {
@@ -52,11 +52,29 @@ export async function POST(req: NextRequest) {
     }
 
     if (!process.env.APPWRITE_API_KEY) {
-      // In environments without server API key, client-side reconciliation claims and upserts the tasks
-      return NextResponse.json({
-        ok: true,
-        note: 'Server API key absent; migration handled via client reconciliation',
-      });
+      return NextResponse.json(
+        { error: 'Server API key absent; migration unavailable' },
+        { status: 503 }
+      );
+    }
+
+    // 2. Security: Verify that fromUserId belongs to an anonymous guest user account,
+    // preventing authenticated users from claiming tasks of other registered users.
+    const serverUsers = getServerUsers();
+    try {
+      const sourceUser = await serverUsers.get(fromUserId);
+      if (sourceUser.email || sourceUser.phone) {
+        return NextResponse.json(
+          { error: 'Forbidden: source user is not an anonymous guest account' },
+          { status: 403 }
+        );
+      }
+    } catch (err: unknown) {
+      console.warn(`[Reassign API] Could not verify source user ${fromUserId}:`, err);
+      return NextResponse.json(
+        { error: 'Source user not found or unverified' },
+        { status: 404 }
+      );
     }
 
     const serverTablesDB = getServerTablesDB();
@@ -64,14 +82,21 @@ export async function POST(req: NextRequest) {
     const TASKS_TABLE = APPWRITE_CONFIG.tables.tasks;
     const STEPS_TABLE = APPWRITE_CONFIG.tables.steps;
 
-    // 2. Fetch all tasks belonging to fromUserId
-    const tasksRes = await serverTablesDB.listRows({
-      databaseId: DB_ID,
-      tableId: TASKS_TABLE,
-      queries: [Query.equal('userId', fromUserId), Query.limit(100)],
-    });
+    // 3. Fetch all tasks belonging to fromUserId with pagination loop
+    const allTasks: Array<{ $id: string }> = [];
+    let taskOffset = 0;
+    while (true) {
+      const tasksRes = await serverTablesDB.listRows({
+        databaseId: DB_ID,
+        tableId: TASKS_TABLE,
+        queries: [Query.equal('userId', fromUserId), Query.limit(100), Query.offset(taskOffset)],
+      });
+      allTasks.push(...tasksRes.rows);
+      if (tasksRes.rows.length < 100) break;
+      taskOffset += 100;
+    }
 
-    if (tasksRes.rows.length === 0) {
+    if (allTasks.length === 0) {
       return NextResponse.json({ ok: true, migratedCount: 0 });
     }
 
@@ -81,8 +106,8 @@ export async function POST(req: NextRequest) {
       Permission.delete(Role.user(toUserId)),
     ];
 
-    // 3. Reassign each task and its steps with the new owner's RLS permissions
-    for (const taskRow of tasksRes.rows) {
+    // 4. Reassign each task and its steps with the new owner's RLS permissions
+    for (const taskRow of allTasks) {
       await serverTablesDB.updateRow({
         databaseId: DB_ID,
         tableId: TASKS_TABLE,
@@ -93,28 +118,34 @@ export async function POST(req: NextRequest) {
         permissions: newPermissions,
       });
 
-      // Update steps for this task
+      // Update steps for this task with pagination loop
       try {
-        const stepsRes = await serverTablesDB.listRows({
-          databaseId: DB_ID,
-          tableId: STEPS_TABLE,
-          queries: [Query.equal('taskId', taskRow.$id), Query.limit(100)],
-        });
-
-        for (const stepRow of stepsRes.rows) {
-          await serverTablesDB.updateRow({
+        let stepOffset = 0;
+        while (true) {
+          const stepsRes = await serverTablesDB.listRows({
             databaseId: DB_ID,
             tableId: STEPS_TABLE,
-            rowId: stepRow.$id,
-            permissions: newPermissions,
+            queries: [Query.equal('taskId', taskRow.$id), Query.limit(100), Query.offset(stepOffset)],
           });
+
+          for (const stepRow of stepsRes.rows) {
+            await serverTablesDB.updateRow({
+              databaseId: DB_ID,
+              tableId: STEPS_TABLE,
+              rowId: stepRow.$id,
+              permissions: newPermissions,
+            });
+          }
+
+          if (stepsRes.rows.length < 100) break;
+          stepOffset += 100;
         }
       } catch (stepErr) {
         console.warn(`[Reassign API] Failed updating steps for task ${taskRow.$id}:`, stepErr);
       }
     }
 
-    return NextResponse.json({ ok: true, migratedCount: tasksRes.rows.length });
+    return NextResponse.json({ ok: true, migratedCount: allTasks.length });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Migration failed';
     console.error('[Reassign API] Error:', err);

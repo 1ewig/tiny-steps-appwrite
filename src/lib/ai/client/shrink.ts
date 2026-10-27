@@ -66,7 +66,7 @@ export async function shrinkStepWithAI(
     const ack =
       data.acknowledgment ||
       data.dialogue ||
-      'No problem at all! If a step makes you hesitate, that is just your brain saying it is still too large. I shrank it into tiny bite-sized pieces for you:';
+      'Wanting smaller steps is completely normal. Here is a smaller, more approachable piece to begin:';
 
     const result = {
       acknowledgment: ack,

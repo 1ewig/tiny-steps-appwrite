@@ -2,6 +2,7 @@ import {
   Client as ServerClient,
   TablesDB as ServerTablesDB,
   Databases as ServerDatabases,
+  Users as ServerUsers,
 } from 'node-appwrite';
 import { APPWRITE_CONFIG } from './config';
 
@@ -31,3 +32,16 @@ export function getServerDatabases(): ServerDatabases {
 
   return new ServerDatabases(client);
 }
+
+export function getServerUsers(): ServerUsers {
+  const client = new ServerClient()
+    .setEndpoint(APPWRITE_CONFIG.endpoint)
+    .setProject(APPWRITE_CONFIG.projectId);
+
+  if (SERVER_API_KEY) {
+    client.setKey(SERVER_API_KEY);
+  }
+
+  return new ServerUsers(client);
+}
+

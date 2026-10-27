@@ -22,9 +22,17 @@ async function performReconcile(userId: string) {
   const { tasks: currentLocal, setTasks, setIsSyncing, setLastSyncedAt } = useTaskStore.getState();
   setIsSyncing(true);
 
+  const anonMigrationId =
+    typeof window !== 'undefined'
+      ? sessionStorage.getItem('tinysteps_anon_migration_id')
+      : null;
+
   try {
-    // 1. Identify local tasks that need cloud migration (unassigned tasks created in guest/offline state)
-    const unassignedLocal = currentLocal.filter((t) => !t.userId);
+    // 1. Identify local tasks that need cloud migration:
+    // Either tasks with no userId, or tasks created during the anonymous guest session being claimed
+    const unassignedLocal = currentLocal.filter(
+      (t) => !t.userId || (anonMigrationId && t.userId === anonMigrationId)
+    );
     if (unassignedLocal.length > 0) {
       await Promise.allSettled(
         unassignedLocal.map((task) =>
@@ -54,8 +62,9 @@ async function performReconcile(userId: string) {
 
     // Process local tasks
     currentLocal.forEach((lt) => {
-      // NEVER claim tasks belonging to another account
-      if (lt.userId && lt.userId !== userId) {
+      const isClaimableGuestTask = !lt.userId || (anonMigrationId && lt.userId === anonMigrationId);
+      // NEVER claim tasks belonging to another permanent account
+      if (lt.userId && lt.userId !== userId && !isClaimableGuestTask) {
         return;
       }
       const cloudVersion = cloudMap.get(lt.id);
@@ -84,6 +93,11 @@ async function performReconcile(userId: string) {
     // Final guard before updating store
     if (currentGen !== reconcileGeneration || useTaskStore.getState().user?.id !== userId) {
       return null;
+    }
+
+    // Guest task migration for this session is complete
+    if (anonMigrationId && typeof window !== 'undefined') {
+      sessionStorage.removeItem('tinysteps_anon_migration_id');
     }
 
     setTasks(mergedList);

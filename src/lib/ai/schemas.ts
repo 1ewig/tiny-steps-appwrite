@@ -89,15 +89,33 @@ export const AssistantIntentSchema = z.object({
       'If encouragement (venting exhaustion), provide calm solidarity.'
     ),
   targetStepId: z
-    .union([z.number(), z.string().transform((v) => Number(v) || undefined)])
+    .union([
+      z.number(),
+      z.string().transform((v) => {
+        const n = Number(v);
+        return Number.isInteger(n) ? n : undefined;
+      }),
+    ])
     .optional()
     .describe('Target step ID if targeting, completing, or modifying a specific parent step'),
   targetSubStepId: z
-    .union([z.number(), z.string().transform((v) => Number(v) || undefined)])
+    .union([
+      z.number(),
+      z.string().transform((v) => {
+        const n = Number(v);
+        return Number.isInteger(n) ? n : undefined;
+      }),
+    ])
     .optional()
     .describe('Target sub-step ID if modifying or removing a specific sub-step'),
   targetStepIndex: z
-    .union([z.number(), z.string().transform((v) => Number(v) || undefined)])
+    .union([
+      z.number(),
+      z.string().transform((v) => {
+        const n = Number(v);
+        return Number.isInteger(n) ? n : undefined;
+      }),
+    ])
     .optional()
     .describe('Target step index (0-based) if shrinking a step'),
   title: z

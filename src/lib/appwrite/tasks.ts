@@ -71,24 +71,21 @@ export async function saveTaskToDb(task: Task, userId: string): Promise<string> 
     queries: [Query.equal('taskId', effectiveTaskId)],
   });
 
-  // 3. Remove old step rows to avoid orphaned or duplicated steps
-  if (existingSteps.rows.length > 0) {
-    await Promise.all(
-      existingSteps.rows.map((row) =>
-        tablesDB.deleteRow({
-          databaseId: DB_ID,
-          tableId: STEPS_TABLE,
-          rowId: row.$id,
-        })
-      )
-    );
-  }
-
-  // 4. Insert current steps
+  // 3. Insert current steps FIRST to protect against data-loss if network drops or insert fails
   if (task.steps && task.steps.length > 0) {
     await Promise.all(
       task.steps.map((st, index) => {
-        const subStepsStr = st.subSteps ? JSON.stringify(st.subSteps) : '[]';
+        const safeSubSteps = Array.isArray(st.subSteps)
+          ? st.subSteps.slice(0, 5).map((sub, sIdx) => ({
+              id: typeof sub.id === 'number' ? sub.id : sIdx + 1,
+              title: (sub.title || sub.text || 'Step').slice(0, 255),
+              text: (sub.text || sub.title || 'Step').slice(0, 255),
+              instruction: (sub.instruction || '').slice(0, 500),
+              completed: Boolean(sub.completed),
+              canSplit: Boolean(sub.canSplit),
+            }))
+          : [];
+        const subStepsStr = JSON.stringify(safeSubSteps);
         return tablesDB.createRow({
           databaseId: DB_ID,
           tableId: STEPS_TABLE,
@@ -100,11 +97,24 @@ export async function saveTaskToDb(task: Task, userId: string): Promise<string> 
             completed: Boolean(st.completed),
             order: index + 1,
             canSplit: st.canSplit ?? true,
-            subSteps: subStepsStr.slice(0, 5000),
+            subSteps: subStepsStr,
           },
           permissions: rowPermissions,
         });
       })
+    );
+  }
+
+  // 4. Remove old step rows now that current steps are safely persisted
+  if (existingSteps.rows.length > 0) {
+    await Promise.all(
+      existingSteps.rows.map((row) =>
+        tablesDB.deleteRow({
+          databaseId: DB_ID,
+          tableId: STEPS_TABLE,
+          rowId: row.$id,
+        })
+      )
     );
   }
 
@@ -229,7 +239,14 @@ export async function fetchUserTasksFromDb(userId: string): Promise<Task[]> {
             try {
               const parsed = JSON.parse(stRow.subSteps);
               if (Array.isArray(parsed) && parsed.length > 0) {
-                subSteps = parsed;
+                subSteps = parsed.map((s: any, sIdx: number) => ({
+                  id: typeof s.id === 'number' ? s.id : sIdx + 1,
+                  title: typeof s.title === 'string' ? s.title : 'Micro action',
+                  text: typeof s.text === 'string' ? s.text : (s.title || 'Micro action'),
+                  instruction: typeof s.instruction === 'string' ? s.instruction : '',
+                  completed: Boolean(s.completed),
+                  canSplit: Boolean(s.canSplit),
+                }));
               }
             } catch {
               subSteps = undefined;

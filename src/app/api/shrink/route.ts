@@ -2,34 +2,14 @@ import { NextResponse } from 'next/server';
 import { generateText, Output } from 'ai';
 import { getAIGatewayModel, getAIReasoningEffort } from '@/lib/ai/gateway';
 import { ShrinkStepSchema } from '@/lib/ai/schemas';
-import { getShrinkStepPrompt, type PromptStepTreeItem } from '@/lib/ai/prompts';
-
-function normalizeStep(step: any, index: number): PromptStepTreeItem {
-  return {
-    id: typeof step?.id === 'number' ? step.id : index + 1,
-    title: typeof step?.title === 'string' ? step.title : undefined,
-    text: typeof step?.text === 'string' ? step.text : undefined,
-    instruction: typeof step?.instruction === 'string' ? step.instruction : undefined,
-    completed: Boolean(step?.completed),
-    subSteps: Array.isArray(step?.subSteps)
-      ? step.subSteps.map((sub: any, subIndex: number) => ({
-          id: typeof sub?.id === 'number' ? sub.id : subIndex + 1,
-          title: typeof sub?.title === 'string' ? sub.title : undefined,
-          text: typeof sub?.text === 'string' ? sub.text : undefined,
-          instruction: typeof sub?.instruction === 'string' ? sub.instruction : undefined,
-          completed: Boolean(sub?.completed),
-        }))
-      : undefined,
-  };
-}
+import { getShrinkStepPrompt, normalizePromptStepTree, type PromptStepTreeItem } from '@/lib/ai/prompts';
 
 export async function POST(req: Request) {
   const startTime = Date.now();
   try {
     const body = await req.json();
-    const taskTitle = typeof body.taskTitle === 'string' ? body.taskTitle.trim() : 'Task';
-    const rawSteps = Array.isArray(body.steps) ? body.steps : [];
-    const steps: PromptStepTreeItem[] = rawSteps.map(normalizeStep);
+    const taskTitle = typeof body.taskTitle === 'string' ? body.taskTitle.trim().slice(0, 500) : 'Task';
+    const steps: PromptStepTreeItem[] = normalizePromptStepTree(body.steps);
     const targetStepIndex = Number.isInteger(body.targetStepIndex)
       ? body.targetStepIndex
       : -1;
@@ -50,7 +30,7 @@ export async function POST(req: Request) {
 
     const completedCount = steps.filter((step) => step.completed).length;
     console.log(
-      `[API:Shrink] START - Target: "${targetTitle}" | Task Title: "${taskTitle}" | Progress: ${completedCount}/${steps.length}`
+      `[API:Shrink] START - Steps: ${steps.length} | Completed: ${completedCount} | Target Index: ${targetStepIndex}`
     );
 
     const model = getAIGatewayModel();
@@ -69,6 +49,7 @@ export async function POST(req: Request) {
       system,
       prompt,
       reasoning: getAIReasoningEffort(),
+      abortSignal: req.signal,
     });
 
     console.log(
@@ -77,10 +58,10 @@ export async function POST(req: Request) {
 
     return NextResponse.json(output);
   } catch (error: any) {
-    console.error(`[API:Shrink] ERROR (${Date.now() - startTime}ms):`, error);
+    console.error(`[API:Shrink] ERROR (${Date.now() - startTime}ms):`, error instanceof Error ? error.message : error);
     return NextResponse.json(
       {
-        error: error?.message || 'Failed to shrink step',
+        error: 'Failed to shrink step. Please try again.',
       },
       { status: 500 }
     );
