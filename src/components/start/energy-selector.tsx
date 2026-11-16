@@ -35,13 +35,13 @@ const ENERGY_OPTIONS: EnergyOption[] = [
     level: 2,
     icon: Leaf,
     label: 'Overwhelmed',
-    description: 'Low-friction starter steps to break through mental fog.',
+    description: 'Gentle, low-friction steps to ease mental fog.',
   },
   {
     level: 3,
     icon: PottedPlant,
     label: 'Full paralysis',
-    description: 'Ultra-small initial actions to break inertia with zero pressure.',
+    description: 'Tiny, zero-pressure actions to get you moving.',
   },
 ];
 

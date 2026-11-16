@@ -7,7 +7,7 @@ import { useHydrated } from '@/hooks/use-hydrated';
 import { useAssistantChat } from '@/hooks/use-assistant-chat';
 import { useFocusStepActions } from '@/hooks/use-focus-step-actions';
 import { TaskCard } from '@/components/task-breakdown/task-card';
-import { PeekToggle } from '@/components/task-breakdown/peek-toggle';
+import { FocusTunnelFab } from '@/components/task-breakdown/focus-tunnel-fab';
 import { ChatInput } from '@/components/shared/chat-input';
 import { AppIcon } from '@/components/shared/app-icon';
 import { getTaskDraftKey } from '@/lib/chat-drafts';
@@ -26,9 +26,8 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
   const {
     tasks,
     granularity,
-    peekFuture,
-    togglePeek,
     focusTunnelTaskId,
+    openFocusTunnel,
     toggleStepCompletion,
     toggleSubStepCompletion,
   } = useTaskStore();
@@ -138,9 +137,9 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
         draftKey={getTaskDraftKey(currentTask.id)}
       />
 
-      {/* Floating Round Blur/Peek Toggle (Bottom-Right) */}
+      {/* Floating Focus Tunnel Launcher (Bottom-Right FAB) */}
       {steps.length > 0 && !focusTunnelOpen && (
-        <PeekToggle isPeekEnabled={peekFuture} onToggle={togglePeek} />
+        <FocusTunnelFab onOpen={() => openFocusTunnel(currentTask.id)} />
       )}
     </>
   );

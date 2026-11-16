@@ -32,6 +32,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
   const {
     tasks,
     peekFuture,
+    togglePeek,
     focusTunnelTaskId,
     isGeneratingTask,
     generationNotice,
@@ -41,7 +42,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     theme,
     deleteTask,
     markIntroSeen,
-    openFocusTunnel,
     closeFocusTunnel,
     openOnboarding,
     closeOnboarding,
@@ -191,20 +191,17 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className={`h-screen flex overflow-hidden font-sans ${peekEnabled ? 'peek-enabled' : ''}`}>
+    <div className={`h-screen h-dvh flex overflow-hidden font-sans ${peekEnabled ? 'peek-enabled' : ''}`}>
       {/* Main Full-Width Column (Distraction-Free Workspace) */}
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
         {/* AppHeader - Fixed, Static & Never Unmounted */}
         <AppHeader
           hasActiveSteps={Boolean(activeTask && steps.length > 0)}
           hasBorder={Boolean(activeTaskId)}
+          isPeekEnabled={peekFuture}
+          onTogglePeek={activeTask && steps.length > 0 ? togglePeek : undefined}
           onToggleHistory={toggleHistory}
-          onOpenOnboarding={openOnboarding}
-          onOpenFocusTunnel={
-            activeTask && activeTaskId && steps.length > 0
-              ? () => openFocusTunnel(activeTaskId)
-              : undefined
-          }
+          onOpenOnboarding={!activeTaskId ? openOnboarding : undefined}
           showHomeButton={Boolean(activeTaskId)}
           onHome={() => {
             closeFocusTunnel();

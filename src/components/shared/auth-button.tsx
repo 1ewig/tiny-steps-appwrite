@@ -79,13 +79,13 @@ export function AuthButton() {
           animate="rest"
           whileHover={reduceMotion ? undefined : 'hover'}
           whileTap={reduceMotion ? undefined : 'tap'}
-          className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex items-center justify-center sm:justify-start gap-1.5 h-8 w-8 sm:w-auto p-0 sm:px-3 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           title="Sign in for cloud backup"
           aria-label="Sign in"
         >
           <motion.span
             variants={reduceMotion ? undefined : tactileIconVariants}
-            className="shrink-0 flex items-center"
+            className="shrink-0 flex items-center justify-center"
           >
             <SignIn size={15} weight="regular" className="text-accent" />
           </motion.span>
@@ -114,32 +114,27 @@ export function AuthButton() {
         animate="rest"
         whileHover={reduceMotion ? undefined : 'hover'}
         whileTap={reduceMotion ? undefined : 'tap'}
-        className="inline-flex items-center gap-1.5 h-8 pl-1.5 pr-2.5 rounded-md text-xs font-medium text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="inline-flex items-center justify-center sm:justify-start gap-1.5 h-8 w-8 sm:w-auto p-0 sm:pl-1.5 sm:pr-2.5 rounded-md text-xs font-medium text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         aria-expanded={isOpen}
         aria-haspopup="menu"
         title={`${displayName} (Signed in)`}
       >
-        <span className="w-5 h-5 rounded-full bg-accent text-text-inverse flex items-center justify-center text-2xs font-bold shrink-0">
+        <span className="w-5 h-5 rounded-full bg-accent text-text-inverse flex items-center justify-center text-2xs font-bold leading-none select-none shrink-0">
           {initial}
         </span>
-        <span className="max-w-[70px] sm:max-w-[90px] truncate hidden xs:inline">
+        <span className="max-w-[70px] sm:max-w-[90px] truncate hidden sm:inline">
           {displayName}
         </span>
-        {/* Sync Status Indicator Icon */}
-        <span className="shrink-0 flex items-center text-text-tertiary">
-          {isSyncing ? (
+        {/* Sync Status Indicator Icon (only visible when actively syncing) */}
+        {isSyncing && (
+          <span className="shrink-0 hidden sm:inline-flex items-center text-text-tertiary">
             <ArrowsClockwise
               size={12}
               weight="bold"
               className="text-accent animate-spin"
             />
-          ) : (
-            <span
-              className="w-1.5 h-1.5 rounded-full bg-accent/80"
-              title="Saved"
-            />
-          )}
-        </span>
+          </span>
+        )}
       </motion.button>
 
       {/* Popover Dropdown Menu */}
@@ -155,7 +150,7 @@ export function AuthButton() {
           >
             {/* User Profile Header */}
             <div className="flex items-center gap-2.5 pb-2.5 border-b border-border-subtle">
-              <div className="w-8 h-8 rounded-full bg-accent text-text-inverse flex items-center justify-center text-xs font-bold shrink-0">
+              <div className="w-8 h-8 rounded-full bg-accent text-text-inverse flex items-center justify-center text-xs font-bold leading-none select-none shrink-0">
                 {initial}
               </div>
               <div className="min-w-0 flex-1">
@@ -243,7 +238,7 @@ export function AuthButton() {
               className={`text-danger-text ${reduceMotion ? '' : 'animate-spin'}`}
             />
           ) : (
-            <SignOut size={20} weight="duotone" className="text-danger-text" />
+            <SignOut size={20} weight="bold" className="text-danger-text" />
           )
         }
         onConfirm={handleConfirmSignOut}

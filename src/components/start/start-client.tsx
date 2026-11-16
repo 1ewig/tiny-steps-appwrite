@@ -2,7 +2,6 @@
 
 import { usePathname } from 'next/navigation';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ClockCounterClockwise } from '@phosphor-icons/react';
 import { useTaskStore } from '@/store/task-store';
 import { useHydrated } from '@/hooks/use-hydrated';
 import { useStartTask } from '@/hooks/use-start-task';
@@ -19,7 +18,7 @@ import {
 export function StartClient() {
   const hasHydrated = useHydrated();
   const pathname = usePathname();
-  const { granularity, setGranularity, tasks, openHistory, openOnboarding } = useTaskStore();
+  const { granularity, setGranularity, tasks, openOnboarding } = useTaskStore();
   const { startTask, isGeneratingTask, error, restoreText, attemptId } = useStartTask();
   const reduceMotion = useReducedMotion();
 
@@ -37,7 +36,7 @@ export function StartClient() {
     >
       <motion.div
         variants={reduceMotion ? undefined : staggerRelaxedVariants}
-        className="w-full max-w-2xl mx-auto my-auto space-y-6"
+        className="w-full max-w-2xl mx-auto my-auto pb-6 sm:pb-0 space-y-6"
       >
         <HeroWelcome />
         <div className="space-y-4">
@@ -69,29 +68,7 @@ export function StartClient() {
         </div>
       </motion.div>
 
-      {hasSavedTasks ? (
-        <motion.div
-          variants={reduceMotion ? undefined : unblurFadeInVariants}
-          className="pt-4 pb-16 sm:pb-2 text-center shrink-0"
-        >
-          <motion.button
-            type="button"
-            onClick={openHistory}
-            disabled={isGeneratingTask}
-            variants={reduceMotion ? undefined : tactileButtonVariants}
-            initial="rest"
-            animate="rest"
-            whileHover={reduceMotion || isGeneratingTask ? undefined : 'hover'}
-            whileTap={reduceMotion || isGeneratingTask ? undefined : 'tap'}
-            className="inline-flex items-center gap-1.5 text-xs text-text-tertiary hover:text-text-secondary transition-colors duration-fast cursor-pointer py-1.5 px-3.5 rounded-full hover:bg-surface-subtle disabled:pointer-events-none whitespace-nowrap"
-          >
-            <ClockCounterClockwise size={14} className="text-accent shrink-0" />
-            <span className="sm:hidden">View earlier tasks</span>
-            <span className="hidden sm:inline">Looking for an earlier task? View history</span>
-            <span aria-hidden="true">→</span>
-          </motion.button>
-        </motion.div>
-      ) : (
+      {!hasSavedTasks && (
         <motion.div
           variants={reduceMotion ? undefined : unblurFadeInVariants}
           className="pt-4 pb-16 sm:pb-2 text-center shrink-0"
