@@ -238,7 +238,7 @@ export function AuthButton() {
               className={`text-danger-text ${reduceMotion ? '' : 'animate-spin'}`}
             />
           ) : (
-            <SignOut size={20} weight="duotone" className="text-danger-text" />
+            <SignOut size={20} weight="bold" className="text-danger-text" />
           )
         }
         onConfirm={handleConfirmSignOut}
