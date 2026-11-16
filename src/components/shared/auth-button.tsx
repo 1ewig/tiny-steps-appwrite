@@ -125,21 +125,16 @@ export function AuthButton() {
         <span className="max-w-[70px] sm:max-w-[90px] truncate hidden xs:inline">
           {displayName}
         </span>
-        {/* Sync Status Indicator Icon */}
-        <span className="shrink-0 flex items-center text-text-tertiary">
-          {isSyncing ? (
+        {/* Sync Status Indicator Icon (only visible when actively syncing) */}
+        {isSyncing && (
+          <span className="shrink-0 flex items-center text-text-tertiary">
             <ArrowsClockwise
               size={12}
               weight="bold"
               className="text-accent animate-spin"
             />
-          ) : (
-            <span
-              className="w-1.5 h-1.5 rounded-full bg-accent/80"
-              title="Saved"
-            />
-          )}
-        </span>
+          </span>
+        )}
       </motion.button>
 
       {/* Popover Dropdown Menu */}

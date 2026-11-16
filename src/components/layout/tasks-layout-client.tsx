@@ -198,13 +198,10 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
         <AppHeader
           hasActiveSteps={Boolean(activeTask && steps.length > 0)}
           hasBorder={Boolean(activeTaskId)}
+          isPeekEnabled={peekFuture}
+          onTogglePeek={activeTask && steps.length > 0 ? togglePeek : undefined}
           onToggleHistory={toggleHistory}
-          onOpenOnboarding={openOnboarding}
-          onOpenFocusTunnel={
-            activeTask && activeTaskId && steps.length > 0
-              ? () => openFocusTunnel(activeTaskId)
-              : undefined
-          }
+          onOpenOnboarding={!activeTaskId ? openOnboarding : undefined}
           showHomeButton={Boolean(activeTaskId)}
           onHome={() => {
             closeFocusTunnel();

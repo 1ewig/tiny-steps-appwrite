@@ -147,8 +147,6 @@ export function AuthOverlay({ isOpen, onClose }: AuthOverlayProps) {
               <span>
                 <kbd className="font-mono text-text-secondary">Esc</kbd> return to workspace
               </span>
-              <span aria-hidden="true">·</span>
-              <span>Your data stays on this device</span>
             </div>
           </footer>
         </motion.div>
