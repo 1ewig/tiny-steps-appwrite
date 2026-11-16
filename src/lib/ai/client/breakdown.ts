@@ -38,7 +38,7 @@ export async function generateTaskBreakdown(
         steps: [],
         isRefused: true,
         refusalCategory: data.refusalCategory,
-        refusalReason: data.refusalReason,
+        refusalReason: data.refusalReason ?? undefined,
       };
       console.log(
         `[Breakdown] REFUSED (${Date.now() - startTime}ms) - Category: ${data.refusalCategory} | Reason: "${data.refusalReason}"`

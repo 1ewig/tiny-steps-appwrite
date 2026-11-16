@@ -20,8 +20,8 @@ export const TaskBreakdownSchema = z.object({
     .describe('Internal category if refused: "self_harm" for self-harm/suicide/crisis, "harmful" for violence/weapons/illegal acts, or "none" if accepted'),
   refusalReason: z
     .string()
-    .optional()
-    .describe('Brief explanation if refused, otherwise omit to save output tokens'),
+    .nullable()
+    .describe('Brief explanation if refused, otherwise null if accepted'),
   relevanceScore: z
     .number()
     .min(0)
@@ -96,8 +96,8 @@ export const AssistantIntentSchema = z.object({
         return Number.isInteger(n) ? n : undefined;
       }),
     ])
-    .optional()
-    .describe('Target step ID if targeting, completing, or modifying a specific parent step'),
+    .nullable()
+    .describe('Target step ID if targeting, completing, or modifying a specific parent step, or null'),
   targetSubStepId: z
     .union([
       z.number(),
@@ -106,8 +106,8 @@ export const AssistantIntentSchema = z.object({
         return Number.isInteger(n) ? n : undefined;
       }),
     ])
-    .optional()
-    .describe('Target sub-step ID if modifying or removing a specific sub-step'),
+    .nullable()
+    .describe('Target sub-step ID if modifying or removing a specific sub-step, or null'),
   targetStepIndex: z
     .union([
       z.number(),
@@ -116,28 +116,31 @@ export const AssistantIntentSchema = z.object({
         return Number.isInteger(n) ? n : undefined;
       }),
     ])
-    .optional()
-    .describe('Target step index (0-based) if shrinking a step'),
+    .nullable()
+    .describe('Target step index (0-based) if shrinking a step, or null'),
   title: z
     .string()
     .max(200)
-    .optional()
+    .nullable()
     .describe(
-      'PUNCHY ACTION VERB PHRASE: 3 to 6 words (approx 18 to 32 characters). Strictly NO trailing period. E.g. "Order stamps online", "Submit via portal". NEVER write essays, explanations, or advice here.'
+      'PUNCHY ACTION VERB PHRASE: 3 to 6 words (approx 18 to 32 characters). Strictly NO trailing period. E.g. "Order stamps online", "Submit via portal". NEVER write essays, explanations, or advice here. Null if not modifying/inserting a step.'
     ),
   instruction: z
     .string()
     .max(300)
-    .optional()
+    .nullable()
     .describe(
-      'MANDATORY TACTILE SENTENCE: Exactly 1 short physical or digital sentence under 10 words (approx 30 to 55 characters) giving concrete clarity. Must end with a period. Required whenever modifying, inserting, or rerouting a step.'
+      'MANDATORY TACTILE SENTENCE: Exactly 1 short physical or digital sentence under 10 words (approx 30 to 55 characters) giving concrete clarity. Must end with a period. Required whenever modifying, inserting, or rerouting a step, or null otherwise.'
     ),
   microSteps: z
     .array(TaskStepSchema)
     .max(3)
-    .optional()
-    .describe('2 to 3 micro-steps (strictly maximum 3) if type is shrink_step. MANDATORY whenever type is shrink_step.'),
-  steps: z.array(TaskStepSchema).optional().describe('Adjusted steps if type is new_task or tweak_steps'),
+    .nullable()
+    .describe('2 to 3 micro-steps (strictly maximum 3) if type is shrink_step, or null otherwise.'),
+  steps: z
+    .array(TaskStepSchema)
+    .nullable()
+    .describe('Adjusted steps if type is new_task or tweak_steps, or null otherwise'),
 });
 
 export type AssistantIntentOutput = z.infer<typeof AssistantIntentSchema>;

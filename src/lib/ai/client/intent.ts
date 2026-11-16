@@ -2,7 +2,7 @@ import type { Step, GranularityLevel, AssistantIntent } from '@/types/task';
 import { serializeStepTree } from './serialize';
 
 // Helper to normalize and enforce concise brevity on step titles and instructions
-function cleanStepTitle(raw?: string, fallback: string = 'Next tiny action'): string {
+function cleanStepTitle(raw?: string | null, fallback: string = 'Next tiny action'): string {
   if (!raw) return fallback;
   let cleaned = raw.trim().replace(/\.+$/, '');
   if (cleaned.length > 80) {
@@ -13,7 +13,7 @@ function cleanStepTitle(raw?: string, fallback: string = 'Next tiny action'): st
   return cleaned || fallback;
 }
 
-function cleanStepInstruction(raw?: string, fallback?: string): string {
+function cleanStepInstruction(raw?: string | null, fallback?: string): string {
   const text = (raw || fallback || 'Focus gently on just this physical motion.').trim();
   return text.endsWith('.') ? text : `${text}.`;
 }
@@ -65,7 +65,7 @@ export async function interpretUserIntentWithAI(
         return {
           type: 'reroute_constraint',
           targetStepId,
-          targetSubStepId: data.targetSubStepId,
+          targetSubStepId: data.targetSubStepId ?? undefined,
           title: cleanStepTitle(data.title, targetStep?.title || 'Alternative action'),
           instruction: cleanStepInstruction(data.instruction, targetStep?.instruction),
           acknowledgment: ack,
@@ -83,7 +83,7 @@ export async function interpretUserIntentWithAI(
         return {
           type: 'modify_step',
           targetStepId,
-          targetSubStepId: data.targetSubStepId,
+          targetSubStepId: data.targetSubStepId ?? undefined,
           title: cleanStepTitle(data.title, targetStep?.title || 'Adjusted action'),
           instruction: cleanStepInstruction(data.instruction, targetStep?.instruction),
           acknowledgment: ack,
@@ -131,7 +131,7 @@ export async function interpretUserIntentWithAI(
         return {
           type: 'remove_step',
           targetStepId,
-          targetSubStepId: data.targetSubStepId,
+          targetSubStepId: data.targetSubStepId ?? undefined,
           acknowledgment: ack,
           dialogue: ack,
         };
@@ -143,7 +143,7 @@ export async function interpretUserIntentWithAI(
       console.log(`[Tweak] END (${Date.now() - startTime}ms) - Intent: insert_step`);
       return {
         type: 'insert_step',
-        afterStepId: data.targetStepId,
+        afterStepId: data.targetStepId ?? undefined,
         title: cleanStepTitle(data.title, 'Added action'),
         instruction: cleanStepInstruction(data.instruction),
         acknowledgment: ack,
