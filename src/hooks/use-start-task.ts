@@ -78,7 +78,7 @@ export function useStartTask() {
         setGenerationNotice(ack);
         setRestoreText(trimmed);
         setAttemptId((prev) => prev + 1);
-        throw new Error(ack || 'Generation refused');
+        return;
       }
 
       const newTaskId = createTask({
