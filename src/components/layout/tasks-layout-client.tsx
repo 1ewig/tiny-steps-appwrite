@@ -191,7 +191,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className={`h-screen flex overflow-hidden font-sans ${peekEnabled ? 'peek-enabled' : ''}`}>
+    <div className={`h-screen h-dvh flex overflow-hidden font-sans ${peekEnabled ? 'peek-enabled' : ''}`}>
       {/* Main Full-Width Column (Distraction-Free Workspace) */}
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
         {/* AppHeader - Fixed, Static & Never Unmounted */}

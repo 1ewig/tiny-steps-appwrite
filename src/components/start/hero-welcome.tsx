@@ -24,14 +24,14 @@ export function HeroWelcome() {
 
       <motion.h1
         variants={reduceMotion ? undefined : unblurFadeInVariants}
-        className="text-3xl sm:text-4xl font-bold tracking-tight text-text-primary leading-tight"
+        className="text-3xl sm:text-4xl font-bold tracking-tight text-text-primary leading-tight text-balance"
       >
         What feels heavy right now?
       </motion.h1>
 
       <motion.p
         variants={reduceMotion ? undefined : unblurFadeInVariants}
-        className="text-text-secondary text-sm sm:text-base leading-relaxed max-w-md mx-auto"
+        className="text-text-secondary text-sm sm:text-base leading-relaxed max-w-md mx-auto text-balance"
       >
         Brain-dump your thoughts. We&apos;ll make it tiny.
       </motion.p>

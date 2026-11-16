@@ -36,7 +36,7 @@ export function StartClient() {
     >
       <motion.div
         variants={reduceMotion ? undefined : staggerRelaxedVariants}
-        className="w-full max-w-2xl mx-auto my-auto space-y-6"
+        className="w-full max-w-2xl mx-auto my-auto pb-6 sm:pb-0 space-y-6"
       >
         <HeroWelcome />
         <div className="space-y-4">
