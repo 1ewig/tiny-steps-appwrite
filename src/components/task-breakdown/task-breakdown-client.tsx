@@ -26,8 +26,6 @@ export function TaskBreakdownClient({ taskId, sessionId }: TaskBreakdownClientPr
   const {
     tasks,
     granularity,
-    peekFuture,
-    togglePeek,
     focusTunnelTaskId,
     openFocusTunnel,
     toggleStepCompletion,

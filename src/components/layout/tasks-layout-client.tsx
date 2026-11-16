@@ -32,6 +32,7 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
   const {
     tasks,
     peekFuture,
+    togglePeek,
     focusTunnelTaskId,
     isGeneratingTask,
     generationNotice,
@@ -41,7 +42,6 @@ export function TasksLayoutClient({ children }: { children: React.ReactNode }) {
     theme,
     deleteTask,
     markIntroSeen,
-    openFocusTunnel,
     closeFocusTunnel,
     openOnboarding,
     closeOnboarding,
