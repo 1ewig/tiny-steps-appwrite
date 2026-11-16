@@ -49,12 +49,12 @@ export function AppHeader({
             animate="rest"
             whileHover={reduceMotion ? undefined : 'hover'}
             whileTap={reduceMotion ? undefined : 'tap'}
-            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex items-center justify-center sm:justify-start gap-1.5 h-8 w-8 sm:w-auto p-0 sm:px-3 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             title="Return home"
           >
             <motion.span
               variants={reduceMotion ? undefined : tactileIconVariants}
-              className="shrink-0 flex items-center"
+              className="shrink-0 flex items-center justify-center"
             >
               <House size={15} weight="regular" className="text-accent" />
             </motion.span>
@@ -74,7 +74,7 @@ export function AppHeader({
             animate="rest"
             whileHover={reduceMotion ? undefined : 'hover'}
             whileTap={reduceMotion ? undefined : 'tap'}
-            className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex items-center justify-center sm:justify-start gap-1.5 h-8 w-8 sm:w-auto p-0 sm:px-2.5 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             title={
               isPeekEnabled
                 ? 'Future steps unblurred (click to blur)'
@@ -84,7 +84,7 @@ export function AppHeader({
           >
             <motion.span
               variants={reduceMotion ? undefined : tactileIconVariants}
-              className="shrink-0 flex items-center"
+              className="shrink-0 flex items-center justify-center"
             >
               {isPeekEnabled ? (
                 <Eye size={15} weight="bold" className="text-accent" />
@@ -110,13 +110,13 @@ export function AppHeader({
             animate="rest"
             whileHover={reduceMotion ? undefined : 'hover'}
             whileTap={reduceMotion ? undefined : 'tap'}
-            className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex items-center justify-center sm:justify-start gap-1.5 h-8 w-8 sm:w-auto p-0 sm:px-2.5 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             title="How Tiny Steps works"
             aria-label="How Tiny Steps works"
           >
             <motion.span
               variants={reduceMotion ? undefined : tactileIconVariants}
-              className="shrink-0 flex items-center"
+              className="shrink-0 flex items-center justify-center"
             >
               <Question size={15} weight="bold" className="text-accent" />
             </motion.span>
@@ -133,13 +133,13 @@ export function AppHeader({
             animate="rest"
             whileHover={reduceMotion ? undefined : 'hover'}
             whileTap={reduceMotion ? undefined : 'tap'}
-            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex items-center justify-center sm:justify-start gap-1.5 h-8 w-8 sm:w-auto p-0 sm:px-3 rounded-md text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-subtle/70 hover:bg-surface-subtle transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             title="Task history (Ctrl+H)"
             aria-label="Open task history"
           >
             <motion.span
               variants={reduceMotion ? undefined : tactileIconVariants}
-              className="shrink-0 flex items-center"
+              className="shrink-0 flex items-center justify-center"
             >
               <ClockCounterClockwise size={15} weight="regular" className="text-accent" />
             </motion.span>
